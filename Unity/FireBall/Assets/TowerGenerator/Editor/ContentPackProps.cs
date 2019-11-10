@@ -1,86 +1,86 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
 
     public class ContentPackProps : AssetPostprocessor
     {
-        // entities
-        private const string Connector = "<Connector>";
-        private const string ChunkStd = "<ChunkStd>";
-        private const string ChunkRoofPeak = "<ChunkRoofPeek>";
-        private const string ChunkIsland = "<ChunkIsland>";
-        private const string ContentCreatureHumanoid = "<ContentCreatureHumanoid>";
+        private List<Tuple<GameObject, string[], System.Object[]>> _props;
 
-        private const string Group = "<Group>";
-
-        // group properties
-        private const string GroupType = "GroupType";
-
-        private const string SetGroupType = "SetGroup";
-        private const string StackGroupType = "StackGroup";
-        private const string SwitchGroupType = "SwitchGroup";
-        private const string ConnectorsGroupType = "ConnectorsGroup";
-        private const string LayersGroupType = "LayersGroup";
-
-        private const string MaxLayerIndexPropagated = "MaxLayerIndexPropagated";
-        private const string MinObjectsSelected = "MinObjectsSelected";
-        private const string MaxObjectsSelected = "MaxObjectsSelected";
-
-
-        void OnPostprocessMeshHierarchy(GameObject gObj)
+        public void OnPreprocessModel()
         {
-            TraverseHierarchy(gObj.transform);
+            _props = new List<Tuple<GameObject, string[], object[]>>(128);
         }
 
-        private void TraverseHierarchy(Transform from) // todo: use alg
+        public void OnPostprocessMeshHierarchy(GameObject gObj) //The ModelImporter calls this function for every root transform hierarchy in the source model file.
         {
-            AddComponents(from);
-            foreach (Transform t in from)
-                TraverseHierarchy(t);
+            Debug.Log("passA "+ gObj.transform.GetDebugName());
+            gObj.transform.ForEachChildrenRecursive(AddComponents);
+        }
+
+        public void OnPostprocessGameObjectWithUserProperties(GameObject gObj, string[] names, System.Object[] values)
+        {
+            Debug.Log("passB " + gObj.transform.GetDebugName());
+            _props.Add(Tuple.Create(gObj,names,values));
+        }
+
+        public void OnPostprocessModel(GameObject contentPack)
+        {
+            // note: at this point the hierarchy exists already, all scripts are attached
+            Debug.Log("passC " + contentPack.transform.GetDebugName());
+
+            // todo: support properties for multyentities on one object
+            foreach (var tuple in _props)
+            {
+                var gObj = tuple.Item1;
+                var names = tuple.Item2;
+                var values = tuple.Item3;
+
+                var propImporter = gObj.GetComponent<BasePropImporter>();
+                Assert.IsNotNull(propImporter, $"{gObj.transform.GetDebugName()} has no BasePropImporter on it but trying to set properties");
+
+                // override default values with user specified values
+                for (int i = 0; i < names.Length; i++)
+                {
+                    string propertyName = names[i];
+                    object propertyValue = values[i];
+                    var isOK = propImporter.SetProp(propertyName, propertyValue);
+                    Assert.IsTrue(isOK, $"Couldn't set prop '{propertyName}' to value '{propertyValue}'. Object is {gObj.transform.GetDebugName()}");
+                }
+            }
         }
 
         private void AddComponents(Transform transform)
         {
-            if (transform.name.Contains("<ChunkStd>"))
+            if (transform.name.Contains("<Layer>"))
             {
-                transform.gameObject.AddComponent<ChunkStd>();
+                transform.gameObject.AddComponent<Layer>().SetDefaultValues();
+            }
+            else if (transform.name.Contains("<ChunkStd>"))
+            {
+                transform.gameObject.AddComponent<ChunkStd>().SetDefaultValues();
             }
             else if (transform.name.Contains("<GroupStack>"))
             {
-                transform.gameObject.AddComponent<GroupStack>();
+                transform.gameObject.AddComponent<GroupStack>().SetDefaultValues();
             }
             else if (transform.name.Contains("<GroupUser>"))
             {
-                transform.gameObject.AddComponent<GroupUser>();
+                transform.gameObject.AddComponent<GroupUser>().SetDefaultValues();
             }
             else if (transform.name.Contains("<GroupRndSwitch>"))
             {
-                transform.gameObject.AddComponent<GroupRndSwitch>();
+                transform.gameObject.AddComponent<GroupRndSwitch>().SetDefaultValues();
             }
             else if (transform.name.Contains("<GroupRndSet>"))
             {
-                transform.gameObject.AddComponent<GroupRndSet>();
-            }
-        }
-
-
-        void OnPostprocessGameObjectWithUserProperties(GameObject gObj, string[] names, System.Object[] values)
-        {
-            for (int i = 0; i < names.Length; i++)
-            {
-                string propertyName = names[i];
-                object propertyValue = values[i];
-
-
-                //Debug.Log($"Object: {gObj}, hash {gObj.GetHashCode()}, Propname: {propertyName}, Value: {propertyValue}");
-                //go.AddComponent<ChunkStd>();
+                transform.gameObject.AddComponent<GroupRndSet>().SetDefaultValues();
             }
         }
     }
-
-
 }

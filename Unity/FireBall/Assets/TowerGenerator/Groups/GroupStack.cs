@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChunkStd : Entity
+public class GroupStack : Group
 {
     public override void SetDefaultValues()
     {
