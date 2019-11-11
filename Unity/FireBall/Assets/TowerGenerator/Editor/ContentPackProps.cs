@@ -19,20 +19,19 @@ namespace TowerGenerator
 
         public void OnPostprocessMeshHierarchy(GameObject gObj) //The ModelImporter calls this function for every root transform hierarchy in the source model file.
         {
-            Debug.Log("passA "+ gObj.transform.GetDebugName());
             gObj.transform.ForEachChildrenRecursive(AddComponents);
         }
 
         public void OnPostprocessGameObjectWithUserProperties(GameObject gObj, string[] names, System.Object[] values)
         {
-            Debug.Log("passB " + gObj.transform.GetDebugName());
+            //Debug.Log("passB " + gObj.transform.GetDebugName());
             _props.Add(Tuple.Create(gObj,names,values));
         }
 
         public void OnPostprocessModel(GameObject contentPack)
         {
             // note: at this point the hierarchy exists already, all scripts are attached
-            Debug.Log("passC " + contentPack.transform.GetDebugName());
+            //Debug.Log("passC " + contentPack.transform.GetDebugName());
 
             // todo: support properties for multyentities on one object
             foreach (var tuple in _props)
