@@ -1,45 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-public static class EntCooker
+namespace TowerGenerator
 {
-    public static GameObject Cook(GameObject semifinishedEnt)
+    public static class EntCooker
     {
-        Debug.Log("Cooking ent");
-
-        BuildGroupsController(semifinishedEnt); // tree
-
-        //var pat = designPattern.GetComponent<Pattern>();
-        //ReorganizeBlocksHierarchy(pat);
-        ////ConfigureConnections(pat);
-        //SetLayer(pat.gameObject, GameConstants.LayerLevel);
-        //ConfigureBG(pat);
-
-        return semifinishedEnt;
-    }
-
-    private static void BuildGroupsController(GameObject ent)
-    {
-        var groupController = ent.AddComponent<GroupsController>();
-        groupController.BuildImpactTree();
-        groupController.CalculateBBMax();
-        groupController.CalculateBBMin();
-    }
-
-    public static MetaBase CreateMeta(Entity ent, string dir, string name)
-    {
-        if (ent is ChunkStd)
+        public static GameObject Cook(GameObject semifinishedEnt)
         {
-            var asset = ScriptableObject.CreateInstance<MetaChunkStd>();
-            string assetPathAndName = dir + "/" + name + ".asset";
-            AssetDatabase.CreateAsset(asset, assetPathAndName);
-            AssetDatabase.SaveAssets();
-            return asset;
+            Debug.Log("Cooking ent");
+
+            BuildGroupsController(semifinishedEnt); // tree
+
+            return semifinishedEnt;
         }
 
-        return null;
+        private static void BuildGroupsController(GameObject ent)
+        {
+            var groupController = ent.AddComponent<GroupsController>();
+            groupController.BuildImpactTree();
+            groupController.CalculateBBMax();
+            groupController.CalculateBBMin();
+        }
+
+        public static MetaBase CreateMeta(Entity ent, string dir, string name)
+        {
+            if (ent is ChunkStd)
+            {
+                var asset = ScriptableObject.CreateInstance<MetaChunkStd>();
+                string assetPathAndName = dir + "/" + name + ".m.asset";
+
+                asset.EntName = name;
+
+                AssetDatabase.CreateAsset(asset, assetPathAndName);
+                AssetDatabase.SaveAssets();
+                return asset;
+            }
+
+            if (ent is ChunkRoofPeek)
+            {
+                var asset = ScriptableObject.CreateInstance<MetaChunkStd>();
+                string assetPathAndName = dir + "/" + name + ".m.asset";
+
+                asset.EntName = name;
+
+                AssetDatabase.CreateAsset(asset, assetPathAndName);
+                AssetDatabase.SaveAssets();
+                return asset;
+            }
+
+            return null;
+        }
     }
 }

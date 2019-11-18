@@ -9,11 +9,11 @@ namespace TowerGenerator
         public int SeedVisual;
         public int SeedContent;
 
-        public bool GenererateOnAwake;
+        public bool GenererateOnStart;
 
         public TopologyGeneratorsManifoldBase TopologyGeneratorManifold;
 
-        void Awake()
+        void Start()
         {
             Assert.IsNotNull(TopologyGeneratorManifold);
 
@@ -35,7 +35,7 @@ namespace TowerGenerator
                 Debug.Log($"Using random SeedContent: {SeedContent}");
             }
 
-            if (GenererateOnAwake)
+            if (GenererateOnStart)
                 TopologyGeneratorManifold.StartGenerate((uint)SeedTopology);
         }
     }

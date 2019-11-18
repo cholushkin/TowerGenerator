@@ -73,6 +73,10 @@ namespace TowerGenerator
             {
                 transform.gameObject.AddComponent<ChunkStd>().SetDefaultValues();
             }
+            else if (transform.name.Contains("<ChunkRoofPeek>"))
+            {
+                transform.gameObject.AddComponent<ChunkRoofPeek>().SetDefaultValues();
+            }
             else if (transform.name.Contains("<GroupStack>"))
             {
                 transform.gameObject.AddComponent<GroupStack>().SetDefaultValues();

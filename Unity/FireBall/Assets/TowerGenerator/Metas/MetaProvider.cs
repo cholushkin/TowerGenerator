@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Alg;
-using Assets.Plugins.Alg;
-using FireBall.Game;
 using GameLib.Random;
 using NCalc;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Profiling;
-
 
 namespace TowerGenerator
 {
@@ -53,8 +44,8 @@ namespace TowerGenerator
         protected override void Awake()
         {
             base.Awake();
-            var metas = Resources.LoadAll("Ents", typeof(MetaBase));
-            Debug.Log($"Metas loaded: {metas.Length}");
+            Metas = Resources.LoadAll<MetaBase>("Ents");
+            Debug.Log($"Metas loaded: {Metas.Length}");
         }
 
 

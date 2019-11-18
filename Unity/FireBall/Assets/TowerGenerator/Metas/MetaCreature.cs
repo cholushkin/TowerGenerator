@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MetaCreature : MetaBase
-{ }
+namespace TowerGenerator
+{
+    public class MetaCreature : MetaBase
+    {
+    }
+}
 
 

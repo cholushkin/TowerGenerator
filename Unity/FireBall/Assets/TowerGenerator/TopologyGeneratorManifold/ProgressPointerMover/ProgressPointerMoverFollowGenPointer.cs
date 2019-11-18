@@ -2,24 +2,28 @@
 using TowerGenerator;
 using UnityEngine;
 
-public class ProgressPointerMoverFollowGenPointer : MonoBehaviour
+
+namespace TowerGenerator
 {
-    public TopologyGeneratorsManifold TopGens;
-    public float StepDelay;
-
-
-    void Awake()
+    public class ProgressPointerMoverFollowGenPointer : MonoBehaviour
     {
-        StartCoroutine(ProcessPointer());
-    }
+        public TopologyGeneratorsManifold TopGens;
+        public float StepDelay;
 
-    IEnumerator ProcessPointer()
-    {
-        while (true)
+
+        void Awake()
         {
-            yield return new WaitForSeconds(StepDelay);
-            if (TopGens.Pointers.DistanceYFactorProgress2Generator() > 100)
-                TopGens.Pointers.MoveProgress();
+            StartCoroutine(ProcessPointer());
+        }
+
+        IEnumerator ProcessPointer()
+        {
+            while (true)
+            {
+                yield return new WaitForSeconds(StepDelay);
+                if (TopGens.Pointers.DistanceYFactorProgress2Generator() > 100)
+                    TopGens.Pointers.MoveProgress();
+            }
         }
     }
 }

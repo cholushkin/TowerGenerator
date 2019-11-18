@@ -93,16 +93,6 @@ namespace TowerGenerator
         {
             var entInst = Object.Instantiate(ent.gameObject);
             entInst.name = entName;
-            //var analizeData = PatternAnalizer.Analize(patInst, dirToImort);
-            //if (analizeData.ErrorCounter > 0)
-            //{
-            //    Debug.LogErrorFormat("Pattern improting error: {0}", analizeData);
-            //    Object.DestroyImmediate(patInst);
-            //    return;
-            //}
-
-
-            //_metas.AddMeta(patMeta);
 
             entInst = EntCooker.Cook(entInst);
             EntCooker.CreateMeta(ent, dirToImort, entName);

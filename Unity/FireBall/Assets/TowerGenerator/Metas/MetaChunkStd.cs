@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public class MetaChunkStd : MetaBase
+namespace TowerGenerator
 {
+    public class MetaChunkStd : MetaBase
+    {
+    }
 }

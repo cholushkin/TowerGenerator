@@ -99,6 +99,9 @@ namespace TowerGenerator
         public PointerProcessor Pointers;
 
         public TopologyGeneratorsVisualizer Visualizer;
+        public VisualBuilder VisualBuilder;
+
+
 #if UNITY_EDITOR
         public bool IsGizmoDrawPointers;
 #endif
@@ -160,9 +163,11 @@ namespace TowerGenerator
                         _bp.Tree = step.Segment;
                         Pointers.SetInitialPointers();
                         Visualizer?.Begin(_bp.Tree);
+                        VisualBuilder.Begin(_bp.Tree);
                     }
 
                     Visualizer?.Step(step);
+                    VisualBuilder.Step(step);
                     yield return null;
                 } // end of chunks generating
 
@@ -195,16 +200,18 @@ namespace TowerGenerator
                         if (Visualizer?.StepDelay > 0f)
                             yield return Visualizer.Wait();
                         Visualizer?.Step(step);
+                        VisualBuilder.Step(step);
                     }
                     Debug.Log($"switching trunk to {topMost}");
                     TreeNode<Blueprint.Segment>.SwitchTrunk(topMost);
                 }
 
                 // ----- Change to next in chain TopGen
-                Pointers.MoveGenerator(curGenerator.CurrentState.Created.FirstOrDefault(
-                    x => (x.BranchLevel == 0 &&
-                          x.Data.Topology.IsOpenedForGenerator == false)
-                )); // just any of new generated segment belonged to trunk and that is stable (will not be recreated or deleted by next TopGen)
+                if(prevGenerator!= null)
+                    Pointers.MoveGenerator(prevGenerator.CurrentState.Created.FirstOrDefault(
+                        x => (x.BranchLevel == 0 &&
+                              x.Data.Topology.IsOpenedForGenerator == false)
+                    )); // just any of new generated segment belonged to trunk and that is stable (will not be recreated or deleted by next TopGen)
 
                 if (Pointers.DistanceYFactorProgress2Generator() > Pointers.MaxDistanceProgressToGenerator)
                     yield return new WaitUntil(IsNeedToGenerateMore);
@@ -221,6 +228,7 @@ namespace TowerGenerator
                 if (Visualizer?.StepDelay > 0f)
                     yield return Visualizer.Wait();
                 Visualizer?.Step(cmd);
+                VisualBuilder.Step(cmd);
                 yield return null;
             }
 

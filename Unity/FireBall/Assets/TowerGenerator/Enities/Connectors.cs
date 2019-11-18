@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Connectors : MonoBehaviour
-{
 
+namespace TowerGenerator
+{
+    public class Connectors : MonoBehaviour
+    {
+
+    }
 }
