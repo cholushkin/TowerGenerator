@@ -171,7 +171,6 @@ namespace TowerGenerator
         {
             foreach (var treeNode in _tree.TraverseBreadthFirst())
             {
-                Debug.Log(treeNode.Data.Transform.name + " " + treeNode.Level);
             }
         }
 

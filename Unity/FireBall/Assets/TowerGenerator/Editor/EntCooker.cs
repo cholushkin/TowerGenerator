@@ -38,7 +38,7 @@ namespace TowerGenerator
 
             if (ent is ChunkRoofPeek)
             {
-                var asset = ScriptableObject.CreateInstance<MetaChunkStd>();
+                var asset = ScriptableObject.CreateInstance<MetaChunkRoofPeek>();
                 string assetPathAndName = dir + "/" + name + ".m.asset";
 
                 asset.EntName = name;

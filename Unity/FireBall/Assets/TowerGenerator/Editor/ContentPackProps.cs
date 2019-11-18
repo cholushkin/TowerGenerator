@@ -64,7 +64,7 @@ namespace TowerGenerator
                 transform.gameObject.AddComponent<Connectors>();
             }
 
-            // be script class
+            // by script class
             if (transform.name.Contains("<Layer>"))
             {
                 transform.gameObject.AddComponent<Layer>().SetDefaultValues();
