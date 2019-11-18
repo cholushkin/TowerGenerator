@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FireBall.Game;
 using UnityEditor;
 using UnityEngine;
@@ -10,13 +11,12 @@ namespace TowerGenerator
 {
     public class ContentPackImporter : AssetPostprocessor
     {
-
         public const string ContentPacksParentDir = "ContentPacks";
 
         //private static Metas _metas;
 
         private static void OnPostprocessAllAssets(
-            string[] importedAssets, 
+            string[] importedAssets,
             string[] deletedAssets,
             string[] movedAssets,
             string[] movedFromAssetPaths)
@@ -31,7 +31,8 @@ namespace TowerGenerator
                 if (ContentPacksParentDir == parentDir)
                 {
                     Debug.Log($"Importing content pack: '{assetPath}'");
-                    
+                    var packName = Path.GetFileNameWithoutExtension(assetPath);
+
                     // load prefab as asset
                     var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                     if (assetObj == null)
@@ -42,50 +43,91 @@ namespace TowerGenerator
 
                     // extracting entities from the pack
                     {
-                        ExtractEntites(assetObj);
+                        ExtractEntities(assetObj, packName);
                     }
                 }
             }
             //EditorUtility.SetDirty(_metas);
             // todo: deletedAssets
-            // delete all patterns of deleted patternpack
+            // todo: delete all ents and metas of deleted content pack
+            foreach (string assetPath in deletedAssets)
+            {
+                var root = Path.GetPathRoot(assetPath);
+                var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
+                if (ContentPacksParentDir == parentDir)
+                {
+                    Debug.Log($"{assetPath} was deleted todo: delete ents from it");
+                }
+            }
         }
 
 
 
-        private static void ExtractEntites(GameObject assetObject)
+        private static void ExtractEntities(GameObject assetObject, string packName)
         {
-            //// --- delete all (previous) patterns of this pack and their patMetas
-            //DirectoryInfo dir = new DirectoryInfo(GameConstants.PathPatterns);
-            //FileInfo[] info = dir.GetFiles("Pat." + packName + "*");
-            //foreach (FileInfo f in info)
-            //{
-            //    if (f.Name.EndsWith(".meta")) // keep unity metas for unity
-            //        continue;
-            //    f.Delete();
-            //    _metas.RemoveMeta(Path.GetFileNameWithoutExtension(f.Name));
-            //}
+            // --- delete all (previous) ents of this content pack and their metas
+            DirectoryInfo dir = new DirectoryInfo(GameConstants.PathEnts);
+            FileInfo[] info = dir.GetFiles(packName + ".*");
+            foreach (FileInfo f in info)
+            {
+                Debug.Log($"deleting {f.Name}");
+                f.Delete();
+            }
+            AssetDatabase.Refresh();
 
-            //// get all patterns to extrude in resources
-            //{
-            //    var patterns = assetObject.GetComponentsInChildren<Pattern>();
+            // process all ents inside fbx
+            {
+                var entities = assetObject.GetComponentsInChildren<Entity>();
 
-            //    // write patterns, add design-time stuff, do hierarchy reorganizations
-            //    foreach (var pattern in patterns)
-            //    {
-            //        var fullPatternName = string.Format(PatternNameFormatString, packName, pattern.gameObject.name);
-            //        ExtractPattern(pattern, GameConstants.PathPatterns, fullPatternName);
-            //    }
-            //}
-            //AssetDatabase.Refresh();
-
-
+                // write patterns, add design-time stuff, do hierarchy reorganizations
+                foreach (var ent in entities)
+                {
+                    var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
+                    ExtractEnt(ent, GameConstants.PathEnts, fullEntName);
+                }
+            }
+            AssetDatabase.Refresh();
         }
 
-    
+        private static void ExtractEnt(Entity ent, string dirToImort, string entName)
+        {
+            var entInst = Object.Instantiate(ent.gameObject);
+            entInst.name = entName;
+            //var analizeData = PatternAnalizer.Analize(patInst, dirToImort);
+            //if (analizeData.ErrorCounter > 0)
+            //{
+            //    Debug.LogErrorFormat("Pattern improting error: {0}", analizeData);
+            //    Object.DestroyImmediate(patInst);
+            //    return;
+            //}
 
 
+            //_metas.AddMeta(patMeta);
 
+            entInst = EntCooker.Cook(entInst);
+            EntCooker.CreateMeta(ent, dirToImort, entName);
 
+            PrefabUtility.SaveAsPrefabAsset(entInst, Path.Combine(dirToImort, entName + ".prefab"));
+            Object.DestroyImmediate(entInst);
+        }
+
+        // removes <> from name
+        private static string CleanName(string entNameInFbx)
+        {
+            string RemoveBetween(string s, char begin, char end)
+            {
+                Regex regex = new Regex($"\\{begin}.*?\\{end}");
+                return regex.Replace(s, string.Empty);
+            }
+            return RemoveBetween(entNameInFbx, '<', '>');
+        }
+
+        private static string GetRelativePath(string absPath)
+        {
+            var normalizedPath = Path.GetFullPath(absPath).Replace("\\", "/");
+            if (normalizedPath.StartsWith(Application.dataPath))
+                absPath = "Assets" + normalizedPath.Substring(Application.dataPath.Length);
+            return absPath;
+        }
     }
 }

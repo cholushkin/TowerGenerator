@@ -34,6 +34,8 @@ namespace TowerGenerator
             //Debug.Log("passC " + contentPack.transform.GetDebugName());
 
             // todo: support properties for multyentities on one object
+            if(_props.Count == 0)
+                Debug.LogWarning($"no props at all, maybe you forgot to export 'Custom Properties'");
             foreach (var tuple in _props)
             {
                 var gObj = tuple.Item1;
@@ -56,6 +58,13 @@ namespace TowerGenerator
 
         private void AddComponents(Transform transform)
         {
+            // by name
+            if (transform.name.StartsWith("Connectors"))
+            {
+                transform.gameObject.AddComponent<Connectors>();
+            }
+
+            // be script class
             if (transform.name.Contains("<Layer>"))
             {
                 transform.gameObject.AddComponent<Layer>().SetDefaultValues();

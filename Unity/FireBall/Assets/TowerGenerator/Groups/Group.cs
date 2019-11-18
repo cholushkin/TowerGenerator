@@ -1,11 +1,12 @@
 ﻿using System;
 using Assets.Plugins.Alg;
+using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public abstract class Group : BasePropImporter
 {
-    public int MaxLayerIndexPropagated; // by default it is propagated only to current layer
+    public int MaxLayerIndexPropagated; // by default it is propagated only to current layer (-1 ignoring)
     protected string MaxLayerIndexPropagatedAll = "all";
 
     public virtual int GetItemsCount()
@@ -41,8 +42,19 @@ public abstract class Group : BasePropImporter
         return baseResult;
     }
 
-    //public virtual void SetProp(string propName, float value)
-    //{
+    public virtual int GetAmountOfTransformImpact()
+    {
+        return transform.childCount;
+    }
 
-    //}
+    public abstract void DoRndChoice(ref RandomHelper rnd);
+    public abstract void DoRndMinimalChoice(ref RandomHelper rnd);
+
+    public void DisableItems()
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
 }

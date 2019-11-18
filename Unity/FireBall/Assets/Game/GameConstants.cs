@@ -13,6 +13,7 @@ namespace FireBall
             // physics
             // block
             // paths
+            public const string PathEnts = "Assets/!Prefabs/Resources/Ents";
         }
     }
 }

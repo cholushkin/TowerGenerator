@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using GameLib.Random;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace TowerGenerator
@@ -8,6 +9,7 @@ namespace TowerGenerator
     {
         public int MinObjectsSelected; // default 0
         public int MaxObjectsSelected; // default transform.childCount
+        public int ItemsSelectedAmount;
 
         public override void SetDefaultValues()
         {
@@ -47,6 +49,32 @@ namespace TowerGenerator
                 return true;
             }
             return baseResult;
+        }
+
+        public override void DoRndChoice(ref RandomHelper rnd)
+        {
+            DisableItems();
+            ItemsSelectedAmount = rnd.FromRangeIntInclusive(MinObjectsSelected, MaxObjectsSelected);
+            int[] itemsIndexes = new int[GetAmountOfTransformImpact()];
+            for (int i = 0; i < GetAmountOfTransformImpact(); ++i)
+                itemsIndexes[i] = i;
+            var choices = rnd.FromArray(itemsIndexes, ItemsSelectedAmount);
+            for (int i = 0; i < ItemsSelectedAmount; ++i)
+            {
+                transform.GetChild(choices[i]).gameObject.SetActive(true);
+            }
+        }
+
+        // assume that all items are sorted ascending 
+        // pick minimal amount of options with minor indexes
+        public override void DoRndMinimalChoice(ref RandomHelper rnd)
+        {
+            DisableItems();
+            ItemsSelectedAmount = MinObjectsSelected;
+            for (int i = 0; i < ItemsSelectedAmount; ++i)
+            {
+                transform.GetChild(i).gameObject.SetActive(true);
+            }
         }
     }
 }
