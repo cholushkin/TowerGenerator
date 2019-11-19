@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
@@ -25,39 +22,42 @@ namespace TowerGenerator
             var fbxProps = gObj.AddComponent<FbxProps>();
             string[] scriptNames = null;
 
+            // get scripts to add
+            var index = Array.FindIndex(names, x => x == "AddScript");
+            if (index == -1)
+            {
+                Debug.LogError($"There must be property 'AddScript'");
+                Debug.LogError($"{gObj.transform.GetDebugName()}");
+                return;
+            }
+
+            string sNames = (string)values[index];
+            scriptNames = sNames.Replace(" ", String.Empty).Split(',');
+
+            foreach (var scriptName in scriptNames)
+                fbxProps.AddScript(scriptName);
+
             for (int i = 0; i < names.Length; ++i)
             {
-                if (i == 0) // extrude script names
+                if(names[i] == "AddScript")
+                    continue;
+                // pass properties to appropriate script
+                var prefixAndPropName = names[i].Split('.');
+                string scriptName;
+                string propName;
+                Assert.IsTrue(prefixAndPropName.Length == 2 || prefixAndPropName.Length == 1);
+                if (prefixAndPropName.Length == 2) // has script name specificator in the prop name
                 {
-                    Assert.IsTrue(names[i] == "AddScript", $"First property must be 'AddScript', but you have '{names[i]}'");
-                    if (names[i] != "AddScript")
-                    {
-                        Debug.LogError($"First property must be 'AddScript', but you have '{names[i]}'");
-                        Debug.LogError($"{gObj.transform.GetDebugName()}");
-                        return;
-                    }
-                    string sNames = (string) values[i];
-                    scriptNames = sNames.Replace(" ", String.Empty).Split(',');
+                    scriptName = prefixAndPropName[0];
+                    propName = prefixAndPropName[1];
+                    Assert.IsTrue(scriptName.Contains(scriptName));
                 }
-                else // pass properties to appropriate script
+                else // just name of prop
                 {
-                    var prefixAndPropName = names[i].Split('.');
-                    string scriptName;
-                    string propName;
-                    Assert.IsTrue(prefixAndPropName.Length == 2 || prefixAndPropName.Length == 1);
-                    if (prefixAndPropName.Length == 2) // has script name specificator in the prop name
-                    {
-                        scriptName = prefixAndPropName[0];
-                        propName = prefixAndPropName[1];
-                        Assert.IsTrue(scriptName.Contains(scriptName));
-                    }
-                    else // just name of prop
-                    {
-                        scriptName = scriptNames[0];
-                        propName = prefixAndPropName[0];
-                    }
-                    fbxProps.AddProp(scriptName, propName, values[i]);
+                    scriptName = scriptNames[0];
+                    propName = prefixAndPropName[0];
                 }
+                fbxProps.AddProp(scriptName, propName, values[i]);
             }
         }
 

@@ -39,6 +39,18 @@ namespace TowerGenerator
             }
             scriptToAdd.AddProp(propName, value);
         }
+
+        public void AddScript(string scriptName)
+        {
+            if (ScriptsToAdd == null)
+                ScriptsToAdd = new List<ScriptToAdd>(2);
+            if (ScriptsToAdd.FirstOrDefault(x => x.ScriptName == scriptName) != null)
+            {
+                Debug.LogError("Multiple script adding");
+                return;
+            }
+            ScriptsToAdd.Add(new ScriptToAdd { ScriptName = scriptName });
+        }
     }
 }
 
