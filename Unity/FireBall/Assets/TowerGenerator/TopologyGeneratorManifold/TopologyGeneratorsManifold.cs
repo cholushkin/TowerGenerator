@@ -179,20 +179,20 @@ namespace TowerGenerator
                     if (opened.Count == 0)
                     {
                         opened = curGenerator.CurrentState.Created.Where(x =>
-                            x.Data.Topology.SegType == Blueprint.Segment.TopologySegment.SegmentType.RoofPeak &&
+                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek &&
                             x != curGenerator.CurrentState.Deadlock).ToList();
 
                         opened.AddRange(curGenerator.PrevState.Created.Where(x =>
-                            x.Data.Topology.SegType == Blueprint.Segment.TopologySegment.SegmentType.RoofPeak &&
+                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek &&
                             x != curGenerator.CurrentState.Deadlock));
                         Debug.Log($"switching trunk to roof {opened}");
                     }
 
                     Assert.IsTrue(opened.Count != 0);
                     var topMost = opened.OrderBy(x => x.Data.Topology.Position.y).Last();
-                    if (topMost.Data.Topology.SegType == Blueprint.Segment.TopologySegment.SegmentType.RoofPeak)
+                    if (topMost.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek)
                     {
-                        topMost.Data.Topology.SegType = Blueprint.Segment.TopologySegment.SegmentType.Std;
+                        topMost.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
                         topMost.Data.Topology.IsOpenedForGenerator = true;
                         var step = TopologyGeneratorBase.TopGenStep.DoStep(topMost,
                             TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegChangeState);

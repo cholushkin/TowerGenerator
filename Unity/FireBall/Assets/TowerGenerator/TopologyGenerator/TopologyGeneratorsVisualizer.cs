@@ -19,7 +19,7 @@ namespace TowerGenerator
 
         public class VisualizationSegment
         {
-            public Blueprint.Segment.TopologySegment.SegmentType SegType;
+            public Blueprint.Segment.TopologySegment.ChunkType SegType;
             public GameObject Chunk;
             public GameObject Wrapper;
             public GameObject OpenedMarker;
@@ -100,7 +100,7 @@ namespace TowerGenerator
                 var gotSeg = _visNodes.TryGetValue(cmd.Segment, out visSeg);
                 Assert.IsTrue(gotSeg, $"can't get {cmd.Segment} while trying to change");
                 Assert.IsNotNull(visSeg);
-                if (visSeg.SegType != cmd.Segment.Data.Topology.SegType)
+                if (visSeg.SegType != cmd.Segment.Data.Topology.ChunkT)
                 {
                     var newVisSeg = BuildTopologyVis(cmd.Segment); // spawn new one segment and marker(if needed)
                     newVisSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay).From(); // appear animation
@@ -145,13 +145,13 @@ namespace TowerGenerator
 
             // create chunk
             var prefabChunk = prefabSegStd;
-            if (segData.SegType == Blueprint.Segment.TopologySegment.SegmentType.IslandAndBasement)
+            if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement)
                 prefabChunk = prefabSegIsland;
-            else if (segData.SegType == Blueprint.Segment.TopologySegment.SegmentType.RoofPeak)
+            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek)
                 prefabChunk = prefabSegRoofPeek;
-            else if (segData.SegType == Blueprint.Segment.TopologySegment.SegmentType.SideEar)
+            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkSideEar)
                 prefabChunk = prefabSegSideEar;
-            else if (segData.SegType == Blueprint.Segment.TopologySegment.SegmentType.BottomEar)
+            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkBottomEar)
                 prefabChunk = prefabSegBottomEar;
 
             GameObject opened = null;
@@ -184,7 +184,7 @@ namespace TowerGenerator
             visSeg.Chunk = chunk;
             visSeg.Wrapper = wrapper;
             visSeg.OpenedMarker = opened;
-            visSeg.SegType = segData.SegType;
+            visSeg.SegType = segData.ChunkT;
 
             return visSeg;
         }

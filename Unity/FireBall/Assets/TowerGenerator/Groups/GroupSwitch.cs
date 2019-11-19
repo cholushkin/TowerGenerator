@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public class GroupRndSwitch : Group
+    public class GroupSwitch : Group
     {
         public int ItemIndexSelected;
 

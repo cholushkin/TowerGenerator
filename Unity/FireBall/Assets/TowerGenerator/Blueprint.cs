@@ -19,14 +19,15 @@ namespace TowerGenerator
         {
             public class TopologySegment
             {
-                public enum SegmentType
+                public enum ChunkType
                 {
-                    IslandAndBasement,
-                    //Base,
-                    Std,
-                    RoofPeak,
-                    SideEar,
-                    BottomEar
+                    ChunkRoofPeek,
+                    ChunkStd,
+                    ChunkIslandAndBasement,
+                    ChunkSideEar,
+                    ChunkBottomEar,
+                    ChunkConnectorVertical,
+                    ChunkConnectorHorizontal,
                 }
 
                 public bool IsOpenedForGenerator;
@@ -34,39 +35,26 @@ namespace TowerGenerator
                 public Vector3 BuildDirection; 
 
                 public Vector3 AspectRatio;
-                public SegmentType SegType;
+                public ChunkType ChunkT;
                 public bool HasCollision { get; set; }
 
                 public override string ToString()
                 {
-                    return $"{SegType}";
+                    return $"{ChunkT}";
                 }
             }
 
             public class VisualSegment
             {
-                // meta/ variants picked
-                // decoration
+                // meta
+                // decorations
+                // biome
             }
 
             public class ContentSegment
             {
                 // monsters, chests, coins/diamonds, path
             }
-
-            //public SegmentData(Vector3 aspectRatio)
-            //{
-            //    AspectRatio = aspectRatio;
-            //}
-            //public Vector3 Position;
-            //public Vector3 ParentOffsetPosition;
-            //public Vector3 AspectRatio;
-            //public Transform Representation; // tmp: for visualization
-            //public bool hasCollision; // tmp: for visualization
-
-            //// visualizing data
-
-            //// 
 
             public override string ToString()
             {

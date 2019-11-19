@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 namespace TowerGenerator
 {
     // Randomly enables some options from the group
-    public class GroupRndSet : Group
+    public class GroupSet : Group
     {
         public int MinObjectsSelected; // default 0
         public int MaxObjectsSelected; // default transform.childCount
