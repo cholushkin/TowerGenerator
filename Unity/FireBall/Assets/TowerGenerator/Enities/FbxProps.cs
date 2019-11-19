@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -6,15 +7,17 @@ namespace TowerGenerator
 {
     public class FbxProps : MonoBehaviour
     {
+        [Serializable]
         public class ScriptToAdd
         {
+            [Serializable]
             public class ScriptProperty
             {
                 public string PropName;
-                public object PropValue;
+                public string PropValue;
             }
 
-            public void AddProp(string propName, object value)
+            public void AddProp(string propName, string value)
             {
                 if(ScriptProperties == null)
                     ScriptProperties = new List<ScriptProperty>();
@@ -27,7 +30,7 @@ namespace TowerGenerator
 
         public List<ScriptToAdd> ScriptsToAdd;
 
-        public void AddProp(string scriptName, string propName, object value)
+        public void AddProp(string scriptName, string propName, string value)
         {
             if (ScriptsToAdd == null)
                 ScriptsToAdd = new List<ScriptToAdd>(2);
@@ -50,6 +53,16 @@ namespace TowerGenerator
                 return;
             }
             ScriptsToAdd.Add(new ScriptToAdd { ScriptName = scriptName });
+        }
+
+        [ContextMenu("DbgPrint")]
+        void DbgPrint()
+        {
+            foreach (var scriptToAdd in ScriptsToAdd)
+            {
+                Debug.Log(JsonUtility.ToJson(scriptToAdd, true));
+            }
+            
         }
     }
 }

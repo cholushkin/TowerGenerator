@@ -21,30 +21,28 @@ namespace TowerGenerator
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
-            //foreach (string assetPath in importedAssets)
-            //{
-            //    var root = Path.GetPathRoot(assetPath);
-            //    var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
+            foreach (string assetPath in importedAssets)
+            {
+                var root = Path.GetPathRoot(assetPath);
+                var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
 
-            //    if (ContentPacksParentDir == parentDir)
-            //    {
-            //        Debug.Log($"Importing content pack: '{assetPath}'");
-            //        var packName = Path.GetFileNameWithoutExtension(assetPath);
+                if (ContentPacksParentDir == parentDir)
+                {
+                    Debug.Log($"Importing content pack: '{assetPath}'");
+                    var packName = Path.GetFileNameWithoutExtension(assetPath);
 
-            //        // load prefab as asset
-            //        var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-            //        if (assetObj == null)
-            //        {
-            //            Debug.LogErrorFormat("Error: can't load asset at path {0}", assetPath);
-            //            continue;
-            //        }
+                    // load prefab as asset
+                    var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                    if (assetObj == null)
+                    {
+                        Debug.LogErrorFormat("Error: can't load asset at path {0}", assetPath);
+                        continue;
+                    }
 
-            //        // extracting entities from the pack
-            //        {
-            //            ExtractEntities(assetObj, packName);
-            //        }
-            //    }
-            //}
+                    // extracting entities from the pack
+                    ExtractEntities(assetObj, packName);
+                }
+            }
             //EditorUtility.SetDirty(_metas);
             // todo: deletedAssets
             // todo: delete all ents and metas of deleted content pack
