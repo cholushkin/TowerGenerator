@@ -147,7 +147,7 @@ namespace TowerGenerator
             var prefabChunk = prefabSegStd;
             if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement)
                 prefabChunk = prefabSegIsland;
-            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek)
+            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
                 prefabChunk = prefabSegRoofPeek;
             else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkSideEar)
                 prefabChunk = prefabSegSideEar;

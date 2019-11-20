@@ -21,7 +21,7 @@ namespace TowerGenerator
             {
                 public enum ChunkType
                 {
-                    ChunkRoofPeek,
+                    ChunkRoofPeak,
                     ChunkStd,
                     ChunkIslandAndBasement,
                     ChunkSideEar,

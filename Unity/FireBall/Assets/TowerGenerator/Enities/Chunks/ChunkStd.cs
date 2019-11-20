@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TowerGenerator
 {
 
-    public class ChunkStd : Entity
+    public class ChunkStd : ChunkBase
     {
     }
 }

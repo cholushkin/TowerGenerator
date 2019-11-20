@@ -1,6 +1,6 @@
 ﻿namespace TowerGenerator
 {
-    public class ChunkSideEar : ChunkBase
+    public class ChunkBase : Entity
     {
     }
 }

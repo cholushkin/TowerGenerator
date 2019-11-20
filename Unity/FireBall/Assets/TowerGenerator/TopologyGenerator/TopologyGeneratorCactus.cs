@@ -94,7 +94,7 @@ namespace TowerGenerator
                                 CurrentState.Deadlock = deadlockParent;
 
                                 Assert.IsTrue(deadlockParent.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkStd);
-                                deadlockParent.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek;
+                                deadlockParent.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
                                 deadlockParent.Data.Topology.IsOpenedForGenerator = false;
                                 yield return TopGenStep.DoStep(deadlockParent, TopGenStep.VisualizationCmd.SegChangeState);
                                 break;
@@ -104,7 +104,7 @@ namespace TowerGenerator
                             // --- close parent
                             {
                                 Assert.IsTrue(stepResult.Prev.Segment.Data.Topology.IsOpenedForGenerator);
-                                Assert.IsTrue(stepResult.Prev.Segment.Data.Topology.ChunkT != Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek);
+                                Assert.IsTrue(stepResult.Prev.Segment.Data.Topology.ChunkT != Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak);
                                 stepResult.Prev.Segment.Data.Topology.IsOpenedForGenerator = false;
                                 yield return TopGenStep.DoStep(stepResult.Prev.Segment, TopGenStep.VisualizationCmd.SegChangeState);
                             }
@@ -198,7 +198,7 @@ namespace TowerGenerator
                 else
                 // end up with peak and close
                 {
-                    openedNode.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek;
+                    openedNode.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
                     openedNode.Data.Topology.IsOpenedForGenerator = false;
                     yield return TopGenStep.DoStep(openedNode, TopGenStep.VisualizationCmd.SegChangeState);
                 }
@@ -257,7 +257,7 @@ namespace TowerGenerator
                         if (_rnd.TrySpawnEvent(GetChanceToPropagateBranch(level + 1))) // opened and std
                             step.Segment.Data.Topology.IsOpenedForGenerator = true;
                         else
-                            step.Segment.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek;
+                            step.Segment.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
                     }
                     yield return TopGenStep.DoStep(step.Segment, TopGenStep.VisualizationCmd.SegSpawn);
                 }

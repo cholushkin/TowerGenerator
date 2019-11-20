@@ -1,4 +1,5 @@
-﻿using Assets.Plugins.Alg;
+﻿using System;
+using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace TowerGenerator
                     return;
                 foreach (var scriptToAdd in fbxProp.ScriptsToAdd)
                     AddComponent(tr.gameObject, scriptToAdd);
+                tr.gameObject.RemoveComponent<FbxProps>();
             }
             semifinishedEnt.transform.ForEachChildrenRecursive(AddScript);
         }
@@ -95,32 +97,42 @@ namespace TowerGenerator
 
         public static MetaBase CreateMeta(GameObject ent, string dir, string name)
         {
+            Blueprint.Segment.TopologySegment.ChunkType Type2ChunkType(Type type)
+            {
+                if (type == typeof(ChunkRoofPeak))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
+                if (type == typeof(ChunkStd))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
+                if (type == typeof(ChunkIslandAndBasement))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement;
+                if (type == typeof(ChunkSideEar))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkSideEar;
+                if (type == typeof(ChunkBottomEar))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkBottomEar;
+                if (type == typeof(ChunkConnectorVertical))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorVertical;
+                if (type == typeof(ChunkConnectorHorizontal))
+                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorHorizontal;
+                return 0;
+            }
+
+
             var entScript = ent.GetComponent<Entity>();
-            if (entScript is ChunkStd)
+            if (entScript is ChunkBase)
             {
-                var asset = ScriptableObject.CreateInstance<MetaChunkStd>();
+                var asset = ScriptableObject.CreateInstance<MetaChunk>();
                 string assetPathAndName = dir + "/" + name + ".m.asset";
 
                 asset.EntName = name;
+                asset.ChunkType = Type2ChunkType(entScript.GetType());
 
                 AssetDatabase.CreateAsset(asset, assetPathAndName);
                 AssetDatabase.SaveAssets();
                 return asset;
             }
-
-            if (entScript is ChunkRoofPeak)
-            {
-                var asset = ScriptableObject.CreateInstance<MetaChunkRoofPeek>();
-                string assetPathAndName = dir + "/" + name + ".m.asset";
-
-                asset.EntName = name;
-
-                AssetDatabase.CreateAsset(asset, assetPathAndName);
-                AssetDatabase.SaveAssets();
-                return asset;
-            }
-
             return null;
         }
+
+        
     }
 }

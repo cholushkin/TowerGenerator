@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace TowerGenerator
 {
-    public class MetaChunkRoofPeek : MetaBase
+    public class MetaChunk : MetaBase
     {
+        public Blueprint.Segment.TopologySegment.ChunkType ChunkType;
     }
 }

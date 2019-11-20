@@ -98,7 +98,7 @@ namespace TowerGenerator
 
         public PointerProcessor Pointers;
 
-        public TopologyGeneratorsVisualizer Visualizer;
+        public TopologyGeneratorsVisualizer TopologyVisualizer;
         public VisualBuilder VisualBuilder;
 
 
@@ -154,19 +154,19 @@ namespace TowerGenerator
                 Debug.LogFormat(">>>>> Start Topology Generator: {0} with seed {1}", curGenerator, seedForNextGenerator);
                 foreach (var step in curGenerator.Generate(seedForNextGenerator, prevGenerator?.CurrentState))
                 {
-                    if (Visualizer?.StepDelay > 0f)
-                        yield return Visualizer.Wait();
+                    if (TopologyVisualizer?.StepDelay > 0f)
+                        yield return TopologyVisualizer.Wait();
 
                     if (_bp.Tree == null)
                     {
                         Assert.IsTrue(step.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegSpawn);
                         _bp.Tree = step.Segment;
                         Pointers.SetInitialPointers();
-                        Visualizer?.Begin(_bp.Tree);
+                        TopologyVisualizer?.Begin(_bp.Tree);
                         VisualBuilder.Begin(_bp.Tree);
                     }
 
-                    Visualizer?.Step(step);
+                    TopologyVisualizer?.Step(step);
                     VisualBuilder.Step(step);
                     yield return null;
                 } // end of chunks generating
@@ -179,27 +179,27 @@ namespace TowerGenerator
                     if (opened.Count == 0)
                     {
                         opened = curGenerator.CurrentState.Created.Where(x =>
-                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek &&
+                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
                             x != curGenerator.CurrentState.Deadlock).ToList();
 
                         opened.AddRange(curGenerator.PrevState.Created.Where(x =>
-                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek &&
+                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
                             x != curGenerator.CurrentState.Deadlock));
                         Debug.Log($"switching trunk to roof {opened}");
                     }
 
                     Assert.IsTrue(opened.Count != 0);
                     var topMost = opened.OrderBy(x => x.Data.Topology.Position.y).Last();
-                    if (topMost.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeek)
+                    if (topMost.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
                     {
                         topMost.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
                         topMost.Data.Topology.IsOpenedForGenerator = true;
                         var step = TopologyGeneratorBase.TopGenStep.DoStep(topMost,
                             TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegChangeState);
 
-                        if (Visualizer?.StepDelay > 0f)
-                            yield return Visualizer.Wait();
-                        Visualizer?.Step(step);
+                        if (TopologyVisualizer?.StepDelay > 0f)
+                            yield return TopologyVisualizer.Wait();
+                        TopologyVisualizer?.Step(step);
                         VisualBuilder.Step(step);
                     }
                     Debug.Log($"switching trunk to {topMost}");
@@ -225,9 +225,9 @@ namespace TowerGenerator
             foreach (var cmd in curGenerator.Finalize(seed, curGenerator.CurrentState)) // finalizing with the global seed 
             {
                 Debug.Log("Finalizing tower");
-                if (Visualizer?.StepDelay > 0f)
-                    yield return Visualizer.Wait();
-                Visualizer?.Step(cmd);
+                if (TopologyVisualizer?.StepDelay > 0f)
+                    yield return TopologyVisualizer.Wait();
+                TopologyVisualizer?.Step(cmd);
                 VisualBuilder.Step(cmd);
                 yield return null;
             }

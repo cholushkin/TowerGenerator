@@ -20,7 +20,6 @@ namespace TowerGenerator
         private TreeNode<ProcessingNode> _tree;
         public Bounds BBMax;
         public Bounds BBMin;
-        public GroupStack GlobalStackLayers;
         public long Seed = -1;
 
         void Awake()
@@ -46,7 +45,7 @@ namespace TowerGenerator
 
             BBMax = _tree.Data.Transform.gameObject.BoundBox();
             BBMax.center = Vector3.zero;
-            Debug.Log($"BBmax:{BBMax}");
+            //Debug.Log($"BBmax:{BBMax}");
             return BBMax;
         }
 
@@ -57,7 +56,7 @@ namespace TowerGenerator
                 BuildImpactTree();
             BBMax = _tree.Data.Transform.gameObject.BoundBox();
             BBMax.center = Vector3.zero;
-            Debug.Log($"BBmax:{BBMax}");
+            //Debug.Log($"BBmax:{BBMax}");
             return BBMax.size;
         }
 
@@ -75,7 +74,7 @@ namespace TowerGenerator
                 SetRndConfiguration();
                 var bbxize = CalculateBBSize();
                 var volume = bbxize.x * bbxize.y * bbxize.z;
-                Debug.Log($"Volume {volume}");
+                //Debug.Log($"Volume {volume}");
 
                 var isInside = bbxize.x <= maxBBSize.x && bbxize.y <= maxBBSize.y && bbxize.z <= maxBBSize.z;
 
@@ -98,7 +97,7 @@ namespace TowerGenerator
                 return false;
             }
 
-            Debug.Log($"Max Volume {maxVolume} seed for it {fitSeed}");
+            //Debug.Log($"Max Volume {maxVolume} seed for it {fitSeed}");
             Seed = fitSeed;
             SetRndConfiguration();
             return true;
@@ -119,7 +118,7 @@ namespace TowerGenerator
         public void SetRndConfiguration(bool minBB = false)
         {
             RandomHelper rnd = new RandomHelper(Seed);
-            Debug.Log(rnd.GetCurrentSeed());
+            //Debug.Log(rnd.GetCurrentSeed());
 
             // enable all parts
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(true));
@@ -127,15 +126,14 @@ namespace TowerGenerator
             if (_tree == null)
                 BuildImpactTree();
 
-            // setup global layer
-            var currentGlobalLayer = -1;
-            if (GlobalStackLayers != null)
+            // all possible hosts works first
+            var hosts = GetComponentsInChildren<GroupStack>();
+            foreach (var groupStack in hosts)
             {
                 if (minBB)
-                    GlobalStackLayers.DoRndMinimalChoice(ref rnd);
+                    groupStack.DoRndMinimalChoice(ref rnd);
                 else
-                    GlobalStackLayers.DoRndChoice(ref rnd);
-                currentGlobalLayer = GlobalStackLayers.LayerIndexSelected;
+                    groupStack.DoRndChoice(ref rnd);
             }
 
             foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
@@ -143,13 +141,12 @@ namespace TowerGenerator
                 var group = treeNode.Data.Group;
                 if (group != null)
                 {
-                    if (group == GlobalStackLayers)
-                        continue;
-
                     if (!treeNode.Data.Transform.gameObject.activeInHierarchy)
                         continue;
 
-                    var groupIsActual = currentGlobalLayer <= group.PropagatedTo;
+                    var groupIsActual = true;
+                    if(group.Host != null)
+                        groupIsActual = group.Host.LayerIndexSelected <= group.PropagatedTo;
 
                     if (groupIsActual)
                     {
@@ -184,15 +181,6 @@ namespace TowerGenerator
                     Transform = iTrans,
                     Group = group
                 });
-
-            var groupStack = group as GroupStack;
-            if (groupStack)
-            {
-                if (groupStack.PropagatedTo == -1)
-                {
-                    GlobalStackLayers = groupStack;
-                }
-            }
 
             parent?.AddChild(node);
 

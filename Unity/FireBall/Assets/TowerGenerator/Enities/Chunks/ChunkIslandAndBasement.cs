@@ -1,6 +1,6 @@
 ﻿namespace TowerGenerator
 {
-    public class ChunkIslandAndBasement : Entity
+    public class ChunkIslandAndBasement : ChunkBase
     {
     }
 }

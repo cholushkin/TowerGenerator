@@ -1,4 +1,5 @@
-﻿using Assets.Plugins.Alg;
+﻿using System.Linq;
+using Assets.Plugins.Alg;
 using GameLib.DataStructures;
 using GameLib.Random;
 using UnityEngine;
@@ -25,8 +26,8 @@ namespace TowerGenerator
         {
             if (cmd.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegSpawn)
             {
-                MetaBase meta = MetaProvider.Instance.Metas[0];
-                Assert.IsNotNull(meta);
+                MetaBase meta = MetaProvider.Instance.Metas.Select(x => x as MetaChunk)
+                                    .FirstOrDefault(x => x.ChunkType == cmd.Segment.Data.Topology.ChunkT);
                 var visSegPrefab = Resources.Load("Ents/" + meta.EntName);
                 var visSegment = (GameObject)Instantiate(visSegPrefab);
                 visSegment.name = visSegPrefab.name;
