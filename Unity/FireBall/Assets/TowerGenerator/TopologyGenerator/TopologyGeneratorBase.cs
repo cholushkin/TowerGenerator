@@ -81,7 +81,7 @@ namespace TowerGenerator
                 return new TopGenStep
                 {
                     Segment = segment,
-                    VisCmd = cmd
+                    VisCmd = cmd,
                 };
             }
         }

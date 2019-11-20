@@ -141,10 +141,12 @@ namespace TowerGenerator
             TopologyGeneratorBase prevGenerator = null;
             TopologyGeneratorBase curGenerator;
 
+            uint generatorChainCounter = 0;
             do
             {
                 curGenerator = _generatorsChooser.GetCurrent();
-                
+                TopologyVisualizer?.ChangeGenerator(curGenerator, generatorChainCounter);
+
                 var isFirstGenerator = prevGenerator == null; // is first generator being called
                 var seedForNextGenerator = isFirstGenerator ? seed : prevGenerator.CurrentSeed;
 
@@ -163,11 +165,11 @@ namespace TowerGenerator
                         _bp.Tree = step.Segment;
                         Pointers.SetInitialPointers();
                         TopologyVisualizer?.Begin(_bp.Tree);
-                        VisualBuilder.Begin(_bp.Tree);
+                        VisualBuilder?.Begin(_bp.Tree);
                     }
 
                     TopologyVisualizer?.Step(step);
-                    VisualBuilder.Step(step);
+                    VisualBuilder?.Step(step);
                     yield return null;
                 } // end of chunks generating
 
@@ -200,7 +202,7 @@ namespace TowerGenerator
                         if (TopologyVisualizer?.StepDelay > 0f)
                             yield return TopologyVisualizer.Wait();
                         TopologyVisualizer?.Step(step);
-                        VisualBuilder.Step(step);
+                        VisualBuilder?.Step(step);
                     }
                     Debug.Log($"switching trunk to {topMost}");
                     TreeNode<Blueprint.Segment>.SwitchTrunk(topMost);
@@ -218,6 +220,7 @@ namespace TowerGenerator
 
                 prevGenerator = curGenerator;
                 _generatorsChooser.Step();
+                ++generatorChainCounter;
 
             } while (_generatorsChooser.GetCurrent() != null); // end generators chain
 
@@ -228,7 +231,7 @@ namespace TowerGenerator
                 if (TopologyVisualizer?.StepDelay > 0f)
                     yield return TopologyVisualizer.Wait();
                 TopologyVisualizer?.Step(cmd);
-                VisualBuilder.Step(cmd);
+                VisualBuilder?.Step(cmd);
                 yield return null;
             }
 

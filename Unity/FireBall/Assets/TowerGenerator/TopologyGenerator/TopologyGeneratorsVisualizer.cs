@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using GameLib.DataStructures;
 using UnityEngine;
@@ -78,7 +79,7 @@ namespace TowerGenerator
 
                 _stats.SegmentsAmount++;
                 if (_stats.MaxHeight < cmd.Segment.Data.Topology.Position.y)
-                    _stats.MaxHeight = (uint) cmd.Segment.Data.Topology.Position.y;
+                    _stats.MaxHeight = (uint)cmd.Segment.Data.Topology.Position.y;
             }
             else if (cmd.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegDestroy)
             {
@@ -164,14 +165,14 @@ namespace TowerGenerator
             chunk = Instantiate(prefabChunk);
 
             // set pos & hierarchy
-            wrapper.transform.position = Pivot.position + segData.Position;
+            wrapper.transform.position = _generatorPivot.position + segData.Position;
             wrapper.transform.localScale = segData.AspectRatio;
 
-            chunk.transform.position = Pivot.position + segData.Position;
+            chunk.transform.position = _generatorPivot.position + segData.Position;
             chunk.transform.localScale = segData.AspectRatio * 0.9f; // todo: real margins
             wrapper.transform.SetParent(chunk.transform);
 
-            chunk.transform.SetParent(Pivot);
+            chunk.transform.SetParent(_generatorPivot);
             chunk.name = $"{segment}";
 
             if (opened != null)
@@ -187,6 +188,14 @@ namespace TowerGenerator
             visSeg.SegType = segData.ChunkT;
 
             return visSeg;
+        }
+
+        private Transform _generatorPivot;
+        public void ChangeGenerator(TopologyGeneratorBase curGenerator, uint generatorChainCounter)
+        {
+            var genObj = new GameObject(curGenerator.GetType().ToString().Split('.').Last() + "." + generatorChainCounter);
+            genObj.transform.SetParent(Pivot);
+            _generatorPivot = genObj.transform;
         }
     }
 }
