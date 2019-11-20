@@ -80,7 +80,7 @@ namespace TowerGenerator
 
                     // --- build the trunk
                     {
-                        Debug.LogFormat("Generating trunk");
+                        //Debug.LogFormat("Generating trunk");
 
                         foreach (var stepResult in segBuilder.Step())
                         {

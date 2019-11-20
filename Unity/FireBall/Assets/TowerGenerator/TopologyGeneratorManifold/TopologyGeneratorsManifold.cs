@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Plugins.Alg;
 using GameLib;
@@ -173,20 +174,29 @@ namespace TowerGenerator
                     yield return null;
                 } // end of chunks generating
 
+                Debug.Log("Generator work finish");
+                Debug.Log($"Opened: {curGenerator.CurrentState.GetOpenedForGeneration().Count}");
+                Debug.Log($"prev state opened: {curGenerator?.PrevState?.GetOpenedForGeneration().Count}");
+
                 // --- resolve deadlock
                 if (curGenerator.CurrentState.Deadlock != null)
                 {
                     Debug.Log("Resolving DEADLOCK");
-                    var opened = curGenerator.CurrentState.GetOpenedForGeneration();
+                    var opened = curGenerator.CurrentState.GetOpenedForGeneration(); 
                     if (opened.Count == 0)
                     {
-                        opened = curGenerator.CurrentState.Created.Where(x =>
+                        opened = Pointers.PointerGenerator.TraverseDepthFirstPostOrder().Where(x =>
                             x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
                             x != curGenerator.CurrentState.Deadlock).ToList();
 
-                        opened.AddRange(curGenerator.PrevState.Created.Where(x =>
-                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
-                            x != curGenerator.CurrentState.Deadlock));
+                        //opened = curGenerator.CurrentState.Created.Where(x =>
+                        //    x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
+                        //    x != curGenerator.CurrentState.Deadlock).ToList();
+
+                        //opened.AddRange(curGenerator.PrevState.Created.Where(x =>
+                        //    x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
+                        //    x != curGenerator.CurrentState.Deadlock));
+
                         Debug.Log($"switching trunk to roof {opened}");
                     }
 
@@ -196,9 +206,12 @@ namespace TowerGenerator
                     {
                         topMost.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
                         topMost.Data.Topology.IsOpenedForGenerator = true;
+                        curGenerator.CurrentState.Created = new Stack<TreeNode<Blueprint.Segment>>();
+                        curGenerator.CurrentState.Created.Push(topMost);
+
                         var step = TopologyGeneratorBase.TopGenStep.DoStep(topMost,
                             TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegChangeState);
-
+                        
                         if (TopologyVisualizer?.StepDelay > 0f)
                             yield return TopologyVisualizer.Wait();
                         TopologyVisualizer?.Step(step);
@@ -211,12 +224,12 @@ namespace TowerGenerator
                 // ----- Change to next in chain TopGen
                 if(prevGenerator!= null)
                     Pointers.MoveGenerator(prevGenerator.CurrentState.Created.FirstOrDefault(
-                        x => (x.BranchLevel == 0 &&
-                              x.Data.Topology.IsOpenedForGenerator == false)
+                        x => (x.BranchLevel == 0 && x.Data.Topology.ChunkT==Blueprint.Segment.TopologySegment.ChunkType.ChunkStd
+                              && x.Data.Topology.IsOpenedForGenerator == false)
                     )); // just any of new generated segment belonged to trunk and that is stable (will not be recreated or deleted by next TopGen)
 
-                if (Pointers.DistanceYFactorProgress2Generator() > Pointers.MaxDistanceProgressToGenerator)
-                    yield return new WaitUntil(IsNeedToGenerateMore);
+                //if (Pointers.DistanceYFactorProgress2Generator() > Pointers.MaxDistanceProgressToGenerator)
+                //    yield return new WaitUntil(IsNeedToGenerateMore);
 
                 prevGenerator = curGenerator;
                 _generatorsChooser.Step();

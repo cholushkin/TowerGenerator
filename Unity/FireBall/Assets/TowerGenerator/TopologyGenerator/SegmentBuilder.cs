@@ -120,7 +120,7 @@ namespace TowerGenerator
                     Segment = null,
                     Next = null,
                     Prev = prevStepResult,
-                    IsDeadlock = fitSize.x < _generator.GetConfig().SegmentsSize.From,
+                    IsDeadlock = fitSize.x < _segmentSize.From,
                     IsFirstOne = i == 0,
                     IsLastOne = i == _segCount - 1,
                     _builder = this

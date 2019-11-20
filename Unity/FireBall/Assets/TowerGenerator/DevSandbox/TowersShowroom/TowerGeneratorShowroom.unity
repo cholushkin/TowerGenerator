@@ -396,6 +396,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: TowerGenerator
       objectReference: {fileID: 0}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: Pivot
+      value: 
+      objectReference: {fileID: 1130781513}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: StepDelay
+      value: 0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 6043195961006098395, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -459,32 +469,27 @@ PrefabInstance:
     - target: {fileID: 6043195961005544643, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: CyclesCount
-      value: 2
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 6043195961005544643, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: VisualBuilder
       value: 
-      objectReference: {fileID: 1075562272}
+      objectReference: {fileID: 0}
     - target: {fileID: 6043195961005544643, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: Visualizer
       value: 
       objectReference: {fileID: 876958864}
-    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+    - target: {fileID: 6043195961005544643, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
-      propertyPath: Pivot
+      propertyPath: TopologyVisualizer
       value: 
-      objectReference: {fileID: 1130781513}
-    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
-        type: 3}
-      propertyPath: StepDelay
-      value: 0.01
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 876958864}
     - target: {fileID: 753887767189281968, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: StepDelay
-      value: 0.1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6043195960587439711, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
@@ -501,10 +506,20 @@ PrefabInstance:
       propertyPath: Config.SegmentsSize.From
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 6043195960587439710, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: Config.BranchSegmentsSize.From
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6043195961006098394, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: GenererateOnStart
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6043195961006098394, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: SeedTopology
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 981e23dfd1416e04889b4f750910e8e5, type: 3}

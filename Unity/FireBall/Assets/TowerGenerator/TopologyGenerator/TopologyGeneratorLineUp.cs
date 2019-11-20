@@ -64,7 +64,7 @@ namespace TowerGenerator
 
                     // --- build the trunk
                     {
-                        Debug.LogFormat("Generating trunk");
+                        //Debug.LogFormat("Generating trunk");
                         Assert.IsTrue(openedNode.Data.Topology.IsOpenedForGenerator);
 
                         var segBuilder = new SegmentBuilder(trunkSegCount, openedNode, Vector3.up, this, Vector3.zero);
