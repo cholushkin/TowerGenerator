@@ -1,12 +1,8 @@
-﻿using UnityEngine.Assertions;
-
+﻿using UnityEngine;
 
 namespace TowerGenerator
 {
-    public class Entity : BasePropImporter
+    public class Entity : MonoBehaviour
     {
-        public override void SetDefaultValues()
-        {
-        }
     }
 }

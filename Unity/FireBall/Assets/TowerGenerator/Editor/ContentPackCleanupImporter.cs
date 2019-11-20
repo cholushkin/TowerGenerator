@@ -12,7 +12,7 @@ namespace TowerGenerator
                 GameObject.DestroyImmediate(gObj);
         }
 
-        public int GetPostprocessOrder()
+        public override int GetPostprocessOrder()
         {
             return 1;
         }

@@ -149,7 +149,7 @@ namespace TowerGenerator
                     if (!treeNode.Data.Transform.gameObject.activeInHierarchy)
                         continue;
 
-                    var groupIsActual = currentGlobalLayer <= group.MaxLayerIndexPropagated;
+                    var groupIsActual = currentGlobalLayer <= group.PropagatedTo;
 
                     if (groupIsActual)
                     {
@@ -188,7 +188,7 @@ namespace TowerGenerator
             var groupStack = group as GroupStack;
             if (groupStack)
             {
-                if (groupStack.MaxLayerIndexPropagated == -1)
+                if (groupStack.PropagatedTo == -1)
                 {
                     GlobalStackLayers = groupStack;
                 }

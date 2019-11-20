@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using GameLib.Random;
-using UnityEngine;
-
+﻿using GameLib.Random;
 
 namespace TowerGenerator
 {

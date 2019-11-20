@@ -72,26 +72,22 @@ namespace TowerGenerator
             AssetDatabase.Refresh();
 
             // process all ents inside fbx
+            foreach (Transform ent in assetObject.transform)
             {
-                var entities = assetObject.GetComponentsInChildren<Entity>();
-
-                // write patterns, add design-time stuff, do hierarchy reorganizations
-                foreach (var ent in entities)
-                {
-                    var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
-                    ExtractEnt(ent, GameConstants.PathEnts, fullEntName);
-                }
+                var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
+                ExtractEnt(ent, GameConstants.PathEnts, fullEntName);
             }
             AssetDatabase.Refresh();
         }
 
-        private static void ExtractEnt(Entity ent, string dirToImort, string entName)
+        // write patterns, add design-time stuff, do hierarchy reorganizations
+        private static void ExtractEnt(Transform ent, string dirToImort, string entName)
         {
             var entInst = Object.Instantiate(ent.gameObject);
             entInst.name = entName;
 
             entInst = EntCooker.Cook(entInst);
-            EntCooker.CreateMeta(ent, dirToImort, entName);
+            EntCooker.CreateMeta(entInst, dirToImort, entName);
 
             PrefabUtility.SaveAsPrefabAsset(entInst, Path.Combine(dirToImort, entName + ".prefab"));
             Object.DestroyImmediate(entInst);

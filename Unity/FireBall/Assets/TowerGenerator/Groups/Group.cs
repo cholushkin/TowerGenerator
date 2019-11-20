@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Assets.Plugins.Alg;
 using GameLib.Random;
 using UnityEngine;
@@ -7,53 +9,116 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public abstract class Group : BasePropImporter
+    public abstract class Group : MonoBehaviour
     {
-        public int MaxLayerIndexPropagated; // by default it is propagated only to current layer (-1 ignoring)
-        protected string MaxLayerIndexPropagatedAll = "all";
+        public int PropagatedTo; // by default it is propagated only to current layer (-1 ignoring propagation)
+        public GroupStack Host; // host group to propagate to
 
-        public virtual int GetItemsCount()
+        public virtual void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
         {
-            return transform.childCount;
-        }
+#if UNITY_EDITOR
+            // check validness of the prop name
+            foreach (var scriptProperty in scriptProperties)
+                if (!IsValidName(scriptProperty.PropName))
+                    Debug.LogError($"Bad property name '{scriptProperty.PropName}' on '{transform.GetDebugName()}'");
+#endif
+            // get domain properties
+            var propPropagatedTo = scriptProperties.FirstOrDefault(x => x.PropName == "PropagatedTo");
+            var propHost = scriptProperties.FirstOrDefault(x => x.PropName == "Host");
 
-        public override void SetDefaultValues()
-        {
-            MaxLayerIndexPropagated = GetMyLayer();
-        }
-
-        public override bool SetProp(string propName, object value) // return false if cannot find property 
-        {
-            var baseResult = base.SetProp(propName, value);
-            if (propName == "MaxLayerIndexPropagated")
+            // ----- get host group
+            if (propHost == null) 
             {
-                var itemCount = GetLayersCount();
-                if (value is string strVal)
+                // get default host
+                var pointer = transform;
+                while (pointer != entityRoot)
                 {
-                    if (strVal.ToLower() == MaxLayerIndexPropagatedAll)
-                        MaxLayerIndexPropagated = itemCount - 1;
+                    pointer = pointer.parent;
+                    var hostCandidate = pointer.GetComponent<GroupStack>();
+                    if (hostCandidate != null)
+                    {
+                        Host = hostCandidate;
+                        break;
+                    }
                 }
-                else
-                {
-                    var valInt = (int) value;
-                    MaxLayerIndexPropagated = Mathf.Clamp(valInt, GetMyLayer(), itemCount - 1);
-                    Assert.IsTrue(valInt == MaxLayerIndexPropagated,
-                        $"Obj {this.transform.GetDebugName()} Value parsed {valInt}, value clamped {MaxLayerIndexPropagated}");
-                }
-
-                return true;
+            }
+            else
+            {
+                // get host by name
+                Host = entityRoot.GetComponentsInChildren<GroupStack>(true).FirstOrDefault(x => x.name == propHost.PropValue);
+                Assert.IsNotNull(Host,$"requesting name: {propHost.PropValue}");
             }
 
-            return baseResult;
+            // ----- get propagated to
+            if (propPropagatedTo == null)
+            {
+                // set default propagation
+                if (Host == null)
+                    PropagatedTo = -1;
+                else
+                {
+                    var pointer = transform;
+                    PropagatedTo = -1;
+                    while (pointer != Host && pointer != entityRoot)
+                    {
+                        pointer = pointer.parent;
+                        for (int i = 0; i < Host.GetItemsCount(); i++)
+                            if (Host.transform.GetChild(i) == pointer)
+                            {
+                                PropagatedTo = i;
+                                break;
+                            }
+                    }
+                }
+            }
+            else
+            {
+                if (Host == null)
+                    Debug.LogError("no host");
+                else
+                    // set propagation by index
+                    PropagatedTo = GetPropagationIndexFromString(propPropagatedTo.PropValue);
+            }
         }
-
-        public virtual int GetAmountOfTransformImpact()
-        {
-            return transform.childCount;
-        }
-
         public abstract void DoRndChoice(ref RandomHelper rnd);
         public abstract void DoRndMinimalChoice(ref RandomHelper rnd);
+
+        protected int GetPropagationIndexFromString(string propValue)
+        {
+            var propIndex = -1;
+            if (Host == null)
+            {
+                Debug.LogError($"no host for propagation index {propValue}");
+                return propIndex;
+            }
+
+            if (propValue.ToLower() == "all")
+            {
+                propIndex = Host.GetItemsCount() - 1;
+                return propIndex;
+            }
+
+            propIndex = Int32.Parse(propValue);
+            var clampedPropIndex = Mathf.Clamp(propIndex, -1, Host.GetItemsCount() - 1);
+            if (propIndex != clampedPropIndex)
+                Debug.LogWarning($"Claming happened {propIndex} -> {clampedPropIndex}");
+            return clampedPropIndex;
+        }
+
+#if UNITY_EDITOR
+        private bool IsValidName(string propertyName)
+        {
+            if (propertyName == "PropagatedTo")
+                return true;
+            if (propertyName == "Host")
+                return true;
+            if (propertyName == "MinObjectsSelected")
+                return true;
+            if (propertyName == "MaxObjectsSelected")
+                return true;
+            return true;
+        }
+#endif
 
         public void DisableItems()
         {
@@ -61,6 +126,11 @@ namespace TowerGenerator
             {
                 child.gameObject.SetActive(false);
             }
+        }
+
+        public virtual int GetItemsCount()
+        {
+            return transform.childCount;
         }
     }
 }

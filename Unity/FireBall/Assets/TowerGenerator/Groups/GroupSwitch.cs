@@ -13,15 +13,15 @@ namespace TowerGenerator
 
         public override void DoRndChoice(ref RandomHelper rnd)
         {
-            Assert.IsTrue(GetAmountOfTransformImpact() > 0);
+            Assert.IsTrue(GetItemsCount() > 0);
             DisableItems();
-            ItemIndexSelected = rnd.FromRangeIntInclusive(0, GetAmountOfTransformImpact() - 1);
+            ItemIndexSelected = rnd.FromRangeIntInclusive(0, GetItemsCount() - 1);
             transform.GetChild(ItemIndexSelected).gameObject.SetActive(true);
         }
 
         public override void DoRndMinimalChoice(ref RandomHelper rnd)
         {
-            Assert.IsTrue(GetAmountOfTransformImpact() > 0);
+            Assert.IsTrue(GetItemsCount() > 0);
             DisableItems();
             ItemIndexSelected = 0;
             transform.GetChild(ItemIndexSelected).gameObject.SetActive(true);

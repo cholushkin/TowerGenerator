@@ -1,4 +1,7 @@
-﻿using GameLib.Random;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -11,52 +14,52 @@ namespace TowerGenerator
         public int MaxObjectsSelected; // default transform.childCount
         public int ItemsSelectedAmount;
 
-        public override void SetDefaultValues()
+        public override void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
         {
-            base.SetDefaultValues();
-            MinObjectsSelected = 0;
-            MaxObjectsSelected = transform.childCount;
+            base.Configure(entityRoot,scriptProperties);
+
+            // get domain properties
+            var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == "MinObjectsSelected");
+            var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == "MaxObjectsSelected");
+
+
+            if (propMaxObjectsSelected != null)
+                MaxObjectsSelected = GetMaxObjectsSelectedFromString(propMaxObjectsSelected.PropValue);
+            else
+                MaxObjectsSelected = GetItemsCount();
+
+            if (propMinObjectsSelected != null)
+                MinObjectsSelected = GetMinObjectsSelectedFromString(propMinObjectsSelected.PropValue);
+            else
+                MinObjectsSelected = 0;
         }
 
-        public override bool SetProp(string propName, object value) // return false if cannot find property 
+        private int GetMaxObjectsSelectedFromString(string propValue)
         {
-            var baseResult = base.SetProp(propName, value);
-            if (propName == "MaxObjectsSelected")
-            {
-                var itemCount = transform.childCount;
-                if (value is string strVal)
-                {
-                    if (strVal.ToLower() == "all")
-                        MaxObjectsSelected = itemCount;
-                }
-                else
-                {
-                    var valInt = (int)value;
-                    MaxObjectsSelected = Mathf.Clamp(valInt, 0, itemCount);
-                    Assert.IsTrue(valInt == MaxObjectsSelected);
-                }
-                return true;
-            }
-
-            if (propName == "MinObjectsSelected")
-            {
-                var itemCount = transform.childCount;
-                {
-                    var valInt = (int)value;
-                    MinObjectsSelected = Mathf.Clamp(valInt, 0, itemCount);
-                    Assert.IsTrue(valInt == MinObjectsSelected, $"user MinObjectsSelected parsed:{valInt}, clamped {MinObjectsSelected}");
-                }
-                return true;
-            }
-            return baseResult;
+            if (propValue.ToLower() == "all")
+                return GetItemsCount();
+            var maxObjectsSelectedParsed = Int32.Parse(propValue);
+            var clamped= Mathf.Clamp(maxObjectsSelectedParsed,0, GetItemsCount());
+            if (clamped != maxObjectsSelectedParsed)
+                Debug.LogWarning($"Clamping happened {maxObjectsSelectedParsed} -> {clamped}");
+            return clamped;
         }
 
+        private int GetMinObjectsSelectedFromString(string propValue)
+        {
+            var minObjectsSelectedParsed = Int32.Parse(propValue);
+            var clamped = Mathf.Clamp(minObjectsSelectedParsed, 0, MaxObjectsSelected);
+            if (clamped != minObjectsSelectedParsed)
+                Debug.LogWarning($"Clamping happened {minObjectsSelectedParsed} -> {clamped}");
+            return clamped;
+        }
+        
         public override void DoRndChoice(ref RandomHelper rnd)
         {
             DisableItems();
             ItemsSelectedAmount = rnd.FromRangeIntInclusive(MinObjectsSelected, MaxObjectsSelected);
-            int[] itemsIndexes = new int[GetAmountOfTransformImpact()];
-            for (int i = 0; i < GetAmountOfTransformImpact(); ++i)
+            int[] itemsIndexes = new int[GetItemsCount()];
+            for (int i = 0; i < GetItemsCount(); ++i)
                 itemsIndexes[i] = i;
             var choices = rnd.FromArray(itemsIndexes, ItemsSelectedAmount);
             for (int i = 0; i < ItemsSelectedAmount; ++i)

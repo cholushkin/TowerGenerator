@@ -60,7 +60,7 @@ namespace TowerGenerator
             }
         }
 
-        public int GetPostprocessOrder()
+        public override int GetPostprocessOrder()
         {
             return 0;
         }
