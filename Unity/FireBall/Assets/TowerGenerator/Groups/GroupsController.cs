@@ -94,6 +94,7 @@ namespace TowerGenerator
                 var isInside = bbxize.x <= maxBBSize.x && bbxize.y <= maxBBSize.y && bbxize.z <= maxBBSize.z;
                 Debug.LogError(
                     $"Can't fit even with minimal cfg resulting bb:{bbxize} in requested bb:{maxBBSize} - obj:{gameObject}");
+                SetRndConfiguration();
                 return false;
             }
 

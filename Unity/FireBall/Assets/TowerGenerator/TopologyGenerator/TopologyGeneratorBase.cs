@@ -125,6 +125,7 @@ namespace TowerGenerator
                 Assert.IsNotNull(openedNode);
                 Assert.IsTrue(openedNode.Data.Topology.IsOpenedForGenerator);
                 openedNode.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
+                openedNode.Data.Topology.IsOpenedForGenerator = false;
                 yield return TopGenStep.DoStep(openedNode, TopGenStep.VisualizationCmd.SegChangeState);
             }
         }

@@ -137,10 +137,10 @@ namespace TowerGenerator
                                 Assert.IsTrue(created[0].Segment.BranchLevel == parentBranchLevel);
 
                                 // get roots for each branch
-                                var parentLeft = created.ElementAt(1 + _rnd.Range(0, created.Length - 2)).Segment;
-                                var parentRight = created.ElementAt(1 + _rnd.Range(0, created.Length - 2)).Segment;
-                                var parentForward = created.ElementAt(1 + _rnd.Range(0, created.Length - 2)).Segment;
-                                var parentBack = created.ElementAt(1 + _rnd.Range(0, created.Length - 2)).Segment;
+                                var parentLeft = created.ElementAt(_rnd.Range(1, created.Length - 1)).Segment;
+                                var parentRight = created.ElementAt(_rnd.Range(1, created.Length - 1)).Segment;
+                                var parentForward = created.ElementAt(_rnd.Range(1, created.Length - 1)).Segment;
+                                var parentBack = created.ElementAt(_rnd.Range(1, created.Length - 1)).Segment;
 
                                 if (_rnd.TrySpawnEvent(Config.AllowedDirections.Left) && _rnd.TrySpawnEvent(GetChanceToPropagateBranch(parentBranchLevel)))
                                 {

@@ -25,6 +25,7 @@ namespace TowerGenerator
             public TreeNode<Blueprint.Segment> PointerGarbageCollector { get; private set; }
             public TreeNode<Blueprint.Segment> PointerProgress { get; private set; }
             public TreeNode<Blueprint.Segment> PointerGenerator { get; private set; }
+            public TreeNode<Blueprint.Segment> PointerStable { get; set; }
             public float MaxDistanceProgressToGenerator;
             public float MaxDistanceProgressToGarbageCollector;
             private Blueprint _bp;
@@ -46,6 +47,7 @@ namespace TowerGenerator
                 PointerGarbageCollector = _bp.Tree;
                 PointerProgress = _bp.Tree;
                 PointerGenerator = _bp.Tree;
+                PointerStable = _bp.Tree;
             }
 
             public float DistanceYFactorProgress2Generator()
@@ -170,13 +172,15 @@ namespace TowerGenerator
                     }
 
                     TopologyVisualizer?.Step(step);
-                    VisualBuilder?.Step(step);
                     yield return null;
                 } // end of chunks generating
 
                 Debug.Log("Generator work finish");
                 Debug.Log($"Opened: {curGenerator.CurrentState.GetOpenedForGeneration().Count}");
                 Debug.Log($"prev state opened: {curGenerator?.PrevState?.GetOpenedForGeneration().Count}");
+                
+                if(curGenerator?.PrevState != null)
+                    Assert.IsTrue(  curGenerator?.PrevState?.GetOpenedForGeneration().Count == 0);
 
                 // --- resolve deadlock
                 if (curGenerator.CurrentState.Deadlock != null)
@@ -185,7 +189,7 @@ namespace TowerGenerator
                     var opened = curGenerator.CurrentState.GetOpenedForGeneration(); 
                     if (opened.Count == 0)
                     {
-                        opened = Pointers.PointerGenerator.TraverseDepthFirstPostOrder().Where(x =>
+                        opened = Pointers.PointerStable.TraverseDepthFirstPostOrder().Where(x =>
                             x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
                             x != curGenerator.CurrentState.Deadlock).ToList();
 
@@ -215,22 +219,24 @@ namespace TowerGenerator
                         if (TopologyVisualizer?.StepDelay > 0f)
                             yield return TopologyVisualizer.Wait();
                         TopologyVisualizer?.Step(step);
-                        VisualBuilder?.Step(step);
                     }
                     Debug.Log($"switching trunk to {topMost}");
                     TreeNode<Blueprint.Segment>.SwitchTrunk(topMost);
                 }
 
-                // ----- Change to next in chain TopGen
-                if(prevGenerator!= null)
-                    Pointers.MoveGenerator(prevGenerator.CurrentState.Created.FirstOrDefault(
-                        x => (x.BranchLevel == 0 && x.Data.Topology.ChunkT==Blueprint.Segment.TopologySegment.ChunkType.ChunkStd
-                              && x.Data.Topology.IsOpenedForGenerator == false)
-                    )); // just any of new generated segment belonged to trunk and that is stable (will not be recreated or deleted by next TopGen)
+                
+                //if(prevGenerator!= null)
+                //    Pointers.MoveGenerator(prevGenerator.CurrentState.Created.FirstOrDefault(
+                //        x => (x.BranchLevel == 0 && x.Data.Topology.ChunkT==Blueprint.Segment.TopologySegment.ChunkType.ChunkStd
+                //              && x.Data.Topology.IsOpenedForGenerator == false)
+                //    )); // just any of new generated segment belonged to trunk and that is stable (will not be recreated or deleted by next TopGen)
+                Pointers.PointerStable = GetStableNode(curGenerator.CurrentState.GetOpenedForGeneration());
+                VisualBuilder?.Build(Pointers.PointerStable);
 
                 //if (Pointers.DistanceYFactorProgress2Generator() > Pointers.MaxDistanceProgressToGenerator)
                 //    yield return new WaitUntil(IsNeedToGenerateMore);
 
+                // ----- Change to next in chain TopGen
                 prevGenerator = curGenerator;
                 _generatorsChooser.Step();
                 ++generatorChainCounter;
@@ -238,18 +244,48 @@ namespace TowerGenerator
             } while (_generatorsChooser.GetCurrent() != null); // end generators chain
 
             // ----- finalization of the tower
+            Debug.Log("Finalizing tower");
             foreach (var cmd in curGenerator.Finalize(seed, curGenerator.CurrentState)) // finalizing with the global seed 
             {
-                Debug.Log("Finalizing tower");
                 if (TopologyVisualizer?.StepDelay > 0f)
                     yield return TopologyVisualizer.Wait();
                 TopologyVisualizer?.Step(cmd);
-                VisualBuilder?.Step(cmd);
+                //VisualBuilder?.Step(cmd);
                 yield return null;
             }
+            VisualBuilder?.Build(null);
 
             yield return null;
             State = GeneratorState.Done;
+        }
+
+        private TreeNode<Blueprint.Segment> GetStableNode(List<TreeNode<Blueprint.Segment>> opened)
+        {
+            TreeNode<Blueprint.Segment> MoveDownToFirstClosedTrunk(TreeNode<Blueprint.Segment> node)
+            {
+                var p = node;
+                while (p != null)
+                {
+                    if (p.Data.Topology.IsOpenedForGenerator == false && p.BranchLevel == 0)
+                        return p;
+                    p = p.Parent;
+                }
+                return null;
+            }
+
+            var closed = new List<TreeNode<Blueprint.Segment>>();
+            foreach (var treeNode in opened)
+                closed.Add(MoveDownToFirstClosedTrunk(treeNode));
+
+            var lowest = closed.OrderBy(x => x.Level).First();
+            return lowest;
+            //var pointer = Pointers.PointerStable;
+            //while (pointer!=null)
+            //{
+            //    if (closed.Contains(pointer))
+            //        return pointer;
+            //    pointer = pointer.Children.First();
+            //}
         }
 
         private bool IsNeedToGenerateMore()
@@ -293,6 +329,15 @@ namespace TowerGenerator
                     pointerGeneratorPos,
                     1.0f);
                 Handles.Label(pointerGeneratorPos, "PointerGenerator");
+
+
+                // _pointerStable
+                var pointerStablePos = transform.TransformPoint(Pointers.PointerStable.Data.Topology.Position);
+                Gizmos.color = Color.black;
+                Gizmos.DrawWireSphere(
+                    pointerStablePos,
+                    1.0f);
+                Handles.Label(pointerStablePos, "PointerStable");
 
                 // _progressPointer
                 var pointerProgress = transform.TransformPoint(Pointers.PointerProgress.Data.Topology.Position);
