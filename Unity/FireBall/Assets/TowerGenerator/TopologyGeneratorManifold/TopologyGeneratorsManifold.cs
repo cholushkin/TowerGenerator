@@ -295,6 +295,7 @@ namespace TowerGenerator
 
 
 #if UNITY_EDITOR
+        private readonly Vector3 ConnectorMargin = Vector3.one;
         void OnDrawGizmos()
         {
             if (_bp == null)
@@ -309,8 +310,17 @@ namespace TowerGenerator
                     transform.TransformPoint(treeNode.Data.Topology.Position),
                     0.5f);
 
-                // all nodes children lines
+                Gizmos.DrawWireCube(
+                    transform.TransformPoint(treeNode.Data.Topology.Position), 
+                    treeNode.Data.Topology.AspectRatio);
 
+                Gizmos.color = Color.gray;
+                Gizmos.DrawWireCube(
+                    transform.TransformPoint(treeNode.Data.Topology.Position),
+                    treeNode.Data.Topology.AspectRatio - ConnectorMargin * 2);
+
+
+                // all nodes children lines
                 foreach (var child in treeNode.Children)
                 {
                     Gizmos.color = (child.BranchLevel == 0) ? Color.white : Color.grey;
