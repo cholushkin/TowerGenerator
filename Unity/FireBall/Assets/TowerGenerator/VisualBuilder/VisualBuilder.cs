@@ -68,11 +68,9 @@ namespace TowerGenerator
             if (node.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
                 segBB = SnapBBPos( Vector3.down, new Bounds(visSegment.transform.position, MaxBB), segBB);
             else if (node.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement)
-                segBB = SnapBBPos(Vector3.down, new Bounds(visSegment.transform.position, MaxBB), segBB);
+                segBB = SnapBBPos(Vector3.up, new Bounds(visSegment.transform.position, MaxBB), segBB);
 
             visSegment.transform.position = segBB.center;
-
-
 
             //var visSeg = BuildTopologyVis(cmd.Segment);
             //visSeg.Chunk.transform.DOLocalMove(visSeg.Chunk.transform.localPosition + Vector3.up * 10, StepDelay).From();

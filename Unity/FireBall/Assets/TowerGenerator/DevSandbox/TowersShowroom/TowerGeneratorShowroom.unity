@@ -406,6 +406,60 @@ PrefabInstance:
       propertyPath: StepDelay
       value: 0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegCollision
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: 9d25a5abe14685446bd542e8f1f6b6f7,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegOpenedForGeneration
+      value: 
+      objectReference: {fileID: 2436664497835823196, guid: 65ffc7f24a3f45044976e4679533c1d9,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkRoofPeak
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: feb6093eb42fff14e951f6469cf29176,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkStd
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: 124b168b40f50204c9d1f328eb2ac093,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkIslandAndBasement
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: 54578fd12909c8946a79ec858330069b,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkSideEar
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: efe5b66494feb374e84fff47a09383de,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkBottomEar
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: ca2cafb3c41ce0145b6e1ff257458ecc,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkConnectorVertical
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: aee6c8859b8234b4494a4202693d09eb,
+        type: 3}
+    - target: {fileID: 777519009468692121, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: prefabSegChunkConnectorHorizontal
+      value: 
+      objectReference: {fileID: 430405561945451886, guid: 6d87ce9a44ef81548a0bc1875da9d14d,
+        type: 3}
     - target: {fileID: 6043195961006098395, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -419,7 +473,7 @@ PrefabInstance:
     - target: {fileID: 6043195961006098395, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 140.2
       objectReference: {fileID: 0}
     - target: {fileID: 6043195961006098395, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
