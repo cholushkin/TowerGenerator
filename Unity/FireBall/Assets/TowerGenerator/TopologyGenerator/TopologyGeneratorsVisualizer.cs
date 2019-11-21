@@ -194,6 +194,7 @@ namespace TowerGenerator
         public void ChangeGenerator(TopologyGeneratorBase curGenerator, uint generatorChainCounter)
         {
             var genObj = new GameObject(curGenerator.GetType().ToString().Split('.').Last() + "." + generatorChainCounter);
+            genObj.transform.position = Pivot.position;
             genObj.transform.SetParent(Pivot);
             _generatorPivot = genObj.transform;
         }
