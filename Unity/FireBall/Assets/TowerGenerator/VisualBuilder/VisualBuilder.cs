@@ -55,24 +55,43 @@ namespace TowerGenerator
             if (!isOK)
                 visSegment.name += "error:missfit";
 
-
             // rotation
             visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
 
             // centering
-            var offset = visSegment.transform.position - visSegment.BoundBox().center;
+            var segBB = visSegment.BoundBox();
+            var offset = visSegment.transform.position - segBB.center;
             visSegment.transform.position += offset;
+            segBB.center = visSegment.transform.position;
 
-                
+            // snapping
+            if (node.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
+                segBB = SnapBBPos( Vector3.down, new Bounds(visSegment.transform.position, MaxBB), segBB);
+            else if (node.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement)
+                segBB = SnapBBPos(Vector3.down, new Bounds(visSegment.transform.position, MaxBB), segBB);
 
-                //var visSeg = BuildTopologyVis(cmd.Segment);
-                //visSeg.Chunk.transform.DOLocalMove(visSeg.Chunk.transform.localPosition + Vector3.up * 10, StepDelay).From();
-                //visSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay).From();
-                //_visNodes[cmd.Segment] = visSeg;
+            visSegment.transform.position = segBB.center;
 
-                //_stats.SegmentsAmount++;
-                //if (_stats.MaxHeight < cmd.Segment.Data.Topology.Position.y)
-                //    _stats.MaxHeight = (uint)cmd.Segment.Data.Topology.Position.y;
+
+
+            //var visSeg = BuildTopologyVis(cmd.Segment);
+            //visSeg.Chunk.transform.DOLocalMove(visSeg.Chunk.transform.localPosition + Vector3.up * 10, StepDelay).From();
+            //visSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay).From();
+            //_visNodes[cmd.Segment] = visSeg;
+
+            //_stats.SegmentsAmount++;
+            //if (_stats.MaxHeight < cmd.Segment.Data.Topology.Position.y)
+            //    _stats.MaxHeight = (uint)cmd.Segment.Data.Topology.Position.y;
+        }
+
+        private Bounds SnapBBPos(Vector3 inDirection, Bounds outerBB, Bounds BB)
+        {
+            var deltaExtents = outerBB.extents - BB.extents;
+            if (inDirection == Vector3.down)
+                BB.center = new Vector3(BB.center.x, BB.center.y - deltaExtents.y, BB.center.z);
+            if (inDirection == Vector3.up)
+                BB.center = new Vector3(BB.center.x, BB.center.y + deltaExtents.y, BB.center.z);
+            return BB;
         }
     }
 }
