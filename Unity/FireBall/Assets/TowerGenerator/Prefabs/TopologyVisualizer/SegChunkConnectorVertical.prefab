@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2355879879752329761}
   - component: {fileID: 3461752872998972259}
   m_Layer: 0
-  m_Name: SegBottomEar
+  m_Name: SegChunkConnectorVertical
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57,7 +57,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ca431ef3c8bcfa944bf63748f2e89649, type: 2}
+  - {fileID: 2100000, guid: 3d42300f2c6ea9f4db95e37f75a376ec, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

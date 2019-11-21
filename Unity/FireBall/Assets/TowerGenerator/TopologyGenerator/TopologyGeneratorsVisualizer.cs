@@ -22,20 +22,20 @@ namespace TowerGenerator
         {
             public Blueprint.Segment.TopologySegment.ChunkType SegType;
             public GameObject Chunk;
-            public GameObject Wrapper;
             public GameObject OpenedMarker;
             public GameObject[] Connectors;
         }
 
-        public GameObject prefabSegTransparent; // wrapper - aabb of the chunk 
-        public GameObject prefabSegTransparentCollision; // collision wrapper
+        public GameObject prefabSegCollision;
+        public GameObject prefabSegOpenedForGeneration;
 
-        public GameObject prefabSegStd; // std chunk segment
-        public GameObject prefabSegOpenedForGen; // opened for generation segment
-        public GameObject prefabSegIsland; // island chunk with base tower chunk on it
-        public GameObject prefabSegRoofPeek; // roof or peak
-        public GameObject prefabSegSideEar;
-        public GameObject prefabSegBottomEar;
+        public GameObject prefabSegChunkRoofPeak;
+        public GameObject prefabSegChunkStd;
+        public GameObject prefabSegChunkIslandAndBasement;
+        public GameObject prefabSegChunkSideEar;
+        public GameObject prefabSegChunkBottomEar;
+        public GameObject prefabSegChunkConnectorVertical;
+        public GameObject prefabSegChunkConnectorHorizontal;
 
         public Transform Pivot;
         public float StepDelay;
@@ -114,7 +114,7 @@ namespace TowerGenerator
                     if (cmd.Segment.Data.Topology.IsOpenedForGenerator) // spawn marker
                     {
                         Assert.IsNull(visSeg.OpenedMarker);
-                        visSeg.OpenedMarker = Instantiate(prefabSegOpenedForGen);
+                        visSeg.OpenedMarker = Instantiate(prefabSegOpenedForGeneration);
                         visSeg.OpenedMarker.name = "Opened";
                         visSeg.OpenedMarker.transform.SetParent(visSeg.Chunk.transform);
                         visSeg.OpenedMarker.transform.SetAsFirstSibling();
@@ -135,57 +135,54 @@ namespace TowerGenerator
 
         }
 
-        VisualizationSegment BuildTopologyVis(TreeNode<Blueprint.Segment> segment)
+        VisualizationSegment BuildTopologyVis(TreeNode<Blueprint.Segment> node)
         {
-            GameObject wrapper, chunk;
-            var segData = segment.Data.Topology;
+            GameObject segment = null;
+
+            var segTopology = node.Data.Topology;
             var visSeg = new VisualizationSegment();
 
-            // create wrapper
-            wrapper = Instantiate(segData.HasCollision ? prefabSegTransparentCollision : prefabSegTransparent);
-
-            // create chunk
-            var prefabChunk = prefabSegStd;
-            if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement)
-                prefabChunk = prefabSegIsland;
-            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
-                prefabChunk = prefabSegRoofPeek;
-            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkSideEar)
-                prefabChunk = prefabSegSideEar;
-            else if (segData.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkBottomEar)
-                prefabChunk = prefabSegBottomEar;
+            // create segment
+            if (segTopology.HasCollision)
+                segment = Instantiate(prefabSegCollision);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
+                segment = Instantiate(prefabSegChunkRoofPeak);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkStd)
+                segment = Instantiate(prefabSegChunkStd);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement)
+                segment = Instantiate(prefabSegChunkIslandAndBasement);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkSideEar)
+                segment = Instantiate(prefabSegChunkSideEar);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkBottomEar)
+                segment = Instantiate(prefabSegChunkBottomEar);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorVertical)
+                segment = Instantiate(prefabSegChunkConnectorVertical);
+            else if (segTopology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorHorizontal)
+                segment = Instantiate(prefabSegChunkConnectorHorizontal);
 
             GameObject opened = null;
-            if (segment.Data.Topology.IsOpenedForGenerator)
+            if (segTopology.IsOpenedForGenerator)
             {
-                opened = Instantiate(prefabSegOpenedForGen);
+                opened = Instantiate(prefabSegOpenedForGeneration);
                 opened.name = "Opened";
             }
 
-            chunk = Instantiate(prefabChunk);
-
             // set pos & hierarchy
-            wrapper.transform.position = _generatorPivot.position + segData.Position;
-            wrapper.transform.localScale = segData.AspectRatio;
-
-            chunk.transform.position = _generatorPivot.position + segData.Position;
-            chunk.transform.localScale = segData.AspectRatio * 0.9f; // todo: real margins
-            wrapper.transform.SetParent(chunk.transform);
-
-            chunk.transform.SetParent(_generatorPivot);
-            chunk.name = $"{segment}";
+            segment.transform.position = _generatorPivot.position + segTopology.Position;
+            segment.transform.localScale = segTopology.AspectRatio;
+            segment.transform.SetParent(_generatorPivot);
+            segment.name = $"{segment}";
 
             if (opened != null)
             {
-                opened.transform.position = chunk.transform.position;
-                opened.transform.SetParent(chunk.transform);
+                opened.transform.position = segment.transform.position;
+                opened.transform.SetParent(segment.transform);
                 opened.transform.SetAsFirstSibling();
             }
 
-            visSeg.Chunk = chunk;
-            visSeg.Wrapper = wrapper;
+            visSeg.Chunk = segment;
             visSeg.OpenedMarker = opened;
-            visSeg.SegType = segData.ChunkT;
+            visSeg.SegType = segTopology.ChunkT;
 
             return visSeg;
         }

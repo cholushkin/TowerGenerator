@@ -317,7 +317,7 @@ namespace TowerGenerator
                 Gizmos.color = Color.gray;
                 Gizmos.DrawWireCube(
                     transform.TransformPoint(treeNode.Data.Topology.Position),
-                    treeNode.Data.Topology.AspectRatio - ConnectorMargin * 2);
+                    treeNode.Data.Topology.AspectRatio - ConnectorMargin);
 
 
                 // all nodes children lines

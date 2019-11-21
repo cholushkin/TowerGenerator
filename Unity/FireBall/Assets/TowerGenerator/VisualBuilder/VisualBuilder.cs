@@ -48,7 +48,7 @@ namespace TowerGenerator
             visSegment.transform.SetParent(Pivot);
 
             // calculate BB for vis segment
-            Vector3 MaxBB = node.Data.Topology.AspectRatio - ConnectorMargin * 2;
+            Vector3 MaxBB = node.Data.Topology.AspectRatio - ConnectorMargin;
 
             var visSegController = visSegment.GetComponent<GroupsController>();
             var isOK = visSegController.SetMaximizedFitRndConfiguration(MaxBB);
