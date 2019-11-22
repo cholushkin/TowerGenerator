@@ -1,4 +1,5 @@
-﻿using GameLib.DataStructures;
+﻿using System.Collections.Generic;
+using GameLib.DataStructures;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -19,28 +20,20 @@ namespace TowerGenerator
         {
             public class TopologySegment
             {
-                public enum ChunkType
-                {
-                    ChunkRoofPeak,
-                    ChunkStd,
-                    ChunkIslandAndBasement,
-                    ChunkSideEar,
-                    ChunkBottomEar,
-                    ChunkConnectorVertical,
-                    ChunkConnectorHorizontal,
-                }
-
                 public bool IsOpenedForGenerator;
                 public Vector3 Position;
                 public Vector3 BuildDirection; 
 
                 public Vector3 AspectRatio;
-                public ChunkType ChunkT;
+                public Entity.EntityType EntityType;
+                public List<Vector3> Connections = new List<Vector3>(6);
                 public bool HasCollision { get; set; }
+
+
 
                 public override string ToString()
                 {
-                    return $"{ChunkT}";
+                    return $"{EntityType}";
                 }
             }
 

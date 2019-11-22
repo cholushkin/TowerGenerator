@@ -97,22 +97,22 @@ namespace TowerGenerator
 
         public static MetaBase CreateMeta(GameObject ent, string dir, string name)
         {
-            Blueprint.Segment.TopologySegment.ChunkType Type2ChunkType(Type type)
+            Entity.EntityType Type2ChunkType(Type type)
             {
                 if (type == typeof(ChunkRoofPeak))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
+                    return Entity.EntityType.ChunkRoofPeak;
                 if (type == typeof(ChunkStd))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
+                    return Entity.EntityType.ChunkStd;
                 if (type == typeof(ChunkIslandAndBasement))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement;
+                    return Entity.EntityType.ChunkIslandAndBasement;
                 if (type == typeof(ChunkSideEar))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkSideEar;
+                    return Entity.EntityType.ChunkSideEar;
                 if (type == typeof(ChunkBottomEar))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkBottomEar;
+                    return Entity.EntityType.ChunkBottomEar;
                 if (type == typeof(ChunkConnectorVertical))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorVertical;
+                    return Entity.EntityType.ChunkConnectorVertical;
                 if (type == typeof(ChunkConnectorHorizontal))
-                    return Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorHorizontal;
+                    return Entity.EntityType.ChunkConnectorHorizontal;
                 return 0;
             }
 

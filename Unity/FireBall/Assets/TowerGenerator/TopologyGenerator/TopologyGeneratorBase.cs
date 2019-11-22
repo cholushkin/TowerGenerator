@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameLib;
 using GameLib.DataStructures;
 using GameLib.Random;
 using UnityEngine;
@@ -124,7 +125,7 @@ namespace TowerGenerator
             {
                 Assert.IsNotNull(openedNode);
                 Assert.IsTrue(openedNode.Data.Topology.IsOpenedForGenerator);
-                openedNode.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak;
+                openedNode.Data.Topology.EntityType = Entity.EntityType.ChunkRoofPeak;
                 openedNode.Data.Topology.IsOpenedForGenerator = false;
                 yield return TopGenStep.DoStep(openedNode, TopGenStep.VisualizationCmd.SegChangeState);
             }
@@ -281,9 +282,12 @@ namespace TowerGenerator
                 : parent.Data.Topology.Position + new Vector3(xOffset, yOffset, zOffset);
             segment.Topology.Position += offset;
             segment.Topology.AspectRatio = aspectRatio;
-            segment.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
+            segment.Topology.EntityType = Entity.EntityType.ChunkStd;
             segment.Topology.HasCollision = false;
             segment.Topology.BuildDirection = attachDirection;
+
+            // connections
+            segment.Topology.Connections.Add(-attachDirection);
 
             CurrentState.Created.Push(node);
             return node;
@@ -326,7 +330,7 @@ namespace TowerGenerator
         {
             var islandSize = config.GetRndSegSize(ref _rnd);
             var islandSegment = CreateSegment(null, Vector3.up, islandSize, Vector3.zero);
-            islandSegment.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkIslandAndBasement;
+            islandSegment.Data.Topology.EntityType = Entity.EntityType.ChunkIslandAndBasement;
             islandSegment.Data.Topology.IsOpenedForGenerator = true;
             CurrentState.Created.Push(islandSegment);
             return islandSegment;

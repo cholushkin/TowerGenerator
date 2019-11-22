@@ -6,6 +6,6 @@ namespace TowerGenerator
 {
     public class MetaChunk : MetaBase
     {
-        public Blueprint.Segment.TopologySegment.ChunkType ChunkType;
+        public Entity.EntityType ChunkType;
     }
 }

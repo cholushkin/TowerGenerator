@@ -190,7 +190,7 @@ namespace TowerGenerator
                     if (opened.Count == 0)
                     {
                         opened = Pointers.PointerStable.TraverseDepthFirstPostOrder().Where(x =>
-                            x.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak &&
+                            x.Data.Topology.EntityType == Entity.EntityType.ChunkRoofPeak &&
                             x != curGenerator.CurrentState.Deadlock).ToList();
 
                         //opened = curGenerator.CurrentState.Created.Where(x =>
@@ -206,9 +206,9 @@ namespace TowerGenerator
 
                     Assert.IsTrue(opened.Count != 0);
                     var topMost = opened.OrderBy(x => x.Data.Topology.Position.y).Last();
-                    if (topMost.Data.Topology.ChunkT == Blueprint.Segment.TopologySegment.ChunkType.ChunkRoofPeak)
+                    if (topMost.Data.Topology.EntityType == Entity.EntityType.ChunkRoofPeak)
                     {
-                        topMost.Data.Topology.ChunkT = Blueprint.Segment.TopologySegment.ChunkType.ChunkStd;
+                        topMost.Data.Topology.EntityType = Entity.EntityType.ChunkStd;
                         topMost.Data.Topology.IsOpenedForGenerator = true;
                         curGenerator.CurrentState.Created = new Stack<TreeNode<Blueprint.Segment>>();
                         curGenerator.CurrentState.Created.Push(topMost);

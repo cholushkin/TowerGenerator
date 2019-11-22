@@ -30,7 +30,7 @@ namespace TowerGenerator
 
             protected internal SegmentBuilder _builder;
 
-            public void BuildSegment(Blueprint.Segment.TopologySegment.ChunkType segment = Blueprint.Segment.TopologySegment.ChunkType.ChunkStd,
+            public void BuildSegment(Entity.EntityType segment = Entity.EntityType.ChunkStd,
                 bool isOpened = false)
             {
                 if (Segment != null)
@@ -43,7 +43,7 @@ namespace TowerGenerator
                     Size,
                     (Index == 0) ? _builder._trunkOffset : Vector3.zero
                 );
-                Segment.Data.Topology.ChunkT = segment;
+                Segment.Data.Topology.EntityType = segment;
                 Segment.Data.Topology.IsOpenedForGenerator = isOpened;
                 _builder.CreatedCount++;
             }
