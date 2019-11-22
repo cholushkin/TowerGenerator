@@ -227,7 +227,11 @@ namespace TowerGenerator
                 {
                     step.BuildSegment();
                     if (step.IsFirstOne)
+                    {
+                        step.Segment.Data.Topology.Connection = Vector3.zero;
                         step.Segment.Data.Topology.EntityType = Entity.EntityType.ChunkIslandAndBasement;
+                    }
+
                     if (step.IsLastOne)
                     {
                         if (_rnd.TrySpawnEvent(Config.PropagateIslandChance)) // opened and std

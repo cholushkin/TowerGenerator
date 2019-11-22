@@ -287,7 +287,8 @@ namespace TowerGenerator
             segment.Topology.BuildDirection = attachDirection;
 
             // connections
-            segment.Topology.Connections.Add(-attachDirection);
+            Assert.IsTrue(segment.Topology.Connection == Vector3.zero);
+            segment.Topology.Connection = -attachDirection;
 
             CurrentState.Created.Push(node);
             return node;
@@ -329,7 +330,7 @@ namespace TowerGenerator
         protected TreeNode<Blueprint.Segment> CreateOriginIsland(TopologyGeneratorConfigBase config)
         {
             var islandSize = config.GetRndSegSize(ref _rnd);
-            var islandSegment = CreateSegment(null, Vector3.up, islandSize, Vector3.zero);
+            var islandSegment = CreateSegment(null, Vector3.zero, islandSize, Vector3.zero);
             islandSegment.Data.Topology.EntityType = Entity.EntityType.ChunkIslandAndBasement;
             islandSegment.Data.Topology.IsOpenedForGenerator = true;
             CurrentState.Created.Push(islandSegment);

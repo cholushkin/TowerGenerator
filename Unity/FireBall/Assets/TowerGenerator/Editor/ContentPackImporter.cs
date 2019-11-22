@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FireBall.Game;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -62,7 +61,7 @@ namespace TowerGenerator
         private static void ExtractEntities(GameObject assetObject, string packName)
         {
             // --- delete all (previous) ents of this content pack and their metas
-            DirectoryInfo dir = new DirectoryInfo(GameConstants.PathEnts);
+            DirectoryInfo dir = new DirectoryInfo(TowerGeneratorConstants.PathEnts);
             FileInfo[] info = dir.GetFiles(packName + ".*");
             foreach (FileInfo f in info)
             {
@@ -75,7 +74,7 @@ namespace TowerGenerator
             foreach (Transform ent in assetObject.transform)
             {
                 var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
-                ExtractEnt(ent, GameConstants.PathEnts, fullEntName);
+                ExtractEnt(ent, TowerGeneratorConstants.PathEnts, fullEntName);
             }
             AssetDatabase.Refresh();
         }

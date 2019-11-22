@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using GameLib;
 using GameLib.DataStructures;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -155,10 +156,16 @@ namespace TowerGenerator
                 segment = Instantiate(prefabSegChunkSideEar);
             else if (segTopology.EntityType == Entity.EntityType.ChunkBottomEar)
                 segment = Instantiate(prefabSegChunkBottomEar);
-            //else if (segTopology.EntityType == Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorVertical)
-            //    segment = Instantiate(prefabSegChunkConnectorVertical);
-            //else if (segTopology.EntityType == Blueprint.Segment.TopologySegment.ChunkType.ChunkConnectorHorizontal)
-            //    segment = Instantiate(prefabSegChunkConnectorHorizontal);
+
+            // create connector
+            GameObject connector = null;
+            if (node.Data.Topology.Connection != Vector3.zero)
+            {
+                if(Direction.IsVertical(node.Data.Topology.Connection))
+                    connector = Instantiate(prefabSegChunkConnectorVertical);
+                else
+                    connector = Instantiate(prefabSegChunkConnectorHorizontal);
+            }
 
             GameObject opened = null;
             if (segTopology.IsOpenedForGenerator)
@@ -172,6 +179,26 @@ namespace TowerGenerator
             segment.transform.localScale = segTopology.AspectRatio;
             segment.transform.SetParent(_generatorPivot);
             segment.name = $"{segment}";
+
+            if (connector != null)
+            {
+                connector.transform.position = segment.transform.position;
+                var m = Direction.IsVertical(node.Data.Topology.Connection)
+                    ? segTopology.AspectRatio.y * 0.5f
+                    : segTopology.AspectRatio.x * 0.5f;
+                connector.transform.position += node.Data.Topology.Connection * m;
+
+                connector.transform.localScale = Direction.IsVertical(node.Data.Topology.Connection)
+                    ? new Vector3(
+                        connector.transform.localScale.x * TowerGeneratorConstants.ConnectorAspect,
+                        connector.transform.localScale.y,
+                        connector.transform.localScale.z * TowerGeneratorConstants.ConnectorAspect)
+                    : new Vector3(
+                        connector.transform.localScale.x * TowerGeneratorConstants.ConnectorAspect,
+                        connector.transform.localScale.y * TowerGeneratorConstants.ConnectorAspect,
+                        connector.transform.localScale.z);
+                connector.transform.SetParent(segment.transform);
+            }
 
             if (opened != null)
             {

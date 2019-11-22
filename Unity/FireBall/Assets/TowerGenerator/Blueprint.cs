@@ -26,7 +26,7 @@ namespace TowerGenerator
 
                 public Vector3 AspectRatio;
                 public Entity.EntityType EntityType;
-                public List<Vector3> Connections = new List<Vector3>(6);
+                public Vector3 Connection = Vector3.zero;
                 public bool HasCollision { get; set; }
 
 
