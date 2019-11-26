@@ -39,7 +39,7 @@ namespace TowerGenerator
         {
             // get any random meta of appropriate chunk type
             MetaBase meta = MetaProvider.Instance.Metas.Select(x => x as MetaChunk)
-                .FirstOrDefault(x => x.ChunkType == node.Data.Topology.EntityType);
+                .FirstOrDefault(x => x.EntityType == node.Data.Topology.EntityType);
             var visSegPrefab = Resources.Load("Ents/" + meta.EntName);
             var visSegment = (GameObject) Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;

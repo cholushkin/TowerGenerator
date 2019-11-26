@@ -2,6 +2,7 @@
 using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
@@ -113,7 +114,7 @@ namespace TowerGenerator
                     return Entity.EntityType.ChunkConnectorVertical;
                 if (type == typeof(ChunkConnectorHorizontal))
                     return Entity.EntityType.ChunkConnectorHorizontal;
-                return 0;
+                return Entity.EntityType.Undefined;
             }
 
 
@@ -124,7 +125,8 @@ namespace TowerGenerator
                 string assetPathAndName = dir + "/" + name + ".m.asset";
 
                 asset.EntName = name;
-                asset.ChunkType = Type2ChunkType(entScript.GetType());
+                asset.EntityType = Type2ChunkType(entScript.GetType());
+                Assert.IsTrue(asset.EntityType != Entity.EntityType.Undefined);
 
                 AssetDatabase.CreateAsset(asset, assetPathAndName);
                 AssetDatabase.SaveAssets();

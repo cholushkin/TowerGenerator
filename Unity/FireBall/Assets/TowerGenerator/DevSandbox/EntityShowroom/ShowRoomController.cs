@@ -157,7 +157,7 @@ namespace TowerGenerator
         {
             State.MetaInfosState.MetasNumber = MetaProvider.Instance.Metas.Length;
             State.MetaInfosState.ChunkRoofPeakNumber = MetaProvider.Instance.Metas.Count(
-                x => x is MetaChunk chunk && chunk.ChunkType == Entity.EntityType.ChunkRoofPeak);
+                x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkRoofPeak);
             State.MetaInfosState.ChunkRoofPeakNumberPercent =
                 (int)((float)State.MetaInfosState.ChunkRoofPeakNumber / State.MetaInfosState.MetasNumber * 100f);
             // todo: all params

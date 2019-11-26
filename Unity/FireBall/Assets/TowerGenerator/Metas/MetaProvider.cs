@@ -1,34 +1,83 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Alg;
 using GameLib.Random;
 using NCalc;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    // responsibilies:
-    // * providing metas by name
-    // * providing metas by filter expression
-
     public class MetaProvider : Singleton<MetaProvider>
     {
         [Serializable]
         public class Filter
         {
-            public Type EntityType;
-            public Range Generation;
-            public string Wildcard;
+            private readonly Range _generation;
+            private readonly Entity.EntityType _entTypes;
+            private readonly Expression _expressionPass;
+            private readonly Range _breadthRange;
+            private readonly Range _heightRange;
+            private readonly string _wildcard;
+            private Expression _expression;
 
-            public void SetTagExpressionToPass(string expression)
+            private string ExpressionPass
             {
-                _expressionPass = new Expression(expression);
-                //_expressionPass.EvaluateParameter += _parameterDefaultValueHandler;
-                //_expressionPass.EvaluateFunction += _tagFunctionsHandler;
+                set
+                {
+                    _expression = new Expression(value);
+                    _expression.EvaluateParameter += _parameterDefaultValueHandler;
+                    _expression.EvaluateFunction += _tagFunctionsHandler;
+                }
             }
 
-            public Expression GetPassExpression()
+            public Filter(Range generationRange = null,
+                Entity.EntityType entFlags = (Entity.EntityType)0b1111111111111111,
+                string wildCard = null, string tagExpression = null, Range breadthRange = null,
+                Range heightRange = null)
             {
-                return _expressionPass;
+                _generation = generationRange;
+                _entTypes = entFlags;
+                _wildcard = wildCard;
+                _breadthRange = breadthRange;
+                _heightRange = heightRange;
+                ExpressionPass = tagExpression;
+            }
+
+            public IEnumerable<MetaBase> FilterGeneration(IEnumerable<MetaBase> metas)
+            {
+                if (_generation == null)
+                    return metas;
+                return metas.Where(m => _generation.IsIn(m.Generation));
+            }
+
+            public IEnumerable<MetaBase> FilterEntType(IEnumerable<MetaBase> metas)
+            {
+                return metas.Where(m => (_entTypes & m.EntityType) != 0);
+            }
+
+            public IEnumerable<MetaBase> FilterNameWildcard(IEnumerable<MetaBase> metas)
+            {
+                if (string.IsNullOrEmpty(_wildcard))
+                    return metas;
+                var wildcard = _wildCardToRegular(_wildcard);
+                return metas.Where(m => Regex.IsMatch(m.EntName, wildcard));
+            }
+
+            public IEnumerable<MetaBase> FilterTagExpression(IEnumerable<MetaBase> metas)
+            {
+                if (_expression == null)
+                    return metas;
+                return metas.Where(x => _checkTagsPass(x, _expression));
+            }
+
+            public IEnumerable<MetaBase> FilterSize(IEnumerable<MetaBase> metas)
+            {
+                if (_breadthRange == null || _heightRange == null)
+                    return metas;
+                return metas.Where(_checkSizes);
             }
 
             public override string ToString()
@@ -36,7 +85,49 @@ namespace TowerGenerator
                 return JsonUtility.ToJson(this);
             }
 
-            private Expression _expressionPass;
+            private static string _wildCardToRegular(string value)
+            {
+                return "^" + Regex.Escape(value).Replace("\\*", ".*") + "$";
+            }
+
+            private static bool _checkTagsPass(MetaBase meta, Expression interpreter)
+            {
+                if (meta.TagSet == null || meta.TagSet.IsEmpty())
+                    return false;
+
+                var metaParameters = meta.TagSet.AsDictionary();
+                Assert.IsNotNull(metaParameters);
+                interpreter.Parameters = metaParameters;
+                return (bool)interpreter.Evaluate();
+            }
+
+            static void _parameterDefaultValueHandler(string name, ParameterArgs args)
+            {
+                args.Result = 0f;
+            }
+
+            static void _tagFunctionsHandler(string name, FunctionArgs args)
+            {
+                if (name == "Has")
+                {
+                    float val = (float)args.Parameters[0].Evaluate();
+                    args.Result = val > 0f;
+                }
+            }
+
+            private bool _checkSizes(MetaBase meta)
+            {
+                Assert.IsTrue(meta.AABBs.Count > 0);
+                foreach (var metaAABB in meta.AABBs)
+                {
+                    var breadthIsOK = _breadthRange.IsIn(metaAABB.x) && _breadthRange.IsIn(metaAABB.z);
+                    var heightIsOK = _heightRange.IsIn(metaAABB.y);
+                    if (breadthIsOK && heightIsOK)
+                        return true;
+                }
+
+                return false;
+            }
         }
 
         public MetaBase[] Metas;
@@ -44,130 +135,98 @@ namespace TowerGenerator
         protected override void Awake()
         {
             base.Awake();
-            Metas = Resources.LoadAll<MetaBase>("Ents");
-            Debug.Log($"Metas loaded: {Metas.Length}");
+            if (Metas.Length != 0)
+            {
+                Debug.LogWarning("Using defined metas set instead of loading");
+                Debug.Log($"Metas using: {Metas.Length}");
+            }
+            else
+            {
+                Metas = Resources.LoadAll<MetaBase>("Ents");
+                Debug.Log($"Metas loaded: {Metas.Length}");
+            }
         }
 
 
-        /*
-                public IEnumerable<MetaBase> GetMetas(Filter filter)
-                {
-                    Assert.IsNotNull(Metas);
+        public IEnumerable<MetaBase> GetMetas(Filter filter = null)
+        {
+            Assert.IsNotNull(Metas);
 
-                    //// no filter? just return original sequence
-                    //if (filter == null)
-                    //    return Metas.PatternMetas;
+            if (filter == null) // no filter? just return original sequence
+                return Metas;
 
-                    //IEnumerable<Metas.PatternMeta> filteredResult = Metas.PatternMetas;
+            IEnumerable<MetaBase> filteredResult = Metas;
 
-                    //// generation filtering
-                    //if (filter.Generation != null && !filter.Generation.IsZero()
-                    //) // note: special case: zero range is special case
-                    //    filteredResult = filteredResult.Where(x => filter.Generation.IsIn(x.PatternInfo.Generation));
+            filteredResult = filter.FilterEntType(filteredResult);
+            filteredResult = filter.FilterGeneration(filteredResult);
+            filteredResult = filter.FilterNameWildcard(filteredResult);
+            filteredResult = filter.FilterTagExpression(filteredResult);
+            filteredResult = filter.FilterSize(filteredResult);
 
-                    //// name wildcard filtering
-                    //if (!string.IsNullOrEmpty(filter.Wildcard))
-                    //{
-                    //    var wildcard = _wildCardToRegular(filter.Wildcard);
-                    //    filteredResult = filteredResult.Where(x => Regex.IsMatch(x.Name, wildcard));
-                    //}
+            return filteredResult;
+        }
 
-                    //// tag expression pass filtering
-                    //if (filter.GetPassExpression() != null)
-                    //{
-                    //    var interpeter = filter.GetPassExpression();
-                    //    filteredResult = filteredResult.Where(x => _checkTagsPass(x, interpeter));
-                    //}
 
-                    //return filteredResult;
-                }
+#if UNITY_EDITOR
 
-                private static bool _checkTagsPass(MetaBase meta, Expression interpreter)
-                {
-                    if (meta.PatternInfo.TagSet == null || meta.PatternInfo.TagSet.IsEmpty())
-                        return false;
+        void DbgPrintMetas(IEnumerable<MetaBase> metas, int cnt = -1)
+        {
+            foreach (var metaBase in metas)
+            {
+                Debug.Log($"{metaBase}");
+            }
+        }
 
-                    Dictionary<string, object> metaParameters = new Dictionary<string, object>();
-                    foreach (var tag in meta.PatternInfo.TagSet.Tags)
-                    {
-                        float value = float.TryParse(tag.Value, out value) ? value : 0f;
-                        metaParameters.Add(tag.Name, value);
-                    }
+        [ContextMenu("DbgTestNoFilter")]
+        void DbgTestNoFilter()
+        {
+            var metas = GetMetas();
+            Debug.Log($"NO FILTER: count = {metas.Count()} of {MetaProvider.Instance.Metas.Length}");
+            DbgPrintMetas(metas);
+        }
 
-                    interpreter.Parameters = metaParameters;
-                    return (bool)interpreter.Evaluate();
-                }
+        //// range filter
+        //    {
+        //        Filter f1 = new Filter();
 
-                static void _parameterDefaultValueHandler(string name, ParameterArgs args)
-                {
-                    args.Result = 0f;
-                }
+        //        // (-1,0] range
+        //        f1.Generation = new Range(-1, 0);
+        //        f1.Generation.ToType = Range.EdgeType.Included;
 
-                static void _tagFunctionsHandler(string name, FunctionArgs args)
-                {
-                    if (name == "Has")
-                    {
-                        float val = (float)args.Parameters[0].Evaluate();
-                        args.Result = val > 0f;
-                    }
-                }
+        //        var metas = GetMetas(f1);
+        //        Debug.LogFormat("RANGE FILTER. Filter is: {0}. Result is: {1}", f1, metas.Count());
+        //    }
 
-                private static string _wildCardToRegular(string value)
-                {
-                    return "^" + Regex.Escape(value).Replace("\\*", ".*") + "$";
-                }
+        //    // name wildcard filter
+        //    {
+        //        Filter f1 = new Filter { Wildcard = "*123*" };
+        //        var metas = GetMetas(f1);
+        //        Debug.LogFormat("WILDCARD FILTER. Filter is: {0}. Result is: {1}", f1, metas.Count());
+        //    }
+        //}
 
-                [ContextMenu("DbgTestFilters")]
-                void DbgTestFilters()
-                {
-                    // no filter
-                    {
-                        Filter f1 = new Filter();
-                        var metas = GetMetas(f1);
-                        Debug.LogFormat("NO FILTER. Filter is: {0}. Result is: {1}", f1, metas.Count());
-                    }
+        //[ContextMenu("DbgTestExpressions")]
+        //void DbgTestExpressions()
+        //{
+        //    string[] expressions =
+        //    {
+        //                "Has(Crazy) and ( Difficulty > 0.4 )",
+        //                "Has(Crazy)",
+        //                "Difficulty!=1",
+        //                "Difficulty==1",
+        //            };
+        //    foreach (var xpression in expressions)
+        //    {
+        //        Filter filter = new Filter();
+        //        filter.SetTagExpressionToPass(xpression);
+        //        var metas = GetMetas(filter);
+        //        Debug.LogFormat("{0} ---> {1} patterns ({2})",
+        //            xpression,
+        //            metas.Count(),
+        //            string.Join(", ", metas.Select(x => x.EntName).ToArray()));
+        //    }
+        //}
 
-                    // range filter
-                    {
-                        Filter f1 = new Filter();
-
-                        // (-1,0] range
-                        f1.Generation = new Range(-1, 0);
-                        f1.Generation.ToType = Range.EdgeType.Included;
-
-                        var metas = GetMetas(f1);
-                        Debug.LogFormat("RANGE FILTER. Filter is: {0}. Result is: {1}", f1, metas.Count());
-                    }
-
-                    // name wildcard filter
-                    {
-                        Filter f1 = new Filter { Wildcard = "*123*" };
-                        var metas = GetMetas(f1);
-                        Debug.LogFormat("WILDCARD FILTER. Filter is: {0}. Result is: {1}", f1, metas.Count());
-                    }
-                }
-
-                [ContextMenu("DbgTestExpressions")]
-                void DbgTestExpressions()
-                {
-                    string[] expressions =
-                    {
-                        "Has(Crazy) and ( Difficulty > 0.4 )",
-                        "Has(Crazy)",
-                        "Difficulty!=1",
-                        "Difficulty==1",
-                    };
-                    foreach (var xpression in expressions)
-                    {
-                        Filter filter = new Filter();
-                        filter.SetTagExpressionToPass(xpression);
-                        var metas = GetMetas(filter);
-                        Debug.LogFormat("{0} ---> {1} patterns ({2})",
-                            xpression,
-                            metas.Count(),
-                            string.Join(", ", metas.Select(x => x.EntName).ToArray()));
-                    }
-                }
-                */
+#endif
     }
 }

@@ -4,15 +4,18 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
+    [Serializable]
     public class MetaBase : ScriptableObject
     {
-        public Type EnType;
+        public Entity.EntityType EntityType;
         public string EntName;
-
         public uint Generation;
+        public TagSet TagSet;
+        public List<Vector3> AABBs;
 
-        // biome tags
-        // user tags
-        public List<Bounds> BBs;
+        public override string ToString()
+        {
+            return JsonUtility.ToJson(this, true);
+        }
     }
 }
