@@ -62,40 +62,40 @@ namespace TowerGenerator
         // flying island support
         public SegmentBuilder(int segCount, TreeNode<Blueprint.Segment> fromSegment, Vector3 initialDirection, TopologyGeneratorBase generator, Vector3 offsetFromTrunk)
         {
-            _segCount = segCount;
-            _initialDirection = initialDirection;
-            CurrentDirection = _initialDirection;
-            _generator = generator;
-            _segmentSize = generator.GetConfig().SegmentsSize;
-            _trunkOffset = offsetFromTrunk;
+            //_segCount = segCount;
+            //_initialDirection = initialDirection;
+            //CurrentDirection = _initialDirection;
+            //_generator = generator;
+            //_segmentSize = generator.GetConfig().SegmentsSize;
+            //_trunkOffset = offsetFromTrunk;
 
-            Assert.IsNotNull(fromSegment);
+            //Assert.IsNotNull(fromSegment);
 
-            // create proxy _fromStep
-            _fromStep = new StepResult
-            {
-                Index = -1,
-                Bounds = new Bounds(fromSegment.Data.Topology.Position, fromSegment.Data.Topology.AspectRatio),
-                BuildDirection = fromSegment.Data.Topology.BuildDirection,
-                Segment = fromSegment,
-                Next = null,
-                Prev = null,
-                IsDeadlock = false,
-                IsFirstOne = false,
-                IsLastOne = false,
-                _builder = null
-            };
+            //// create proxy _fromStep
+            //_fromStep = new StepResult
+            //{
+            //    Index = -1,
+            //    Bounds = new Bounds(fromSegment.Data.Topology.Geometry.Position, fromSegment.Data.Topology.Geometry.AspectRatio),
+            //    BuildDirection = fromSegment.Data.Topology.BuildDirection,
+            //    Segment = fromSegment,
+            //    Next = null,
+            //    Prev = null,
+            //    IsDeadlock = false,
+            //    IsFirstOne = false,
+            //    IsLastOne = false,
+            //    _builder = null
+            //};
         }
 
         public SegmentBuilder(int segCount, StepResult fromStep, Vector3 initialDirection, TopologyGeneratorBase generator, Vector3 offsetFromTrunk)
         {
-            _segCount = segCount;
-            _fromStep = fromStep;
-            _initialDirection = initialDirection;
-            CurrentDirection = _initialDirection;
-            _generator = generator;
-            _segmentSize = generator.GetConfig().SegmentsSize;
-            _trunkOffset = offsetFromTrunk;
+            //_segCount = segCount;
+            //_fromStep = fromStep;
+            //_initialDirection = initialDirection;
+            //CurrentDirection = _initialDirection;
+            //_generator = generator;
+            //_segmentSize = generator.GetConfig().SegmentsSize;
+            //_trunkOffset = offsetFromTrunk;
         }
 
         public IEnumerable<StepResult> Step()

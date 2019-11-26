@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Assets.Plugins.Alg;
+using Boo.Lang;
+using GameLib;
 using GameLib.DataStructures;
 using GameLib.Random;
 using UnityEngine;
@@ -27,6 +30,68 @@ namespace TowerGenerator
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
         }
+
+
+        public class GroupVariant
+        {
+            public Group Group;
+            public int Variant;
+            public int Index;
+
+            public override string ToString()
+            {
+                return $"{Group.name}_{Variant}({Index})";
+            }
+        }
+
+        [ContextMenu("GetAllPermutations")]
+        public void GetAllPermutations()
+        {
+            // get all groups (except UserGroup)
+            var groups = GetComponentsInChildren<Group>().Where(x => x is GroupUser == false);
+
+            List<GroupVariant> combinations = new List<GroupVariant>();
+
+            // get list of all variants
+            var index = 0;
+            foreach (var group in groups)
+            {
+                for (int i = 0; i < group.GetNumberOfPermutations(); i++)
+                {
+                    var gVar = new GroupVariant
+                    {
+                        Group = group,
+                        Variant = i,
+                        Index = index++
+                    };
+                    combinations.Push(gVar);
+                    Debug.Log($"{gVar}");
+                }
+            }
+            Debug.Log($"Amount of all variants : {index}");
+            Debug.Log($"{groups.ToArray().Count()}");
+            Debug.Log($"Amount of combinations with that variants: {GetAmountOfGroupVarCombinations(index,8)}");
+        }
+
+        public ulong GetAmountOfGroupVarCombinations(int n, int m)
+        {
+            return (Numbers.Factorial(n) / (Numbers.Factorial(n - m) * Numbers.Factorial(m)));
+        }
+
+        //string NextSet(int* a, int n, int m)
+        //{
+        //    int k = m;
+        //    for (int i = k - 1; i >= 0; --i)
+        //        if (a[i] < n - k + i + 1)
+        //        {
+        //            ++a[i];
+        //            for (int j = i + 1; j < k; ++j)
+        //                a[j] = a[j - 1] + 1;
+        //            return true;
+        //        }
+        //    return false;
+        //}
+
 
         public void BuildImpactTree()
         {

@@ -15,6 +15,28 @@ namespace TowerGenerator
         public class TopologyGeneratorConfigBase // base config with some helpers
         {
             [Serializable]
+            public class PlacementConfig
+            {
+                public enum PlacementStrategy
+                {
+                    ChunkRndSize,
+                    ChunkMaxSize,
+                    ChunkMinSize
+                }
+                public PlacementStrategy Strategy;
+                public bool IgnoreChunkSizeRestrictions;
+                public Range SegmentsSizeBreadth;
+                public Range SegmentsSizeHeight;
+            }
+
+            public class ChunkSpecificPlacement
+            {
+                public Entity.EntityType ApplyTo;
+                public PlacementConfig Placement;
+            }
+
+
+            [Serializable]
             public class AllowedDirectionsChances
             {
                 [Range(0f, 1f)] public float Left;
@@ -26,8 +48,10 @@ namespace TowerGenerator
             }
 
             public Range SegmentsBudget;
-            public Range SegmentsSize;
+            public PlacementConfig DefaultPlacement;
+            public List<ChunkSpecificPlacement> ChunkSpecific;
             public AllowedDirectionsChances AllowedDirections = new AllowedDirectionsChances();
+
 
             private float[] _dirChances = new float[6];
 
@@ -50,12 +74,12 @@ namespace TowerGenerator
                 return _directions[rndDirIndex];
             }
 
-            public Vector3 GetRndSegSize(ref RandomHelper rnd)
+            public Vector3 GetRndSegSize(ref RandomHelper rnd, Entity.EntityType entType)
             {
-                var x = rnd.FromRange(SegmentsSize);
-                var z = x;
-                var y = rnd.FromRange(SegmentsSize);
-                return new Vector3(x, y, z);
+                var placementCfg = ChunkSpecific.FirstOrDefault(e => e.ApplyTo == entType)?.Placement ?? DefaultPlacement;
+                var breadth = rnd.FromRange(placementCfg.SegmentsSizeBreadth);
+                var height = rnd.FromRange(placementCfg.SegmentsSizeHeight);
+                return new Vector3(breadth, height, breadth);
             }
 
             public override string ToString()
@@ -138,6 +162,25 @@ namespace TowerGenerator
             CurrentState = new GeneratorState();
         }
 
+        public Blueprint.Segment.TopologySegment.ChunkGeometry GetNextSegmentGeometry(
+            TopologyGeneratorConfigBase.PlacementConfig placementConfig, 
+            Bounds parentBounds, 
+            Vector3 buildDirection, 
+            Vector3 offset, // instead of connecting close to parent (side to side) use this offset of the parent
+            IEnumerable<Bounds> collisionBoundsEx = null)
+        {
+            var geom = new Blueprint.Segment.TopologySegment.ChunkGeometry();
+
+            // get range of allowed AABB by cfg 
+
+            // get metas inside that range
+
+            return geom;
+
+        }
+
+
+
         // return random from min to max
         Vector3 GetRndSegmentSize(Vector3 from, Vector3 to)
         {
@@ -180,7 +223,7 @@ namespace TowerGenerator
         public Bounds CreateBounds(TreeNode<Blueprint.Segment> node)
         {
             Assert.IsNotNull(node);
-            return new Bounds(node.Data.Topology.Position, node.Data.Topology.AspectRatio);
+            return new Bounds(node.Data.Topology.Geometry.Position, node.Data.Topology.Geometry.AspectRatio);
         }
 
         public Vector3 GetNextSegmentRndFitSize(Range segmentSizeRange,
@@ -190,8 +233,10 @@ namespace TowerGenerator
             return GetNextSegmentRndFitSize(segmentSizeRange, CreateBounds(parent), buildDirection, offset);
         }
 
-        public Vector3 GetNextSegmentRndFitSize(Range segmentSizeRange,
-            Bounds parentBounds, Vector3 buildDirection, Vector3 offset, IEnumerable<Bounds> collisionBoundsEx = null)
+        public Vector3 GetNextSegmentRndFitSize(
+            Range segmentSizeRange,
+            Bounds parentBounds, 
+            Vector3 buildDirection, Vector3 offset, IEnumerable<Bounds> collisionBoundsEx = null)
         {
             // max possible segment size
             var maxSegSize = Vector3.one * segmentSizeRange.To;
@@ -206,7 +251,7 @@ namespace TowerGenerator
             List<Bounds> CollidedList = new List<Bounds>(8);
             foreach (var node in _manifold.Pointers.PointerGarbageCollector.TraverseDepthFirstPreOrder())
             {
-                var nodeBounds = new Bounds(node.Data.Topology.Position, node.Data.Topology.AspectRatio);
+                var nodeBounds = new Bounds(node.Data.Topology.Geometry.Position, node.Data.Topology.Geometry.AspectRatio);
                 if (nodeBounds.IntersectsEx(currentBB))
                     CollidedList.Add(nodeBounds);
             }
@@ -247,12 +292,12 @@ namespace TowerGenerator
             return Vector3.zero;
         }
 
-        protected void DisconnectSegment(TreeNode<Blueprint.Segment> segment)
-        {
-            Assert.IsNotNull(segment);
-            Assert.IsTrue(segment.IsLeaf);
-            segment.Disconnect();
-        }
+        //protected void DisconnectSegment(TreeNode<Blueprint.Segment> segment)
+        //{
+        //    Assert.IsNotNull(segment);
+        //    Assert.IsTrue(segment.IsLeaf);
+        //    segment.Disconnect();
+        //}
 
         public TreeNode<Blueprint.Segment> CreateSegment(
             TreeNode<Blueprint.Segment> parent,
@@ -269,19 +314,19 @@ namespace TowerGenerator
             }
 
             // set pos
-            var parentAspRatX = parent?.Data.Topology.AspectRatio.x ?? 0;
-            var parentAspRatY = parent?.Data.Topology.AspectRatio.y ?? 0;
-            var parentAspRatZ = parent?.Data.Topology.AspectRatio.z ?? 0;
+            var parentAspRatX = parent?.Data.Topology.Geometry.AspectRatio.x ?? 0;
+            var parentAspRatY = parent?.Data.Topology.Geometry.AspectRatio.y ?? 0;
+            var parentAspRatZ = parent?.Data.Topology.Geometry.AspectRatio.z ?? 0;
 
             var xOffset = (parentAspRatX + aspectRatio.x) * attachDirection.x * .5f;
             var yOffset = (parentAspRatY + aspectRatio.y) * attachDirection.y * .5f;
             var zOffset = (parentAspRatZ + aspectRatio.z) * attachDirection.z * .5f;
 
-            segment.Topology.Position = parent == null
+            segment.Topology.Geometry.Position = parent == null
                 ? Vector3.zero
-                : parent.Data.Topology.Position + new Vector3(xOffset, yOffset, zOffset);
-            segment.Topology.Position += offset;
-            segment.Topology.AspectRatio = aspectRatio;
+                : parent.Data.Topology.Geometry.Position + new Vector3(xOffset, yOffset, zOffset);
+            segment.Topology.Geometry.Position += offset;
+            segment.Topology.Geometry.AspectRatio = aspectRatio;
             segment.Topology.EntityType = Entity.EntityType.ChunkStd;
             segment.Topology.HasCollision = false;
             segment.Topology.BuildDirection = attachDirection;
@@ -296,13 +341,13 @@ namespace TowerGenerator
 
         protected bool CheckCollisions(TreeNode<Blueprint.Segment> checkNode)
         {
-            Bounds checkNodeBounds = new Bounds(checkNode.Data.Topology.Position, checkNode.Data.Topology.AspectRatio);
+            Bounds checkNodeBounds = new Bounds(checkNode.Data.Topology.Geometry.Position, checkNode.Data.Topology.Geometry.AspectRatio);
 
             foreach (var node in _manifold.Pointers.PointerGarbageCollector.TraverseDepthFirstPreOrder())
             {
                 if (node == checkNode)
                     continue;
-                var nodeBounds = new Bounds(node.Data.Topology.Position, node.Data.Topology.AspectRatio);
+                var nodeBounds = new Bounds(node.Data.Topology.Geometry.Position, node.Data.Topology.Geometry.AspectRatio);
                 if (nodeBounds.IntersectsEx(checkNodeBounds))
                     return true;
             }
@@ -314,33 +359,27 @@ namespace TowerGenerator
         // todo: bypass 
         // todo: sprawling
 
-        protected IEnumerable<TopGenStep> GenerateLine(Range segSizeMinMax,
-            TreeNode<Blueprint.Segment> parent, int segCount, Vector3 direction)
-        {
-            for (int i = 0; i < segCount; ++i)
-            {
-                Vector3 fitSize = GetNextSegmentRndFitSize(segSizeMinMax, parent, direction, Vector3.zero);
-                if (fitSize.x < segSizeMinMax.From)
-                    yield break;
-                parent = CreateSegment(parent, direction, fitSize, Vector3.zero);
-                yield return TopGenStep.DoStep(CurrentState.Created.Peek(), TopGenStep.VisualizationCmd.SegSpawn);
-            }
-        }
+        //protected IEnumerable<TopGenStep> GenerateLine(Range segSizeMinMax,
+        //    TreeNode<Blueprint.Segment> parent, int segCount, Vector3 direction)
+        //{
+        //    for (int i = 0; i < segCount; ++i)
+        //    {
+        //        Vector3 fitSize = GetNextSegmentRndFitSize(segSizeMinMax, parent, direction, Vector3.zero);
+        //        if (fitSize.x < segSizeMinMax.From)
+        //            yield break;
+        //        parent = CreateSegment(parent, direction, fitSize, Vector3.zero);
+        //        yield return TopGenStep.DoStep(CurrentState.Created.Peek(), TopGenStep.VisualizationCmd.SegSpawn);
+        //    }
+        //}
 
         protected TreeNode<Blueprint.Segment> CreateOriginIsland(TopologyGeneratorConfigBase config)
         {
-            var islandSize = config.GetRndSegSize(ref _rnd);
+            var islandSize = config.GetRndSegSize(ref _rnd, Entity.EntityType.ChunkIslandAndBasement);
             var islandSegment = CreateSegment(null, Vector3.zero, islandSize, Vector3.zero);
             islandSegment.Data.Topology.EntityType = Entity.EntityType.ChunkIslandAndBasement;
             islandSegment.Data.Topology.IsOpenedForGenerator = true;
             CurrentState.Created.Push(islandSegment);
             return islandSegment;
-        }
-
-        protected IEnumerable<TopGenStep> FindBypass(TopologyGeneratorConfigBase config, Vector3 direction, TreeNode<Blueprint.Segment> from, int maxSegmentsAmount = -1)
-        {
-            // from rnd(left,up,right,down,forward,back)
-            throw new NotImplementedException();
         }
         #endregion
     }

@@ -228,7 +228,7 @@ namespace TowerGenerator
         float DistanceToCentralAxis(TreeNode<Blueprint.Segment> trunkNode)
         {
             Assert.IsNotNull(trunkNode);
-            var planePos = trunkNode.Data.Topology.Position;
+            var planePos = trunkNode.Data.Topology.Geometry.Position;
             planePos.y = 0f;
             return planePos.magnitude;
         }

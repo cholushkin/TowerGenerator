@@ -11,6 +11,11 @@ namespace TowerGenerator
     {
         public int ItemIndexSelected;
 
+        public override int GetNumberOfPermutations()
+        {
+            return GetItemsCount();
+        }
+
         public override void DoRndChoice(ref RandomHelper rnd)
         {
             Assert.IsTrue(GetItemsCount() > 0);

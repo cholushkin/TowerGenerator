@@ -79,8 +79,8 @@ namespace TowerGenerator
                 _visNodes[cmd.Segment] = visSeg;
 
                 _stats.SegmentsAmount++;
-                if (_stats.MaxHeight < cmd.Segment.Data.Topology.Position.y)
-                    _stats.MaxHeight = (uint)cmd.Segment.Data.Topology.Position.y;
+                if (_stats.MaxHeight < cmd.Segment.Data.Topology.Geometry.Position.y)
+                    _stats.MaxHeight = (uint)cmd.Segment.Data.Topology.Geometry.Position.y;
             }
             else if (cmd.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegDestroy)
             {
@@ -175,8 +175,8 @@ namespace TowerGenerator
             }
 
             // set pos & hierarchy
-            segment.transform.position = _generatorPivot.position + segTopology.Position;
-            segment.transform.localScale = segTopology.AspectRatio;
+            segment.transform.position = _generatorPivot.position + segTopology.Geometry.Position;
+            segment.transform.localScale = segTopology.Geometry.AspectRatio;
             segment.transform.SetParent(_generatorPivot);
             segment.name = $"{segment}";
 
@@ -184,8 +184,8 @@ namespace TowerGenerator
             {
                 connector.transform.position = segment.transform.position;
                 var m = Direction.IsVertical(node.Data.Topology.Connection)
-                    ? segTopology.AspectRatio.y * 0.5f
-                    : segTopology.AspectRatio.x * 0.5f;
+                    ? segTopology.Geometry.AspectRatio.y * 0.5f
+                    : segTopology.Geometry.AspectRatio.x * 0.5f;
                 connector.transform.position += node.Data.Topology.Connection * m;
 
                 connector.transform.localScale = Direction.IsVertical(node.Data.Topology.Connection)

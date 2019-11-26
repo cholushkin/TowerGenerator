@@ -80,6 +80,10 @@ namespace TowerGenerator
                     PropagatedTo = GetPropagationIndexFromString(propPropagatedTo.PropValue);
             }
         }
+
+        public abstract int GetNumberOfPermutations();
+
+
         public abstract void DoRndChoice(ref RandomHelper rnd);
         public abstract void DoRndMinimalChoice(ref RandomHelper rnd);
 

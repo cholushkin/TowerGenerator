@@ -12,7 +12,7 @@ namespace TowerGenerator
             var seg = Manifold.Pointers.PointerProgress;
             if (seg?.Data?.Topology == null)
                 return;
-            transform.position = seg.Data.Topology.Position;
+            transform.position = seg.Data.Topology.Geometry.Position;
         }
     }
 }

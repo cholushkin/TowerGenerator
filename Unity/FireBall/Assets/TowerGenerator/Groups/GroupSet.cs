@@ -34,6 +34,11 @@ namespace TowerGenerator
                 MinObjectsSelected = 0;
         }
 
+        public override int GetNumberOfPermutations()
+        {
+            return (int)Math.Pow(2, GetItemsCount());
+        }
+
         private int GetMaxObjectsSelectedFromString(string propValue)
         {
             if (propValue.ToLower() == "all")

@@ -8,6 +8,11 @@ namespace TowerGenerator
     {
         public int LayerIndexSelected;
 
+        public override int GetNumberOfPermutations()
+        {
+            return GetItemsCount(); 
+        }
+
         public override void DoRndChoice(ref RandomHelper rnd)
         {
             DisableItems();

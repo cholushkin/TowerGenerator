@@ -20,16 +20,20 @@ namespace TowerGenerator
         {
             public class TopologySegment
             {
-                public bool IsOpenedForGenerator;
-                public Vector3 Position;
-                public Vector3 BuildDirection; 
+                public class ChunkGeometry
+                {
+                    public Vector3 Position;
+                    public Vector3 AspectRatio; // aabb
+                    public string Meta;
+                    public long Seed;
+                }
 
-                public Vector3 AspectRatio;
+                public ChunkGeometry Geometry;
+                public bool IsOpenedForGenerator;
+                public Vector3 BuildDirection; 
                 public Entity.EntityType EntityType;
                 public Vector3 Connection = Vector3.zero;
                 public bool HasCollision { get; set; }
-
-
 
                 public override string ToString()
                 {

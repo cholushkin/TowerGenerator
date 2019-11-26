@@ -44,11 +44,11 @@ namespace TowerGenerator
             var visSegment = (GameObject) Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;
 
-            visSegment.transform.position = Pivot.position + node.Data.Topology.Position;
+            visSegment.transform.position = Pivot.position + node.Data.Topology.Geometry.Position;
             visSegment.transform.SetParent(Pivot);
 
             // calculate BB for vis segment
-            Vector3 MaxBB = node.Data.Topology.AspectRatio - ConnectorMargin;
+            Vector3 MaxBB = node.Data.Topology.Geometry.AspectRatio - ConnectorMargin;
 
             var visSegController = visSegment.GetComponent<GroupsController>();
             var isOK = visSegController.SetMaximizedFitRndConfiguration(MaxBB);

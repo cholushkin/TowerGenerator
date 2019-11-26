@@ -52,8 +52,8 @@ namespace TowerGenerator
 
             public float DistanceYFactorProgress2Generator()
             {
-                return Mathf.Abs(PointerProgress.Data.Topology.Position.y -
-                                 PointerGenerator.Data.Topology.Position.y);
+                return Mathf.Abs(PointerProgress.Data.Topology.Geometry.Position.y -
+                                 PointerGenerator.Data.Topology.Geometry.Position.y);
             }
 
             public void MoveProgress()
@@ -66,7 +66,7 @@ namespace TowerGenerator
                 PointerProgress = nextTrunkNode;
 
                 // Decrease distance between PointerProgress and PointerGarbageCollector
-                while (Mathf.Abs(PointerProgress.Data.Topology.Position.y - PointerGarbageCollector.Data.Topology.Position.y)
+                while (Mathf.Abs(PointerProgress.Data.Topology.Geometry.Position.y - PointerGarbageCollector.Data.Topology.Geometry.Position.y)
                        > MaxDistanceProgressToGarbageCollector) // y distance from PointerProgress to PointerGarbageCollector
                 {
                     MoveGarbageCollectorPointer();
@@ -205,7 +205,7 @@ namespace TowerGenerator
                     }
 
                     Assert.IsTrue(opened.Count != 0);
-                    var topMost = opened.OrderBy(x => x.Data.Topology.Position.y).Last();
+                    var topMost = opened.OrderBy(x => x.Data.Topology.Geometry.Position.y).Last();
                     if (topMost.Data.Topology.EntityType == Entity.EntityType.ChunkRoofPeak)
                     {
                         topMost.Data.Topology.EntityType = Entity.EntityType.ChunkStd;
@@ -306,17 +306,17 @@ namespace TowerGenerator
                 // node center
                 Gizmos.color = Color.red;
                 Gizmos.DrawSphere(
-                    transform.TransformPoint(treeNode.Data.Topology.Position),
+                    transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
                     0.5f);
 
                 Gizmos.DrawWireCube(
-                    transform.TransformPoint(treeNode.Data.Topology.Position), 
-                    treeNode.Data.Topology.AspectRatio);
+                    transform.TransformPoint(treeNode.Data.Topology.Geometry.Position), 
+                    treeNode.Data.Topology.Geometry.AspectRatio);
 
                 Gizmos.color = Color.gray;
                 Gizmos.DrawWireCube(
-                    transform.TransformPoint(treeNode.Data.Topology.Position),
-                    treeNode.Data.Topology.AspectRatio - TowerGeneratorConstants.ConnectorMargin);
+                    transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
+                    treeNode.Data.Topology.Geometry.AspectRatio - TowerGeneratorConstants.ConnectorMargin);
 
 
                 // all nodes children lines
@@ -324,15 +324,15 @@ namespace TowerGenerator
                 {
                     Gizmos.color = (child.BranchLevel == 0) ? Color.white : Color.grey;
 
-                    var childPos = transform.TransformPoint(child.Data.Topology.Position);
-                    Gizmos.DrawLine(childPos, transform.TransformPoint(treeNode.Data.Topology.Position));
+                    var childPos = transform.TransformPoint(child.Data.Topology.Geometry.Position);
+                    Gizmos.DrawLine(childPos, transform.TransformPoint(treeNode.Data.Topology.Geometry.Position));
                 }
             }
 
             if (IsGizmoDrawPointers)
             {
                 // _pointerGenerator
-                var pointerGeneratorPos = transform.TransformPoint(Pointers.PointerGenerator.Data.Topology.Position);
+                var pointerGeneratorPos = transform.TransformPoint(Pointers.PointerGenerator.Data.Topology.Geometry.Position);
                 Gizmos.color = Color.black;
                 Gizmos.DrawWireSphere(
                     pointerGeneratorPos,
@@ -341,7 +341,7 @@ namespace TowerGenerator
 
 
                 // _pointerStable
-                var pointerStablePos = transform.TransformPoint(Pointers.PointerStable.Data.Topology.Position);
+                var pointerStablePos = transform.TransformPoint(Pointers.PointerStable.Data.Topology.Geometry.Position);
                 Gizmos.color = Color.black;
                 Gizmos.DrawWireSphere(
                     pointerStablePos,
@@ -349,7 +349,7 @@ namespace TowerGenerator
                 Handles.Label(pointerStablePos, "PointerStable");
 
                 // _progressPointer
-                var pointerProgress = transform.TransformPoint(Pointers.PointerProgress.Data.Topology.Position);
+                var pointerProgress = transform.TransformPoint(Pointers.PointerProgress.Data.Topology.Geometry.Position);
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(
                     pointerProgress,
@@ -359,7 +359,7 @@ namespace TowerGenerator
 
                 // _pointerGarbageCollector
                 var pointerGarbageCollectorPos =
-                    transform.TransformPoint(Pointers.PointerGarbageCollector.Data.Topology.Position);
+                    transform.TransformPoint(Pointers.PointerGarbageCollector.Data.Topology.Geometry.Position);
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(
                     pointerGarbageCollectorPos,
