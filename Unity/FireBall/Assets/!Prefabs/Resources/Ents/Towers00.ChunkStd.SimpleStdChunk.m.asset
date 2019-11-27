@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4aa6e3ac818c4142b1dd4fa1fbf3675, type: 3}
   m_Name: Towers00.ChunkStd.SimpleStdChunk.m
   m_EditorClassIdentifier: 
+  EntityType: 2
   EntName: Towers00.ChunkStd.SimpleStdChunk
   Generation: 0
-  BBs: []
-  ChunkType: 1
+  TagSet:
+    Tags: []
+  AABBs: []

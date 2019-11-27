@@ -19,8 +19,8 @@ namespace TowerGenerator
             base.Configure(entityRoot,scriptProperties);
 
             // get domain properties
-            var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == "MinObjectsSelected");
-            var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == "MaxObjectsSelected");
+            var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameMinObjectsSelected);
+            var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameMaxObjectsSelected);
 
 
             if (propMaxObjectsSelected != null)

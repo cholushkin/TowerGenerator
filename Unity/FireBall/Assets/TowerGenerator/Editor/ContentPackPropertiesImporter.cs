@@ -22,11 +22,10 @@ namespace TowerGenerator
             string[] scriptNames = null;
 
             // get scripts to add
-            var index = Array.FindIndex(names, x => x == "AddScript");
+            var index = Array.FindIndex(names, x => x == PropertyParserHelper.PropNameAddScript);
             if (index == -1)
             {
-                Debug.LogError($"There must be property 'AddScript'");
-                Debug.LogError($"{gObj.transform.GetDebugName()}");
+                Debug.LogError($"There must be property 'AddScript' on {gObj.transform.GetDebugName()}");
                 return;
             }
 
@@ -38,7 +37,7 @@ namespace TowerGenerator
 
             for (int i = 0; i < names.Length; ++i)
             {
-                if(names[i] == "AddScript")
+                if(names[i] == PropertyParserHelper.PropNameAddScript)
                     continue;
                 // pass properties to appropriate script
                 var prefixAndPropName = names[i].Split('.');

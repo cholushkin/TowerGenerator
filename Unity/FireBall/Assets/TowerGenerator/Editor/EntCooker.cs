@@ -81,7 +81,9 @@ namespace TowerGenerator
                 case "Connectors":
                     gObj.AddComponent<Connectors>();
                     break;
-
+                case "ColliderCheck":
+                    gObj.AddComponent<ColliderCheck>().Configure(_entity, scriptWithParams.ScriptProperties);
+                    break;
                 default:
                     Debug.LogError($"Unsupported script type: {scriptWithParams.ScriptName}");
                     return;

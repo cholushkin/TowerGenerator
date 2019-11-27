@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4aa6e3ac818c4142b1dd4fa1fbf3675, type: 3}
   m_Name: Towers00.ChunkSideEarStub.m
   m_EditorClassIdentifier: 
+  EntityType: 8
   EntName: Towers00.ChunkSideEarStub
   Generation: 0
-  BBs: []
-  ChunkType: 3
+  TagSet:
+    Tags: []
+  AABBs: []

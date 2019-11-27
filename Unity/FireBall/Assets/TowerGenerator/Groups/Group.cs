@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Plugins.Alg;
 using GameLib.Random;
@@ -17,14 +16,18 @@ namespace TowerGenerator
         public virtual void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
         {
 #if UNITY_EDITOR
-            // check validness of the prop name
-            foreach (var scriptProperty in scriptProperties)
-                if (!IsValidName(scriptProperty.PropName))
-                    Debug.LogError($"Bad property name '{scriptProperty.PropName}' on '{transform.GetDebugName()}'");
+            if( !PropertyParserHelper.CheckPropNames(
+                scriptProperties,
+                PropertyParserHelper.PropNamePropagatedTo, 
+                PropertyParserHelper.PropNameHost,
+                PropertyParserHelper.PropNameMaxObjectsSelected,
+                PropertyParserHelper.PropNameMinObjectsSelected
+            ))
+                Debug.LogError($"Bad property name on '{transform.GetDebugName()}'");
 #endif
             // get domain properties
-            var propPropagatedTo = scriptProperties.FirstOrDefault(x => x.PropName == "PropagatedTo");
-            var propHost = scriptProperties.FirstOrDefault(x => x.PropName == "Host");
+            var propPropagatedTo = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNamePropagatedTo);
+            var propHost = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameHost);
 
             // ----- get host group
             if (propHost == null) 
@@ -102,27 +105,14 @@ namespace TowerGenerator
                 return propIndex;
             }
 
-            propIndex = Int32.Parse(propValue);
+
+            if (!PropertyParserHelper.ParseInt(propValue, out propIndex))
+                Debug.LogError($"Parsing int error for value {propValue}");
             var clampedPropIndex = Mathf.Clamp(propIndex, -1, Host.GetItemsCount() - 1);
             if (propIndex != clampedPropIndex)
                 Debug.LogWarning($"Claming happened {propIndex} -> {clampedPropIndex}");
             return clampedPropIndex;
         }
-
-#if UNITY_EDITOR
-        private bool IsValidName(string propertyName)
-        {
-            if (propertyName == "PropagatedTo")
-                return true;
-            if (propertyName == "Host")
-                return true;
-            if (propertyName == "MinObjectsSelected")
-                return true;
-            if (propertyName == "MaxObjectsSelected")
-                return true;
-            return true;
-        }
-#endif
 
         public void DisableItems()
         {

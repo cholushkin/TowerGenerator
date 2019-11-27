@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2205202703027289944
+--- !u!1 &4577451991295003538
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6357510809948343482}
-  - component: {fileID: 2835999856501707675}
-  - component: {fileID: 8553997082212281846}
+  - component: {fileID: 121457279154935457}
+  - component: {fileID: 8602461679130789812}
+  - component: {fileID: 4599431566570221729}
   m_Layer: 0
   m_Name: stub.003
   m_TagString: Untagged
@@ -18,35 +18,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6357510809948343482
+--- !u!4 &121457279154935457
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2205202703027289944}
+  m_GameObject: {fileID: 4577451991295003538}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.00012904043, y: 0.00025929091, z: 0.00030251502}
   m_LocalScale: {x: 0.6705777, y: 0.6705777, z: 0.6705777}
   m_Children: []
-  m_Father: {fileID: 7331640997224056292}
+  m_Father: {fileID: 3070520002432856876}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &2835999856501707675
+--- !u!33 &8602461679130789812
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2205202703027289944}
+  m_GameObject: {fileID: 4577451991295003538}
   m_Mesh: {fileID: -8546101174491428046, guid: e247a0015511499469e2c9fe809ad1e7, type: 3}
---- !u!23 &8553997082212281846
+--- !u!23 &4599431566570221729
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2205202703027289944}
+  m_GameObject: {fileID: 4577451991295003538}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -78,7 +78,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!1 &8913924942813374458
+--- !u!1 &5961740816186555867
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,10 +86,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7331640997224056292}
-  - component: {fileID: 3723587890724105101}
-  - component: {fileID: 5829910408655813500}
-  - component: {fileID: 3569753611521464384}
+  - component: {fileID: 3070520002432856876}
+  - component: {fileID: 3813600245473018772}
+  - component: {fileID: 431543665625829805}
   m_Layer: 0
   m_Name: Towers00.ChunkConnectorHorizontalStub
   m_TagString: Untagged
@@ -97,55 +96,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7331640997224056292
+--- !u!4 &3070520002432856876
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8913924942813374458}
+  m_GameObject: {fileID: 5961740816186555867}
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: 3.4065577e-15, y: -15.341772, z: -2.413313}
   m_LocalScale: {x: 149.12515, y: 149.12515, z: 149.12515}
   m_Children:
-  - {fileID: 6357510809948343482}
+  - {fileID: 121457279154935457}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3723587890724105101
+--- !u!114 &3813600245473018772
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8913924942813374458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e9b1a6a3d248a9479acb58908c6302c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ScriptsToAdd:
-  - ScriptName: ChunkConnectorHorizontal
-    ScriptProperties: []
---- !u!114 &5829910408655813500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8913924942813374458}
+  m_GameObject: {fileID: 5961740816186555867}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6847cf31b8ec2dc49ac18ea83d93c108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3569753611521464384
+--- !u!114 &431543665625829805
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8913924942813374458}
+  m_GameObject: {fileID: 5961740816186555867}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ac98aa0c685dafa43ad4087e82ad802d, type: 3}
