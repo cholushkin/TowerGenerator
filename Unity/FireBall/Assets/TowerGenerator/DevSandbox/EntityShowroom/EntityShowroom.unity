@@ -212,6 +212,31 @@ PrefabInstance:
       propertyPath: DelayButtonValues.Array.data[2]
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982761, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: State.MetaControlPanelState.ChunkRoofPeak
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982761, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: State.MetaControlPanelState.ChunkStd
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982761, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: State.MetaControlPanelState.ChunkIslandAndBasement
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982761, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: State.MetaControlPanelState.ChunkSideEar
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982761, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: State.MetaControlPanelState.ChunkConnectorVertical
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9320f212596a79d46a1891961f5e49d6, type: 3}
 --- !u!114 &151939627409478536 stripped

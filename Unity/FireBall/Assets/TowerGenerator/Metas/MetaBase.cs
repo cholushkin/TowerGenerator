@@ -13,6 +13,13 @@ namespace TowerGenerator
         public TagSet TagSet;
         public List<Vector3> AABBs;
 
+        public void AddAABB(Vector3 aabb)
+        {
+            if(AABBs==null)
+                AABBs = new List<Vector3>(3);
+            AABBs.Add(aabb);
+        }
+
         public override string ToString()
         {
             return JsonUtility.ToJson(this, false);

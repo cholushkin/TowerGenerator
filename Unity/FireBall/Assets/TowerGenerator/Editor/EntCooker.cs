@@ -20,8 +20,6 @@ namespace TowerGenerator
             return semifinishedEnt;
         }
 
-
-
         private static void AddScripts(GameObject semifinishedEnt)
         {
             void AddScript(Transform tr)
@@ -93,9 +91,10 @@ namespace TowerGenerator
         private static void BuildGroupsController(GameObject ent)
         {
             var groupController = ent.AddComponent<GroupsController>();
+            groupController.Init();
             groupController.BuildImpactTree();
-            groupController.CalculateBBMax();
-            groupController.CalculateBBMin();
+            //groupController.CalculateBBMax();
+            //groupController.CalculateBBMin();
         }
 
         public static MetaBase CreateMeta(GameObject ent, string dir, string name)
@@ -121,6 +120,8 @@ namespace TowerGenerator
 
 
             var entScript = ent.GetComponent<Entity>();
+            
+
             if (entScript is ChunkBase)
             {
                 var asset = ScriptableObject.CreateInstance<MetaChunk>();
@@ -129,6 +130,22 @@ namespace TowerGenerator
                 asset.EntName = name;
                 asset.EntityType = Type2ChunkType(entScript.GetType());
                 Assert.IsTrue(asset.EntityType != Entity.EntityType.Undefined);
+
+                var groupController = ent.GetComponent<GroupsController>();
+                Assert.IsNotNull(groupController, "chunk must have a group controller");
+
+
+                // todo: generation
+                // todo: TagSet
+
+                // AABBs
+                for (int i = 0; i < groupController.GroupSizeStack.GetItemsCount(); ++i)
+                {
+                    groupController.GroupSizeStack.DoChoice(i);
+                    asset.AddAABB( groupController.CalculateBB().size );
+                }
+                
+
 
                 AssetDatabase.CreateAsset(asset, assetPathAndName);
                 AssetDatabase.SaveAssets();

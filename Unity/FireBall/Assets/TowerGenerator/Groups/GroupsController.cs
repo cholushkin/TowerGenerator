@@ -21,62 +21,65 @@ namespace TowerGenerator
         }
 
         private TreeNode<ProcessingNode> _tree;
-        public Bounds BBMax;
-        public Bounds BBMin;
+        //public Bounds BBMax;
+        //public Bounds BBMin;
         public long Seed = -1;
 
-        void Awake()
+        public GroupStack GroupSizeStack;
+
+        public void Init()
         {
-            if (Seed == -1)
-                Seed = Random.Range(0, Int32.MaxValue);
+            //if (Seed == -1)
+            //    Seed = Random.Range(0, Int32.MaxValue);
+            GroupSizeStack = GetComponentInChildren<GroupStack>();
+            Assert.IsNotNull(GroupSizeStack, $"{gameObject.transform.GetDebugName()}");
         }
 
+        //public class GroupVariant
+        //{
+        //    public Group Group;
+        //    public int Variant;
+        //    public int Index;
 
-        public class GroupVariant
-        {
-            public Group Group;
-            public int Variant;
-            public int Index;
+        //    public override string ToString()
+        //    {
+        //        return $"{Group.name}_{Variant}({Index})";
+        //    }
+        //}
 
-            public override string ToString()
-            {
-                return $"{Group.name}_{Variant}({Index})";
-            }
-        }
+        //[ContextMenu("GetAllPermutations")]
+        //public void GetAllPermutations()
+        //{
+        //    // get all groups (except UserGroup)
+        //    var groups = GetComponentsInChildren<Group>().Where(x => x is GroupUser == false);
 
-        [ContextMenu("GetAllPermutations")]
-        public void GetAllPermutations()
-        {
-            // get all groups (except UserGroup)
-            var groups = GetComponentsInChildren<Group>().Where(x => x is GroupUser == false);
+        //    List<GroupVariant> combinations = new List<GroupVariant>();
 
-            List<GroupVariant> combinations = new List<GroupVariant>();
+        //    // get list of all variants
+        //    var index = 0;
+        //    foreach (var group in groups)
+        //    {
+        //        for (int i = 0; i < group.GetNumberOfPermutations(); i++)
+        //        {
+        //            var gVar = new GroupVariant
+        //            {
+        //                Group = group,
+        //                Variant = i,
+        //                Index = index++
+        //            };
+        //            combinations.Push(gVar);
+        //            Debug.Log($"{gVar}");
+        //        }
+        //    }
+        //    Debug.Log($"Amount of all variants : {index}");
+        //    Debug.Log($"{groups.ToArray().Count()}");
+        //    Debug.Log($"Amount of combinations with that variants: {GetAmountOfGroupVarCombinations(index,8)}");
+        //}
 
-            // get list of all variants
-            var index = 0;
-            foreach (var group in groups)
-            {
-                for (int i = 0; i < group.GetNumberOfPermutations(); i++)
-                {
-                    var gVar = new GroupVariant
-                    {
-                        Group = group,
-                        Variant = i,
-                        Index = index++
-                    };
-                    combinations.Push(gVar);
-                    Debug.Log($"{gVar}");
-                }
-            }
-            Debug.Log($"Amount of all variants : {index}");
-            Debug.Log($"{groups.ToArray().Count()}");
-            Debug.Log($"Amount of combinations with that variants: {GetAmountOfGroupVarCombinations(index,8)}");
-        }
-
-        public ulong GetAmountOfGroupVarCombinations(int n, int m)
-        {
-            return (Numbers.Factorial(n) / (Numbers.Factorial(n - m) * Numbers.Factorial(m)));
-        }
+        //public ulong GetAmountOfGroupVarCombinations(int n, int m)
+        //{
+        //    return (Numbers.Factorial(n) / (Numbers.Factorial(n - m) * Numbers.Factorial(m)));
+        //}
 
         //string NextSet(int* a, int n, int m)
         //{
@@ -98,88 +101,100 @@ namespace TowerGenerator
             ForEachChildrenRecursive(transform, null);
         }
 
-        public Bounds CalculateBBMax()
-        {
-            foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
-            {
-                if (treeNode.Data.Transform.GetComponent<Connectors>() != null)
-                    treeNode.Data.Transform.gameObject.SetActive(false);
-                else
-                    treeNode.Data.Transform.gameObject.SetActive(true);
-            }
-
-            BBMax = _tree.Data.Transform.gameObject.BoundBox();
-            BBMax.center = Vector3.zero;
-            //Debug.Log($"BBmax:{BBMax}");
-            return BBMax;
-        }
-
-        [ContextMenu("CalculateBBSize")]
-        public Vector3 CalculateBBSize()
+        public Bounds CalculateBB()
         {
             if (_tree == null)
                 BuildImpactTree();
-            BBMax = _tree.Data.Transform.gameObject.BoundBox();
-            BBMax.center = Vector3.zero;
-            //Debug.Log($"BBmax:{BBMax}");
-            return BBMax.size;
+            var bb = _tree.Data.Transform.gameObject.BoundBox();
+            return bb;
         }
 
+        //public Bounds CalculateBBMax()
+        //{
+        //    foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
+        //    {
+        //        if (treeNode.Data.Transform.GetComponent<Connectors>() != null)
+        //            treeNode.Data.Transform.gameObject.SetActive(false);
+        //        else
+        //            treeNode.Data.Transform.gameObject.SetActive(true);
+        //    }
 
-        public bool SetMaximizedFitRndConfiguration(Vector3 maxBBSize)
-        {
-            var origSeed = Seed;
+        //    BBMax = _tree.Data.Transform.gameObject.BoundBox();
+        //    BBMax.center = Vector3.zero;
+        //    //Debug.Log($"BBmax:{BBMax}");
+        //    return BBMax;
+        //}
 
-            const int iterations = 32;
-            float maxVolume = 0;
-            long fitSeed = -1;
-            for (int i = 0; i < iterations; i++)
-            {
-                var s = Seed;
-                SetRndConfiguration();
-                var bbxize = CalculateBBSize();
-                var volume = bbxize.x * bbxize.y * bbxize.z;
-                //Debug.Log($"Volume {volume}");
+        //[ContextMenu("CalculateBBSize")]
+        //public Vector3 CalculateBBSize()
+        //{
+        //    if (_tree == null)
+        //        BuildImpactTree();
+        //    BBMax = _tree.Data.Transform.gameObject.BoundBox();
+        //    BBMax.center = Vector3.zero;
+        //    //Debug.Log($"BBmax:{BBMax}");
+        //    return BBMax.size;
+        //}
 
-                var isInside = bbxize.x <= maxBBSize.x && bbxize.y <= maxBBSize.y && bbxize.z <= maxBBSize.z;
 
-                if (volume > maxVolume && isInside)
-                {
-                    maxVolume = volume;
-                    fitSeed = s;
-                }
-            }
+        //public bool SetMaximizedFitRndConfiguration(Vector3 maxBBSize)
+        //{
+        //    var origSeed = Seed;
 
-            if (fitSeed == -1)
-            {
-                Debug.Log($"Can't fit! Using SetMinimizedRndConfiguration with original seed {origSeed}");
-                Seed = origSeed;
-                SetMinimizedRndConfiguration();
-                var bbxize = CalculateBBSize();
-                var isInside = bbxize.x <= maxBBSize.x && bbxize.y <= maxBBSize.y && bbxize.z <= maxBBSize.z;
-                Debug.LogError(
-                    $"Can't fit even with minimal cfg resulting bb:{bbxize} in requested bb:{maxBBSize} - obj:{gameObject}");
-                SetRndConfiguration();
-                return false;
-            }
+        //    const int iterations = 32;
+        //    float maxVolume = 0;
+        //    long fitSeed = -1;
+        //    for (int i = 0; i < iterations; i++)
+        //    {
+        //        var s = Seed;
+        //        SetRndConfiguration();
+        //        var bbxize = CalculateBBSize();
+        //        var volume = bbxize.x * bbxize.y * bbxize.z;
+        //        //Debug.Log($"Volume {volume}");
 
-            //Debug.Log($"Max Volume {maxVolume} seed for it {fitSeed}");
-            Seed = fitSeed;
-            SetRndConfiguration();
-            return true;
-        }
+        //        var isInside = bbxize.x <= maxBBSize.x && bbxize.y <= maxBBSize.y && bbxize.z <= maxBBSize.z;
 
-        [ContextMenu("SetMinimizedRndConfiguration")]
+        //        if (volume > maxVolume && isInside)
+        //        {
+        //            maxVolume = volume;
+        //            fitSeed = s;
+        //        }
+        //    }
+
+        //    if (fitSeed == -1)
+        //    {
+        //        Debug.Log($"Can't fit! Using SetMinimizedRndConfiguration with original seed {origSeed}");
+        //        Seed = origSeed;
+        //        SetMinimizedRndConfiguration();
+        //        var bbxize = CalculateBBSize();
+        //        var isInside = bbxize.x <= maxBBSize.x && bbxize.y <= maxBBSize.y && bbxize.z <= maxBBSize.z;
+        //        Debug.LogError(
+        //            $"Can't fit even with minimal cfg resulting bb:{bbxize} in requested bb:{maxBBSize} - obj:{gameObject}");
+        //        SetRndConfiguration();
+        //        return false;
+        //    }
+
+        //    //Debug.Log($"Max Volume {maxVolume} seed for it {fitSeed}");
+        //    Seed = fitSeed;
+        //    SetRndConfiguration();
+        //    return true;
+        //}
+
+
+        // todo: remove me
+        [ContextMenu("SetMinimizedRndConfiguration")] 
         public void SetMinimizedRndConfiguration()
         {
             SetRndConfiguration(true);
         }
 
+        
         [ContextMenu("SetRndConfiguration")]
         public void SetRndConfiguration()
         {
             SetRndConfiguration(false);
         }
+
 
         public void SetRndConfiguration(bool minBB = false)
         {
@@ -230,12 +245,12 @@ namespace TowerGenerator
         }
 
 
-        public void CalculateBBMin()
-        {
-            foreach (var treeNode in _tree.TraverseBreadthFirst())
-            {
-            }
-        }
+        //public void CalculateBBMin()
+        //{
+        //    foreach (var treeNode in _tree.TraverseBreadthFirst())
+        //    {
+        //    }
+        //}
 
         public void ForEachChildrenRecursive(Transform iTrans, TreeNode<ProcessingNode> parent)
         {

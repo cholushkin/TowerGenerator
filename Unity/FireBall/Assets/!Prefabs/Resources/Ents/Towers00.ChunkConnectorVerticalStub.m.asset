@@ -17,4 +17,5 @@ MonoBehaviour:
   Generation: 0
   TagSet:
     Tags: []
-  AABBs: []
+  AABBs:
+  - {x: 2, y: 2, z: 2}

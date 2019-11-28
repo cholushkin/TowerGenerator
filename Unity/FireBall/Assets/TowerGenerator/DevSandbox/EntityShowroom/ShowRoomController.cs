@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using GameLib.Random;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -63,6 +64,7 @@ namespace TowerGenerator
 
         public int[] DelayButtonValues;
         public EntityPlace EntPlace;
+        private static RandomHelper _rnd = new RandomHelper(-1);
 
         static readonly Vector2 ButtonSize = new Vector2(100, 100);
         static readonly Vector2 ButtonWideSize = new Vector2(230, 100);
@@ -79,13 +81,45 @@ namespace TowerGenerator
 
         private IEnumerator ProcessShowing()
         {
-            NextEntity();
-            yield return new WaitForSeconds(DelayButtonValues[_pointer]);
+            while (true)
+            {
+                var nextMetaToShow = GetNextMeta();
+                Debug.Log($"Meta to show: {nextMetaToShow}");
+                if (nextMetaToShow == null)
+                {
+                    yield return new WaitForSeconds(1f);
+                    continue;
+                }
+                EntPlace.Place(nextMetaToShow, _rnd.GetCurrentSeed());
+                yield return new WaitForSeconds(DelayButtonValues[_pointer]);
+            }
         }
 
-        private void NextEntity()
+
+        
+        private MetaBase GetNextMeta()
         {
-            //MetaProvider.Instance.Metas
+            Entity.EntityType CookFlagedValue(GUIState.MetaControlPanel stateMetaControlPanelState)
+            {
+                Entity.EntityType result = Entity.EntityType.Undefined;
+                result |= stateMetaControlPanelState.ChunkRoofPeak ? Entity.EntityType.ChunkRoofPeak : 0;
+                result |= stateMetaControlPanelState.ChunkStd ? Entity.EntityType.ChunkStd : 0;
+                result |= stateMetaControlPanelState.ChunkIslandAndBasement ? Entity.EntityType.ChunkIslandAndBasement : 0;
+                result |= stateMetaControlPanelState.ChunkSideEar ? Entity.EntityType.ChunkSideEar : 0;
+                result |= stateMetaControlPanelState.ChunkBottomEar ? Entity.EntityType.ChunkBottomEar : 0;
+                result |= stateMetaControlPanelState.ChunkConnectorVertical ? Entity.EntityType.ChunkConnectorVertical : 0;
+                result |= stateMetaControlPanelState.ChunkConnectorHorizontal ? Entity.EntityType.ChunkConnectorHorizontal : 0;
+                return result;
+            }
+
+            var filter = new MetaProvider.Filter(
+                entFlags : CookFlagedValue( State.MetaControlPanelState )
+            );
+
+            var metas = MetaProvider.Instance.GetMetas(filter);
+            if (!metas.Any())
+                return null;
+            return _rnd.FromEnumerable(metas);
         }
 
 
@@ -147,20 +181,57 @@ namespace TowerGenerator
                 Screen.height - ButtonSize.y - Offset.y,
                 ButtonSize.x, ButtonSize.y), $"[DevGUI]:\n{State.ShowGUI}"))
                 OnPressShowGUI();
-            //GUI.Label(new Rect(0, 0, 200, 50), $"BB size {_currentBoundsSize.ToString()}");
-            //GUI.Label(new Rect(0, 50, 200, 50), $"Groups {_amountOfGroups.x} of {_amountOfGroups.y}");
-            //GUI.Label(new Rect(0, 100, 200, 50), $"Seed {_seed}");
         }
 
 
         private void GetData()
         {
-            State.MetaInfosState.MetasNumber = MetaProvider.Instance.Metas.Length;
-            State.MetaInfosState.ChunkRoofPeakNumber = MetaProvider.Instance.Metas.Count(
-                x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkRoofPeak);
-            State.MetaInfosState.ChunkRoofPeakNumberPercent =
-                (int)((float)State.MetaInfosState.ChunkRoofPeakNumber / State.MetaInfosState.MetasNumber * 100f);
-            // todo: all params
+            // get meta number data
+            {
+                State.MetaInfosState.MetasNumber = MetaProvider.Instance.Metas.Length;
+
+                // ChunkRoofPeakNumber
+                State.MetaInfosState.ChunkRoofPeakNumber = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkRoofPeak);
+                State.MetaInfosState.ChunkRoofPeakNumberPercent =
+                    (int) ((float) State.MetaInfosState.ChunkRoofPeakNumber / State.MetaInfosState.MetasNumber * 100f);
+
+                // ChunkStdNumber
+                State.MetaInfosState.ChunkStdNumber = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkStd);
+                State.MetaInfosState.ChunkStdNumberPercent =
+                    (int)((float)State.MetaInfosState.ChunkStdNumber / State.MetaInfosState.MetasNumber * 100f);
+
+                // ChunkIslandAndBasementNumber
+                State.MetaInfosState.ChunkIslandAndBasementNumber = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkIslandAndBasement);
+                State.MetaInfosState.ChunkIslandAndBasementNumberPercent =
+                    (int)((float)State.MetaInfosState.ChunkIslandAndBasementNumber / State.MetaInfosState.MetasNumber * 100f);
+
+                // ChunkSideEarNumber
+                State.MetaInfosState.ChunkSideEarNumber = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkSideEar);
+                State.MetaInfosState.ChunkSideEarNumberPercent =
+                    (int)((float)State.MetaInfosState.ChunkSideEarNumber / State.MetaInfosState.MetasNumber * 100f);
+
+                // ChunkBottomEarNumber
+                State.MetaInfosState.ChunkBottomEarNumber = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkBottomEar);
+                State.MetaInfosState.ChunkBottomEarNumberPercent =
+                    (int)((float)State.MetaInfosState.ChunkBottomEarNumber / State.MetaInfosState.MetasNumber * 100f);
+
+                // ChunkConnectorVerticalNumber
+                State.MetaInfosState.ChunkConnectorVerticalNumber = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkConnectorVertical);
+                State.MetaInfosState.ChunkConnectorVerticalNumberPercent =
+                    (int)((float)State.MetaInfosState.ChunkConnectorVerticalNumber / State.MetaInfosState.MetasNumber * 100f);
+
+                // ChunkConnectorHorizontal
+                State.MetaInfosState.ChunkConnectorHorizontal = MetaProvider.Instance.Metas.Count(
+                    x => x is MetaChunk chunk && chunk.EntityType == Entity.EntityType.ChunkConnectorHorizontal);
+                State.MetaInfosState.ChunkConnectorHorizontalPercent =
+                    (int)((float)State.MetaInfosState.ChunkConnectorHorizontal / State.MetaInfosState.MetasNumber * 100f);
+            }
         }
 
 

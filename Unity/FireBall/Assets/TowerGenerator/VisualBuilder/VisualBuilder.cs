@@ -51,9 +51,9 @@ namespace TowerGenerator
             Vector3 MaxBB = node.Data.Topology.Geometry.AspectRatio - ConnectorMargin;
 
             var visSegController = visSegment.GetComponent<GroupsController>();
-            var isOK = visSegController.SetMaximizedFitRndConfiguration(MaxBB);
-            if (!isOK)
-                visSegment.name += "error:missfit";
+            //var isOK = visSegController.SetMaximizedFitRndConfiguration(MaxBB);
+            //if (!isOK)
+            //    visSegment.name += "error:missfit";
 
             // rotation
             visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));

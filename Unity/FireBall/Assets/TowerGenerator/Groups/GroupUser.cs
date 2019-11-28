@@ -10,6 +10,11 @@ namespace TowerGenerator
             return 0;
         }
 
+        public override void DoChoice(params int[] index)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override void DoRndChoice(ref RandomHelper rnd)
         {
             DisableItems();

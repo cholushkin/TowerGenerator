@@ -58,7 +58,14 @@ namespace TowerGenerator
                 Debug.LogWarning($"Clamping happened {minObjectsSelectedParsed} -> {clamped}");
             return clamped;
         }
-        
+
+        public override void DoChoice(params int[] indexes)
+        {
+            ItemsSelectedAmount = indexes.Length;
+            foreach (var t in indexes)
+                transform.GetChild(t).gameObject.SetActive(true);
+        }
+
         public override void DoRndChoice(ref RandomHelper rnd)
         {
             DisableItems();
@@ -67,10 +74,7 @@ namespace TowerGenerator
             for (int i = 0; i < GetItemsCount(); ++i)
                 itemsIndexes[i] = i;
             var choices = rnd.FromArray(itemsIndexes, ItemsSelectedAmount);
-            for (int i = 0; i < ItemsSelectedAmount; ++i)
-            {
-                transform.GetChild(choices[i]).gameObject.SetActive(true);
-            }
+            DoChoice(choices);
         }
 
         // assume that all items are sorted ascending 
@@ -80,9 +84,7 @@ namespace TowerGenerator
             DisableItems();
             ItemsSelectedAmount = MinObjectsSelected;
             for (int i = 0; i < ItemsSelectedAmount; ++i)
-            {
-                transform.GetChild(i).gameObject.SetActive(true);
-            }
+                DoChoice(i);
         }
     }
 }

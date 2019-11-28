@@ -27,6 +27,11 @@ namespace TowerGenerator
             {
                 set
                 {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        _expression = null;
+                        return;
+                    }
                     _expression = new Expression(value);
                     _expression.EvaluateParameter += _parameterDefaultValueHandler;
                     _expression.EvaluateFunction += _tagFunctionsHandler;

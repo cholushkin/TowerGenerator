@@ -87,6 +87,7 @@ namespace TowerGenerator
         public abstract int GetNumberOfPermutations();
 
 
+        public abstract void DoChoice(params int[] index);
         public abstract void DoRndChoice(ref RandomHelper rnd);
         public abstract void DoRndMinimalChoice(ref RandomHelper rnd);
 
