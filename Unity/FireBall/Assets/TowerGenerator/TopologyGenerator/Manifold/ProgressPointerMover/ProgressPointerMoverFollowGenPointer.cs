@@ -21,8 +21,8 @@ namespace TowerGenerator
             while (true)
             {
                 yield return new WaitForSeconds(StepDelay);
-                if (TopGens.Pointers.DistanceYFactorProgress2Generator() > 100)
-                    TopGens.Pointers.MoveProgress();
+                //if (TopGens.Pointers.DistanceYFactorProgress2Generator() > 100)
+                //    TopGens.Pointers.MoveProgress();
             }
         }
     }

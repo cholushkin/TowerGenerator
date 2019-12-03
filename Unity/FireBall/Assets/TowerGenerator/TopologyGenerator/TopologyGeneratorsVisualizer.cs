@@ -68,51 +68,51 @@ namespace TowerGenerator
             _stats = new GeneratorStats();
         }
 
-        public void Step(TopologyGeneratorBase.TopGenStep cmd)
+        public void Step(GeneratorBase.TopGenStep step)
         {
-            if (cmd.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegSpawn)
+            if (step.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn)
             {
-                var visSeg = BuildTopologyVis(cmd.Segment);
+                var visSeg = BuildTopologyVis(step.Segment);
                 visSeg.Chunk.transform.DOLocalMove(visSeg.Chunk.transform.localPosition + Vector3.up * 10, StepDelay)
                     .From();
                 visSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay).From();
-                _visNodes[cmd.Segment] = visSeg;
+                _visNodes[step.Segment] = visSeg;
 
                 _stats.SegmentsAmount++;
-                if (_stats.MaxHeight < cmd.Segment.Data.Topology.Geometry.Position.y)
-                    _stats.MaxHeight = (uint)cmd.Segment.Data.Topology.Geometry.Position.y;
+                if (_stats.MaxHeight < step.Segment.Data.Topology.Geometry.Bounds.center.y)
+                    _stats.MaxHeight = (uint)step.Segment.Data.Topology.Geometry.Bounds.center.y;
             }
-            else if (cmd.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegDestroy)
+            else if (step.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegDestroy)
             {
                 VisualizationSegment visSeg;
-                Assert.IsTrue(cmd.Segment.Data.Topology.IsOpenedForGenerator == false);
-                _visNodes.TryGetValue(cmd.Segment, out visSeg);
+                Assert.IsTrue(step.Segment.Data.Topology.IsOpenedForGenerator == false);
+                _visNodes.TryGetValue(step.Segment, out visSeg);
                 _stats.SegmentsAmount--;
                 Assert.IsNotNull(visSeg);
                 if (visSeg != null)
                 {
                     visSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay * 0.5f)
                         .OnComplete(() => Destroy(visSeg.Chunk));
-                    _visNodes[cmd.Segment] = null;
+                    _visNodes[step.Segment] = null;
                 }
             }
-            else if (cmd.VisCmd == TopologyGeneratorBase.TopGenStep.VisualizationCmd.SegChangeState)
+            else if (step.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegChangeState)
             {
                 VisualizationSegment visSeg;
-                var gotSeg = _visNodes.TryGetValue(cmd.Segment, out visSeg);
-                Assert.IsTrue(gotSeg, $"can't get {cmd.Segment} while trying to change");
+                var gotSeg = _visNodes.TryGetValue(step.Segment, out visSeg);
+                Assert.IsTrue(gotSeg, $"can't get {step.Segment} while trying to change");
                 Assert.IsNotNull(visSeg);
-                if (visSeg.SegType != cmd.Segment.Data.Topology.EntityType)
+                if (visSeg.SegType != step.Segment.Data.Topology.Geometry.EntityType)
                 {
-                    var newVisSeg = BuildTopologyVis(cmd.Segment); // spawn new one segment and marker(if needed)
+                    var newVisSeg = BuildTopologyVis(step.Segment); // spawn new one segment and marker(if needed)
                     newVisSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay).From(); // appear animation
-                    _visNodes[cmd.Segment] = newVisSeg;
+                    _visNodes[step.Segment] = newVisSeg;
                     visSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay * 0.5f)
                         .OnComplete(() => Destroy(visSeg.Chunk)); // disappear and destroy seg
                 }
                 else // only marker
                 {
-                    if (cmd.Segment.Data.Topology.IsOpenedForGenerator) // spawn marker
+                    if (step.Segment.Data.Topology.IsOpenedForGenerator) // spawn marker
                     {
                         Assert.IsNull(visSeg.OpenedMarker);
                         visSeg.OpenedMarker = Instantiate(prefabSegOpenedForGeneration);
@@ -146,15 +146,15 @@ namespace TowerGenerator
             // create segment
             if (segTopology.HasCollision)
                 segment = Instantiate(prefabSegCollision);
-            else if (segTopology.EntityType == Entity.EntityType.ChunkRoofPeak)
+            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkRoofPeak)
                 segment = Instantiate(prefabSegChunkRoofPeak);
-            else if (segTopology.EntityType == Entity.EntityType.ChunkStd)
+            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkStd)
                 segment = Instantiate(prefabSegChunkStd);
-            else if (segTopology.EntityType == Entity.EntityType.ChunkIslandAndBasement)
+            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkIslandAndBasement)
                 segment = Instantiate(prefabSegChunkIslandAndBasement);
-            else if (segTopology.EntityType == Entity.EntityType.ChunkSideEar)
+            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkSideEar)
                 segment = Instantiate(prefabSegChunkSideEar);
-            else if (segTopology.EntityType == Entity.EntityType.ChunkBottomEar)
+            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkBottomEar)
                 segment = Instantiate(prefabSegChunkBottomEar);
 
             // create connector
@@ -175,8 +175,8 @@ namespace TowerGenerator
             }
 
             // set pos & hierarchy
-            segment.transform.position = _generatorPivot.position + segTopology.Geometry.Position;
-            segment.transform.localScale = segTopology.Geometry.AspectRatio;
+            segment.transform.position = _generatorPivot.position + segTopology.Geometry.Bounds.center;
+            segment.transform.localScale = segTopology.Geometry.Bounds.size;
             segment.transform.SetParent(_generatorPivot);
             segment.name = $"{segment}";
 
@@ -184,8 +184,8 @@ namespace TowerGenerator
             {
                 connector.transform.position = segment.transform.position;
                 var m = Direction.IsVertical(node.Data.Topology.Connection)
-                    ? segTopology.Geometry.AspectRatio.y * 0.5f
-                    : segTopology.Geometry.AspectRatio.x * 0.5f;
+                    ? segTopology.Geometry.Bounds.size.y * 0.5f
+                    : segTopology.Geometry.Bounds.size.x * 0.5f;
                 connector.transform.position += node.Data.Topology.Connection * m;
 
                 connector.transform.localScale = Direction.IsVertical(node.Data.Topology.Connection)
@@ -209,18 +209,20 @@ namespace TowerGenerator
 
             visSeg.Chunk = segment;
             visSeg.OpenedMarker = opened;
-            visSeg.SegType = segTopology.EntityType;
+            visSeg.SegType = segTopology.Geometry.EntityType;
 
             return visSeg;
         }
 
         private Transform _generatorPivot;
-        public void ChangeGenerator(TopologyGeneratorBase curGenerator, uint generatorChainCounter)
+        private uint _generatorChainCounter;
+        public void ChangeGenerator(GeneratorBase curGenerator)
         {
-            var genObj = new GameObject(curGenerator.GetType().ToString().Split('.').Last() + "." + generatorChainCounter);
+            var genObj = new GameObject(curGenerator.GetType().ToString().Split('.').Last() + "." + _generatorChainCounter);
             genObj.transform.position = Pivot.position;
             genObj.transform.SetParent(Pivot);
             _generatorPivot = genObj.transform;
+            ++_generatorChainCounter;
         }
     }
 }

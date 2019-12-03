@@ -22,7 +22,7 @@ namespace TowerGenerator
 
         public override string ToString()
         {
-            return JsonUtility.ToJson(this, false);
+            return JsonUtility.ToJson(this, true);
         }
     }
 }

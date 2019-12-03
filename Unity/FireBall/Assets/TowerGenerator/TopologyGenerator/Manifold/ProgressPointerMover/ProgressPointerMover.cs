@@ -19,7 +19,7 @@ namespace TowerGenerator
             while (true)
             {
                 yield return new WaitForSeconds(StepDelay);
-                TopGens.Pointers.MoveProgress();
+                //TopGens.Pointers.MoveProgress();
             }
         }
     }

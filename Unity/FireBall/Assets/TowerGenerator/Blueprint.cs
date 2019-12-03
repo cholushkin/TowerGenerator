@@ -22,22 +22,23 @@ namespace TowerGenerator
             {
                 public class ChunkGeometry
                 {
-                    public Vector3 Position;
-                    public Vector3 AspectRatio; // aabb
+                    public Entity.EntityType EntityType;
+                    public Bounds Bounds; // position and aspects
+                    public Vector3 BuildDirection;
                     public string Meta;
+                    public int SizeIndex;
                     public long Seed;
                 }
 
                 public ChunkGeometry Geometry;
+
                 public bool IsOpenedForGenerator;
-                public Vector3 BuildDirection; 
-                public Entity.EntityType EntityType;
                 public Vector3 Connection = Vector3.zero;
                 public bool HasCollision { get; set; }
 
                 public override string ToString()
                 {
-                    return $"{EntityType}";
+                    return $"{Geometry.EntityType}";
                 }
             }
 

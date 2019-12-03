@@ -35,7 +35,9 @@ namespace TowerGenerator
 
             // centering
             var segBB = visSegController.CalculateBB();
-            var offset = visSegment.transform.position - segBB.center;
+            Debug.Log($"sebBB:{segBB}");
+            var offset = visSegController.transform.position - segBB.center;
+            Debug.Log($"offset:{offset}");
             visSegment.transform.position += offset;
             segBB.center = visSegment.transform.position;
             return visSegment;

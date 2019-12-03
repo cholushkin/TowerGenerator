@@ -39,16 +39,16 @@ namespace TowerGenerator
         {
             // get any random meta of appropriate chunk type
             MetaBase meta = MetaProvider.Instance.Metas.Select(x => x as MetaChunk)
-                .FirstOrDefault(x => x.EntityType == node.Data.Topology.EntityType);
+                .FirstOrDefault(x => x.EntityType == node.Data.Topology.Geometry.EntityType);
             var visSegPrefab = Resources.Load("Ents/" + meta.EntName);
             var visSegment = (GameObject) Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;
 
-            visSegment.transform.position = Pivot.position + node.Data.Topology.Geometry.Position;
+            visSegment.transform.position = Pivot.position + node.Data.Topology.Geometry.Bounds.center;
             visSegment.transform.SetParent(Pivot);
 
             // calculate BB for vis segment
-            Vector3 MaxBB = node.Data.Topology.Geometry.AspectRatio - ConnectorMargin;
+            Vector3 MaxBB = node.Data.Topology.Geometry.Bounds.size - ConnectorMargin;
 
             var visSegController = visSegment.GetComponent<GroupsController>();
             //var isOK = visSegController.SetMaximizedFitRndConfiguration(MaxBB);
@@ -65,9 +65,9 @@ namespace TowerGenerator
             segBB.center = visSegment.transform.position;
 
             // snapping
-            if (node.Data.Topology.EntityType == Entity.EntityType.ChunkRoofPeak)
+            if (node.Data.Topology.Geometry.EntityType == Entity.EntityType.ChunkRoofPeak)
                 segBB = SnapBBPos( Vector3.down, new Bounds(visSegment.transform.position, MaxBB), segBB);
-            else if (node.Data.Topology.EntityType == Entity.EntityType.ChunkIslandAndBasement)
+            else if (node.Data.Topology.Geometry.EntityType == Entity.EntityType.ChunkIslandAndBasement)
                 segBB = SnapBBPos(Vector3.up, new Bounds(visSegment.transform.position, MaxBB), segBB);
 
             visSegment.transform.position = segBB.center;

@@ -120,6 +120,18 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &771584938 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 481525083584476470, guid: 0493819dd97853f4199660f0fa829b97,
+    type: 3}
+  m_PrefabInstance: {fileID: 481525083222357612}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a62c7572ac429e4d80b4585d4f4a094, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &151939627409478535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -237,6 +249,11 @@ PrefabInstance:
       propertyPath: State.MetaControlPanelState.ChunkConnectorVertical
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6391237939642824950, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: CameraEntShowroomController
+      value: 
+      objectReference: {fileID: 771584938}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9320f212596a79d46a1891961f5e49d6, type: 3}
 --- !u!114 &151939627409478536 stripped

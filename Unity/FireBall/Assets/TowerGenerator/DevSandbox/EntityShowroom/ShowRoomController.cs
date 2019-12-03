@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
+    // todo: pause button (for save seeds)
+    // todo: dump current entity to file
     public class ShowRoomController : MonoBehaviour
     {
         [Serializable]
@@ -48,15 +50,17 @@ namespace TowerGenerator
             [Serializable]
             public class EntityControlPanel
             {
-                public string CurrentMeta;
-                public int GroupsNumber;
-                public Vector3[] Sizes;
-                public string[] Tags;
+                public long CurrentSeed;
+                //public int GroupsNumber;
+                //public Vector3[] Sizes;
+                //public string[] Tags;
             }
 
             public MetaInfos MetaInfosState;
             public MetaControlPanel MetaControlPanelState;
             public EntityControlPanel EntityControlPanelState;
+            public string CurrentMeta = "asdasda";
+            public bool IsPauseButtonPressed;
             public bool ShowGUI;
         }
 
@@ -75,8 +79,14 @@ namespace TowerGenerator
 
         void Awake()
         {
-            GetData();
+            UpdateData();
             StartCoroutine(ProcessShowing());
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+                OnPressPause();
         }
 
         private IEnumerator ProcessShowing()
@@ -84,22 +94,22 @@ namespace TowerGenerator
             while (true)
             {
                 var nextMetaToShow = GetNextMeta();
-                Debug.Log($"Meta to show: {nextMetaToShow}");
+                var seed = _rnd.GetCurrentSeed();
+                Debug.Log($"Seed&Meta to show:{seed} {nextMetaToShow}");
                 if (nextMetaToShow == null)
                 {
                     yield return new WaitForSeconds(1f);
                     continue;
                 }
-                EntPlace.Place(nextMetaToShow, _rnd.GetCurrentSeed());
+                UpdateDataForMeta(nextMetaToShow, seed);
+                EntPlace.Place(nextMetaToShow, seed);
                 yield return new WaitForSeconds(DelayButtonValues[_pointer]);
             }
         }
-
-
         
         private MetaBase GetNextMeta()
         {
-            Entity.EntityType CookFlagedValue(GUIState.MetaControlPanel stateMetaControlPanelState)
+            Entity.EntityType CookFlaggedValue(GUIState.MetaControlPanel stateMetaControlPanelState)
             {
                 Entity.EntityType result = Entity.EntityType.Undefined;
                 result |= stateMetaControlPanelState.ChunkRoofPeak ? Entity.EntityType.ChunkRoofPeak : 0;
@@ -113,7 +123,7 @@ namespace TowerGenerator
             }
 
             var filter = new MetaProvider.Filter(
-                entFlags : CookFlagedValue( State.MetaControlPanelState )
+                entFlags : CookFlaggedValue( State.MetaControlPanelState )
             );
 
             var metas = MetaProvider.Instance.GetMetas(filter);
@@ -171,8 +181,14 @@ namespace TowerGenerator
                     OnPressDelay();
 
                 // EntityControlPanel
-                GUI.Box(new Rect(Screen.width - BigDataLabelSize.x - Offset.x, Offset.y, BigDataLabelSize.x, BigDataLabelSize.y),
+                GUI.Box(new Rect(Screen.width - ButtonWideSize.x - Offset.x, Offset.y, ButtonWideSize.x, ButtonWideSize.y),
                     $"{JsonUtility.ToJson(State.EntityControlPanelState, true)}");
+
+                GUI.Box(new Rect(
+                        Screen.width - BigDataLabelSize.x - Offset.x, 
+                        Offset.y + ButtonWideSize.y + Offset.y, 
+                        BigDataLabelSize.x, BigDataLabelSize.y * 2f),
+                    $"{State.CurrentMeta}");
             }
 
             // ShowGUI
@@ -181,10 +197,23 @@ namespace TowerGenerator
                 Screen.height - ButtonSize.y - Offset.y,
                 ButtonSize.x, ButtonSize.y), $"[DevGUI]:\n{State.ShowGUI}"))
                 OnPressShowGUI();
+
+
+            if (GUI.Button(new Rect(
+                Screen.width - ButtonSize.x * 2 - Offset.x,
+                Screen.height - ButtonSize.y - Offset.y,
+                ButtonSize.x, ButtonSize.y), State.IsPauseButtonPressed ? "[ ▶ ]" : "[ ॥ ]"))
+                OnPressPause();
+        }
+
+        private void OnPressPause()
+        {
+            State.IsPauseButtonPressed = !State.IsPauseButtonPressed;
+            Time.timeScale = State.IsPauseButtonPressed ? 0f : 1f;
         }
 
 
-        private void GetData()
+        private void UpdateData()
         {
             // get meta number data
             {
@@ -234,6 +263,11 @@ namespace TowerGenerator
             }
         }
 
+        private void UpdateDataForMeta(MetaBase meta, long seed)
+        {
+            State.EntityControlPanelState.CurrentSeed = seed;
+            State.CurrentMeta = meta.ToString();
+        }
 
         void OnPressShowGUI()
         {

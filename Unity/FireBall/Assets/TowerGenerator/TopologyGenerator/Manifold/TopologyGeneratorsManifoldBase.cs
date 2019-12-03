@@ -14,5 +14,15 @@ namespace TowerGenerator
         {
             return null;
         }
+
+        protected virtual void FinalizeTower(uint seed)
+        {
+
+        }
+
+        protected virtual void ResolveDeadlock()
+        {
+
+        }
     }
 }

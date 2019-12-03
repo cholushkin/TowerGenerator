@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GameLib.DataStructures;
 using GameLib.Random;
@@ -9,153 +10,209 @@ namespace TowerGenerator
 {
     public class SegmentBuilder
     {
-        public class StepResult
+        public class MemorySegment
         {
-            public int Index;
-            public Bounds Bounds;
-
-            public Vector3 Size => Bounds.size;
-            public Vector3 Position => Bounds.center;
-            public Vector3 BuildDirection;
-
-            public TreeNode<Blueprint.Segment> Segment { get; internal set; }
-            public StepResult Prev { get; internal set; }
-            public StepResult Next { get; internal set; }
-
-            public bool IsFirstOne { get; set; }
-
-            public bool IsLastOne { get; set; }
-
-            public bool IsDeadlock { get; set; }
-
-            protected internal SegmentBuilder _builder;
-
-            public void BuildSegment(Entity.EntityType segment = Entity.EntityType.ChunkStd,
-                bool isOpened = false)
+            public MemorySegment()
             {
-                if (Segment != null)
-                    return;
-                if (_builder == null) // for proxy step result
-                    return;
-                Segment = _builder._generator.CreateSegment(
-                    Prev.Segment,
-                    BuildDirection,
-                    Size,
-                    (Index == 0) ? _builder._trunkOffset : Vector3.zero
-                );
-                Segment.Data.Topology.EntityType = segment;
-                Segment.Data.Topology.IsOpenedForGenerator = isOpened;
-                _builder.CreatedCount++;
             }
-        }
 
-        public Vector3 CurrentDirection { get; set; }
-        private StepResult _steps;
-        private int _segCount;
-        protected TopologyGeneratorBase _generator;
-        private StepResult _fromStep;
-        private Vector3 _initialDirection;
-        protected Vector3 _trunkOffset;
-        private Range _segmentSize;
-        public int CreatedCount { get; set; }
-
-        // flying island support
-        public SegmentBuilder(int segCount, TreeNode<Blueprint.Segment> fromSegment, Vector3 initialDirection, TopologyGeneratorBase generator, Vector3 offsetFromTrunk)
-        {
-            //_segCount = segCount;
-            //_initialDirection = initialDirection;
-            //CurrentDirection = _initialDirection;
-            //_generator = generator;
-            //_segmentSize = generator.GetConfig().SegmentsSize;
-            //_trunkOffset = offsetFromTrunk;
-
-            //Assert.IsNotNull(fromSegment);
-
-            //// create proxy _fromStep
-            //_fromStep = new StepResult
-            //{
-            //    Index = -1,
-            //    Bounds = new Bounds(fromSegment.Data.Topology.Geometry.Position, fromSegment.Data.Topology.Geometry.AspectRatio),
-            //    BuildDirection = fromSegment.Data.Topology.BuildDirection,
-            //    Segment = fromSegment,
-            //    Next = null,
-            //    Prev = null,
-            //    IsDeadlock = false,
-            //    IsFirstOne = false,
-            //    IsLastOne = false,
-            //    _builder = null
-            //};
-        }
-
-        public SegmentBuilder(int segCount, StepResult fromStep, Vector3 initialDirection, TopologyGeneratorBase generator, Vector3 offsetFromTrunk)
-        {
-            //_segCount = segCount;
-            //_fromStep = fromStep;
-            //_initialDirection = initialDirection;
-            //CurrentDirection = _initialDirection;
-            //_generator = generator;
-            //_segmentSize = generator.GetConfig().SegmentsSize;
-            //_trunkOffset = offsetFromTrunk;
-        }
-
-        public IEnumerable<StepResult> Step()
-        {
-            var prevStepResult = _fromStep;
-            for (int i = 0; i < _segCount; ++i)
+            public MemorySegment(TreeNode<Blueprint.Segment> blueprintSegment)
             {
-                // new step
-                var trunkOffset = i == 0 ? _trunkOffset : Vector3.zero;
-                var parentBounds = prevStepResult.Bounds;
+                ChunkGeometry = blueprintSegment.Data.Topology.Geometry;
+                CreatedNode = blueprintSegment;
+            }
 
-                // in addition to tree collision check we also need to check for self collision
-                var prevBounds = Steps().Select(x => x.Bounds);
-                var fitSize = _generator.GetNextSegmentRndFitSize(_segmentSize, parentBounds, CurrentDirection, trunkOffset, prevBounds);
-                var bounds = _generator.CreateBoundsForChild(parentBounds, CurrentDirection, fitSize, trunkOffset);
+            public Blueprint.Segment.TopologySegment.ChunkGeometry ChunkGeometry = new Blueprint.Segment.TopologySegment.ChunkGeometry();
+            public bool HasCollision { get; set; }
+            public TreeNode<Blueprint.Segment> CreatedNode;
+        }
 
-                var currentStepResult = new StepResult
+        //private MemorySegment _steps;
+        //private Range _segCount;
+        //private MemorySegment _fromStep;
+        public int CreatedCount { get; set; }
+        private GeneratorBase _generator; // for tree state and creation methods
+        private RandomHelper _rnd;
+        //private TreeNode<Blueprint.Segment> _rootNode;
+        private TreeNode<MemorySegment> _blueprintTree;
+        private List<TreeNode<MemorySegment>> _varLeafPointers;
+
+        public SegmentBuilder(GeneratorBase generator, int seed)
+        {
+            _generator = generator;
+            _rnd = new RandomHelper(seed);
+        }
+
+        public void Project(
+            TreeNode<Blueprint.Segment> from,
+            Range segCount,
+            Vector3 direction,
+            Vector3 offsetFromTrunk,
+            ConfigBase.PlacementConfig firstPlacementConfig,
+            ConfigBase.PlacementConfig intermediatePlacementConfig,
+            ConfigBase.PlacementConfig lastPlacementConfig)
+        {
+
+            TreeNode<MemorySegment> proxyMemSegment = null;
+            if (from != null)
+                proxyMemSegment = new TreeNode<MemorySegment>(new MemorySegment(from));
+
+            Project(
+                proxyMemSegment,
+                segCount,
+                direction,
+                offsetFromTrunk,
+                firstPlacementConfig,
+                intermediatePlacementConfig,
+                lastPlacementConfig
+            );
+        }
+
+        public void Project(
+            TreeNode<MemorySegment> from,
+            Range segCount,
+            Vector3 direction,
+            Vector3 offsetFromTrunk,
+            ConfigBase.PlacementConfig firstPlacementConfig,
+            ConfigBase.PlacementConfig intermediatePlacementConfig,
+            ConfigBase.PlacementConfig lastPlacementConfig)
+        {
+            Assert.IsTrue(_varLeafPointers == null || _varLeafPointers.Count == 0);
+
+            int targetSegmentCount = (int)segCount.From;
+            int segmentCounter = 0;
+            int branchesCounter = 0;
+            _varLeafPointers = new List<TreeNode<MemorySegment>>((int) (segCount.To - segCount.From));
+            TreeNode<MemorySegment> nodePointer = from;
+            while (segmentCounter != targetSegmentCount)
+            {
+                // get actual placement config
+                var placementConfig = (segmentCounter == 0) ? firstPlacementConfig : intermediatePlacementConfig;
+                if (segmentCounter == targetSegmentCount - 1)
+                    placementConfig = lastPlacementConfig;
+
+                // create memory segment
+                var memSeg = CreateMemorySegment(nodePointer, direction, 
+                    segmentCounter == 0 ? offsetFromTrunk : Vector3.zero, 
+                    placementConfig);
+
+                if (memSeg.Data.HasCollision)
                 {
-                    Index = i,
-                    Bounds = bounds,
-                    BuildDirection = CurrentDirection,
-                    Segment = null,
-                    Next = null,
-                    Prev = prevStepResult,
-                    IsDeadlock = fitSize.x < _segmentSize.From,
-                    IsFirstOne = i == 0,
-                    IsLastOne = i == _segCount - 1,
-                    _builder = this
-                };
-
-                if (i == 0)
-                    _steps = currentStepResult;
-
-                if (prevStepResult != _fromStep)
-                    prevStepResult.Next = currentStepResult;
-
-                yield return currentStepResult;
-                if (currentStepResult.IsDeadlock)
-                {
-                    currentStepResult.Prev.IsLastOne = true;
-                    yield break;
+                    break;
                 }
 
-                prevStepResult = currentStepResult;
+                ++segmentCounter;
+                if (segmentCounter == targetSegmentCount)
+                {
+                    _varLeafPointers.Add(memSeg);
+                    ++branchesCounter;
+                    ++targetSegmentCount;
+                    continue;
+                }
+                nodePointer = memSeg;
             }
         }
 
-        public IEnumerable<StepResult> Steps()
+
+        public int GetProjectVariantsNumber()
         {
-            StepResult pointer = _steps;
-            while (pointer != null)
+            if (_varLeafPointers == null)
+                return 0;
+            return _varLeafPointers.Count;
+        }
+
+        public void ApplyProject(int index)
+        {
+            var chosen = _varLeafPointers[index];
+            foreach (var varLeafPointer in _varLeafPointers)
             {
-                yield return pointer;
-                pointer = pointer.Next;
+                if (varLeafPointer == chosen)
+                    continue;
+                varLeafPointer.Disconnect();
             }
+            _varLeafPointers.Clear();
         }
 
-        public void SetSegmentSize(Range segmentSize) // by default takes it from cfg
+        public void ApplyProjectRnd()
         {
-            _segmentSize = segmentSize;
+            var rndIndex = _rnd.Range(0, _varLeafPointers.Count);
+            ApplyProject(rndIndex);
+        }
+
+
+        private TreeNode<MemorySegment> CreateMemorySegment(
+            TreeNode<MemorySegment> parentMemSegment,
+            Vector3 buildDirection,
+            Vector3 offsetFromParent,
+            ConfigBase.PlacementConfig placementConfig)
+        {
+            var memSeg = new MemorySegment();
+            var curNode = new TreeNode<MemorySegment>(memSeg);
+            parentMemSegment.AddChild(curNode);
+
+            // get segment size
+            if (placementConfig.ChunkSizeStrategy == ConfigBase.PlacementConfig.SizeStrategy.ChunkRndSize)
+            {
+                // get random meta of placementConfig.ChunkEntityType
+                var filter = new MetaProvider.Filter(entFlags: placementConfig.ChunkEntityType,
+                    breadthRange: placementConfig.IgnoreChunkSizeRestrictions
+                        ? null
+                        : placementConfig.SegmentsSizeBreadth,
+                    heightRange: placementConfig.IgnoreChunkSizeRestrictions
+                        ? null
+                        : placementConfig.SegmentsSizeHeight);
+                var meta = _rnd.FromEnumerable(MetaProvider.Instance.GetMetas(filter));
+
+                // get random size
+                int sizeIndex = _rnd.Range(0, meta.AABBs.Count);
+                _rnd.FromList(meta.AABBs);
+
+                var parentBounds = parentMemSegment.Data.ChunkGeometry.Bounds;
+                var childBounds = _generator.CreateBoundsForChild(parentBounds, buildDirection, meta.AABBs[sizeIndex], offsetFromParent);
+
+                var memoryBounds = _blueprintTree.TraverseDepthFirstPostOrder().Select(x => x.Data.ChunkGeometry.Bounds); // in addition to tree collision check we also need to check for self collision
+                var hasCollision = _generator.CheckCollisions(childBounds, memoryBounds);
+
+                memSeg.ChunkGeometry.EntityType = placementConfig.ChunkEntityType;
+                memSeg.ChunkGeometry.Bounds = childBounds;
+                memSeg.ChunkGeometry.BuildDirection = buildDirection;
+                memSeg.ChunkGeometry.Meta = meta.name;
+                memSeg.ChunkGeometry.SizeIndex = sizeIndex;
+                memSeg.ChunkGeometry.Seed = _rnd.ValueInt();
+
+                memSeg.HasCollision = hasCollision;
+
+                return curNode;
+            }
+            else if (placementConfig.ChunkSizeStrategy == ConfigBase.PlacementConfig.SizeStrategy.ChunkMaxSize)
+            {
+                // take all last aabbs that is inside restrictions
+                throw new NotImplementedException();
+
+            }
+            else if (placementConfig.ChunkSizeStrategy == ConfigBase.PlacementConfig.SizeStrategy.ChunkMinSize)
+            {
+                // take all first aabbs that is inside restrictions
+                throw new NotImplementedException();
+            }
+
+            return null;
+        }
+
+        public IEnumerable<TreeNode<Blueprint.Segment>> Build()
+        {
+            Assert.IsTrue(_varLeafPointers == null || _varLeafPointers.Count == 0);
+
+            foreach (var node in _blueprintTree.TraverseDepthFirstPostOrder())
+            {
+                var parent = node.Parent;
+                var created = _generator.CreateSegment(
+                    parent.Data.CreatedNode,
+                    node.Data.ChunkGeometry
+                );
+                node.Data.CreatedNode = created;
+                yield return created;
+            }
         }
     }
 }
