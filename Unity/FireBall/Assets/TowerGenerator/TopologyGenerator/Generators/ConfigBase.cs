@@ -10,7 +10,11 @@ namespace TowerGenerator
 {
     public abstract class ConfigBase : MonoBehaviour
     {
-        public abstract GeneratorBase CreateGenerator(TreeNode<Blueprint.Segment> startFrom);
+        public abstract GeneratorBase CreateGenerator(
+            long seed,
+            TreeNode<Blueprint.Segment> startFrom,
+            TopologyGeneratorsManifoldBase manifold
+        );
 
         [Serializable]
         public class PlacementConfig

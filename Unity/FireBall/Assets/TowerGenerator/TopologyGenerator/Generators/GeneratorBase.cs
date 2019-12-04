@@ -56,9 +56,9 @@ namespace TowerGenerator
         public ConfigBase Config;
         protected RandomHelper _rnd;
         private static readonly Bounds ZeroBounds = new Bounds(Vector3.zero, Vector3.zero);
-        private TopologyGeneratorsManifold _manifold;
+        private TopologyGeneratorsManifoldBase _manifold;
 
-        protected GeneratorBase(uint seed, TreeNode<Blueprint.Segment.TopologySegment> trunkNode, ConfigBase cfg, TopologyGeneratorsManifold manifold)
+        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> trunkNode, ConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
         {
             Assert.IsNotNull(trunkNode);
             _rnd = new RandomHelper(seed);
@@ -67,6 +67,10 @@ namespace TowerGenerator
             _manifold = manifold;
         }
 
+        public long GetCurrentSeed()
+        {
+            return _rnd.GetCurrentSeed();
+        }
 
         public virtual TopGenStep EstablishTower()
         {
