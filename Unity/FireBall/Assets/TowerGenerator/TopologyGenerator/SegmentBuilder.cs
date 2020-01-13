@@ -31,11 +31,12 @@ namespace TowerGenerator
         //private Range _segCount;
         //private MemorySegment _fromStep;
         public int CreatedCount { get; set; }
-        private GeneratorBase _generator; // for tree state and creation methods
+        private GeneratorBase _generator; // for created
         private RandomHelper _rnd;
         //private TreeNode<Blueprint.Segment> _rootNode;
         private TreeNode<MemorySegment> _blueprintTree;
         private List<TreeNode<MemorySegment>> _varLeafPointers;
+        private Range _segmentsCount;
 
         public SegmentBuilder(GeneratorBase generator, int seed)
         {
@@ -52,7 +53,6 @@ namespace TowerGenerator
             ConfigBase.PlacementConfig intermediatePlacementConfig,
             ConfigBase.PlacementConfig lastPlacementConfig)
         {
-
             TreeNode<MemorySegment> proxyMemSegment = null;
             if (from != null)
                 proxyMemSegment = new TreeNode<MemorySegment>(new MemorySegment(from));
@@ -78,7 +78,7 @@ namespace TowerGenerator
             ConfigBase.PlacementConfig lastPlacementConfig)
         {
             Assert.IsTrue(_varLeafPointers == null || _varLeafPointers.Count == 0);
-
+            _segmentsCount = segCount;
             int targetSegmentCount = (int)segCount.From;
             int segmentCounter = 0;
             int branchesCounter = 0;
@@ -119,6 +119,11 @@ namespace TowerGenerator
             if (_varLeafPointers == null)
                 return 0;
             return _varLeafPointers.Count;
+        }
+
+        public bool IsProjectInRange()
+        {
+            return GetProjectVariantsNumber() >= _segmentsCount.From;
         }
 
         public void ApplyProject(int index)

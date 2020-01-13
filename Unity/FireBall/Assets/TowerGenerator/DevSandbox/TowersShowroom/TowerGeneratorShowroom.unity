@@ -573,7 +573,69 @@ PrefabInstance:
     - target: {fileID: 6043195961006098394, guid: 981e23dfd1416e04889b4f750910e8e5,
         type: 3}
       propertyPath: SeedTopology
-      value: 460806356
+      value: -1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 6043195960587439704, guid: 981e23dfd1416e04889b4f750910e8e5,
+        type: 3}
+      propertyPath: m_Name
+      value: GeneratorConfigs
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6043195960587439711, guid: 981e23dfd1416e04889b4f750910e8e5, type: 3}
+    - {fileID: 6043195960587439710, guid: 981e23dfd1416e04889b4f750910e8e5, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 981e23dfd1416e04889b4f750910e8e5, type: 3}
+--- !u!1 &6043195961101056755 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6043195960587439704, guid: 981e23dfd1416e04889b4f750910e8e5,
+    type: 3}
+  m_PrefabInstance: {fileID: 6043195961101056754}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6043195961101056756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6043195961101056755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcac074373ccd9b49898c772bc60c77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SegmentsBudget:
+    From: 2
+    To: 7
+    FromType: 0
+    ToType: 0
+  PlacementConfigs:
+  - ChunkEntityType: 0
+    ChunkSizeStrategy: 0
+    IgnoreChunkSizeRestrictions: 1
+    SegmentsSizeBreadth:
+      From: 0
+      To: 0
+      FromType: 0
+      ToType: 0
+    SegmentsSizeHeight:
+      From: 0
+      To: 0
+      FromType: 0
+      ToType: 0
+  AllowedDirections:
+    Left: 0
+    Right: 0
+    Up: 0
+    Down: 0
+    Forward: 0
+    Back: 0
+  IslandHeight:
+    From: 0
+    To: 0
+    FromType: 0
+    ToType: 0
+  IslandDistanceFromTrunk:
+    From: 0
+    To: 0
+    FromType: 0
+    ToType: 0
+  PropagateIslandChance: 0.206

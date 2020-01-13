@@ -36,7 +36,7 @@ namespace TowerGenerator
         public class GeneratorState
         {
             public Stack<TreeNode<Blueprint.Segment>> Created = new Stack<TreeNode<Blueprint.Segment>>(16);
-            public TreeNode<Blueprint.Segment> Deadlock;
+            public TreeNode<Blueprint.Segment> TrunkDeadlock;
 
             public List<TreeNode<Blueprint.Segment>> GetOpenedForGeneration()
             {
@@ -48,7 +48,7 @@ namespace TowerGenerator
                 return Created.FirstOrDefault(x => x.Data.Topology.IsOpenedForGenerator && x.BranchLevel == 0);
             }
 
-            public bool IsStillGeneratingTrunk { get; private set; }
+            public bool IsStillGeneratingTrunk { get; internal set; }
         }
 
         public int Iteration { get; internal set; }
@@ -57,14 +57,16 @@ namespace TowerGenerator
         protected RandomHelper _rnd;
         private static readonly Bounds ZeroBounds = new Bounds(Vector3.zero, Vector3.zero);
         private TopologyGeneratorsManifoldBase _manifold;
+        protected TreeNode<Blueprint.Segment> _startingNode;
 
-        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> trunkNode, ConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
+        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> startingNode, ConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
         {
-            Assert.IsNotNull(trunkNode);
             _rnd = new RandomHelper(seed);
             State = new GeneratorState();
             Config = cfg;
             _manifold = manifold;
+            _startingNode = startingNode;
+            State.IsStillGeneratingTrunk = true;
         }
 
         public long GetCurrentSeed()
@@ -165,6 +167,15 @@ namespace TowerGenerator
             Vector3 offset)
         {
             throw new NotImplementedException();
+        }
+
+        private TreeNode<Blueprint.Segment> CreateMemorySegment(
+            TreeNode<Blueprint.Segment> parentSegment,
+            Vector3 buildDirection,
+            Vector3 offsetFromParent,
+            ConfigBase.PlacementConfig placementConfig)
+        {
+            
         }
 
         public TreeNode<Blueprint.Segment> CreateSegment( 
