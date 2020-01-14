@@ -16,9 +16,9 @@ namespace TowerGenerator
         public virtual void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
         {
 #if UNITY_EDITOR
-            if( !PropertyParserHelper.CheckPropNames(
+            if (!PropertyParserHelper.CheckPropNames(
                 scriptProperties,
-                PropertyParserHelper.PropNamePropagatedTo, 
+                PropertyParserHelper.PropNamePropagatedTo,
                 PropertyParserHelper.PropNameHost,
                 PropertyParserHelper.PropNameMaxObjectsSelected,
                 PropertyParserHelper.PropNameMinObjectsSelected
@@ -30,7 +30,7 @@ namespace TowerGenerator
             var propHost = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameHost);
 
             // ----- get host group
-            if (propHost == null) 
+            if (propHost == null)
             {
                 // get default host
                 var pointer = transform;
@@ -49,7 +49,7 @@ namespace TowerGenerator
             {
                 // get host by name
                 Host = entityRoot.GetComponentsInChildren<GroupStack>(true).FirstOrDefault(x => x.name == propHost.PropValue);
-                Assert.IsNotNull(Host,$"requesting name: {propHost.PropValue}");
+                Assert.IsNotNull(Host, $"requesting name: {propHost.PropValue}");
             }
 
             // ----- get propagated to

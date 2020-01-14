@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
-    public abstract class ConfigBase : MonoBehaviour
+    public abstract class GeneratorConfigBase : MonoBehaviour
     {
         public abstract GeneratorBase CreateGenerator(
             long seed,

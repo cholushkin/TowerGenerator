@@ -4,7 +4,6 @@ using System.Linq;
 using Assets.Plugins.Alg;
 using GameLib;
 using GameLib.DataStructures;
-using GameLib.Log;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +27,7 @@ namespace TowerGenerator
 
         [Tooltip("-1 is infinite")]
         public int CyclesCount;
-        public CyclerType GeneratorCycler;
+        public CyclerType GeneratorConfigCycler;
 
 
         
@@ -45,8 +44,8 @@ namespace TowerGenerator
         
 
         public Transform TopologyGeneratorConfigsTransform;
-        private ConfigBase[] _topologyGeneratorConfigs;
-        private Chooser<ConfigBase> _genConfigChooser;
+        private GeneratorConfigBase[] _topologyGeneratorConfigs;
+        private Chooser<GeneratorConfigBase> _genConfigChooser;
 
 
         public override void StartGenerate(uint seed)
@@ -58,9 +57,9 @@ namespace TowerGenerator
         private void Init(uint seed)
         {
             Debug.Log("TopologyGeneratorsManifold.Init");
-            _topologyGeneratorConfigs = TopologyGeneratorConfigsTransform.GetComponents<ConfigBase>();
+            _topologyGeneratorConfigs = TopologyGeneratorConfigsTransform.GetComponents<GeneratorConfigBase>();
             Assert.IsTrue(_topologyGeneratorConfigs.Length > 0);
-            _genConfigChooser = new Chooser<ConfigBase>(_topologyGeneratorConfigs, GeneratorCycler, seed, CyclesCount);
+            _genConfigChooser = new Chooser<GeneratorConfigBase>(_topologyGeneratorConfigs, GeneratorConfigCycler, seed, CyclesCount);
         }
 
 

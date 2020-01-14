@@ -10,7 +10,8 @@ namespace TowerGenerator
 {
     public abstract class GeneratorBase
     {
-        public class TopGenStep // topology generation elementary step
+        // topology generation elementary step for visualization
+        public class TopGenStep 
         {
             public enum Cmd
             {
@@ -19,17 +20,19 @@ namespace TowerGenerator
                 SegChangeState,
             }
 
-            public TreeNode<Blueprint.Segment> Segment;
-            public Cmd GeneratorCmd;
+            public TreeNode<Blueprint.Segment> Segment { get; }
+            public Cmd GeneratorCmd { get; }
+
+            private TopGenStep(TreeNode<Blueprint.Segment> segment, Cmd cmd)
+            {
+                Segment = segment;
+                GeneratorCmd = cmd;
+            }
 
             public static TopGenStep DoStep(TreeNode<Blueprint.Segment> segment, Cmd cmd)
             {
                 Assert.IsNotNull(segment);
-                return new TopGenStep
-                {
-                    Segment = segment,
-                    GeneratorCmd = cmd,
-                };
+                return new TopGenStep(segment, cmd);
             }
         }
 
@@ -53,13 +56,13 @@ namespace TowerGenerator
 
         public int Iteration { get; internal set; }
         public GeneratorState State { get; protected set; }
-        public ConfigBase Config;
+        public GeneratorConfigBase Config;
         protected RandomHelper _rnd;
         private static readonly Bounds ZeroBounds = new Bounds(Vector3.zero, Vector3.zero);
         private TopologyGeneratorsManifoldBase _manifold;
         protected TreeNode<Blueprint.Segment> _startingNode;
 
-        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> startingNode, ConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
+        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> startingNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
         {
             _rnd = new RandomHelper(seed);
             State = new GeneratorState();
@@ -173,9 +176,9 @@ namespace TowerGenerator
             TreeNode<Blueprint.Segment> parentSegment,
             Vector3 buildDirection,
             Vector3 offsetFromParent,
-            ConfigBase.PlacementConfig placementConfig)
+            GeneratorConfigBase.PlacementConfig placementConfig)
         {
-            
+            throw new NotImplementedException();
         }
 
         public TreeNode<Blueprint.Segment> CreateSegment( 

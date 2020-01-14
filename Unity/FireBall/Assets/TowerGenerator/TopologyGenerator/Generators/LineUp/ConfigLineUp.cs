@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
-    public class ConfigLineUp : ConfigBase
+    public class ConfigLineUp : GeneratorConfigBase
     {
         public Range IslandHeight;
         public Range IslandDistanceFromTrunk;

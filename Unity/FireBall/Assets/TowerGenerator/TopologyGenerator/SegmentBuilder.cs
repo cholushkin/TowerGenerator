@@ -49,9 +49,9 @@ namespace TowerGenerator
             Range segCount,
             Vector3 direction,
             Vector3 offsetFromTrunk,
-            ConfigBase.PlacementConfig firstPlacementConfig,
-            ConfigBase.PlacementConfig intermediatePlacementConfig,
-            ConfigBase.PlacementConfig lastPlacementConfig)
+            GeneratorConfigBase.PlacementConfig firstPlacementConfig,
+            GeneratorConfigBase.PlacementConfig intermediatePlacementConfig,
+            GeneratorConfigBase.PlacementConfig lastPlacementConfig)
         {
             TreeNode<MemorySegment> proxyMemSegment = null;
             if (from != null)
@@ -73,9 +73,9 @@ namespace TowerGenerator
             Range segCount,
             Vector3 direction,
             Vector3 offsetFromTrunk,
-            ConfigBase.PlacementConfig firstPlacementConfig,
-            ConfigBase.PlacementConfig intermediatePlacementConfig,
-            ConfigBase.PlacementConfig lastPlacementConfig)
+            GeneratorConfigBase.PlacementConfig firstPlacementConfig,
+            GeneratorConfigBase.PlacementConfig intermediatePlacementConfig,
+            GeneratorConfigBase.PlacementConfig lastPlacementConfig)
         {
             Assert.IsTrue(_varLeafPointers == null || _varLeafPointers.Count == 0);
             _segmentsCount = segCount;
@@ -149,14 +149,14 @@ namespace TowerGenerator
             TreeNode<MemorySegment> parentMemSegment,
             Vector3 buildDirection,
             Vector3 offsetFromParent,
-            ConfigBase.PlacementConfig placementConfig)
+            GeneratorConfigBase.PlacementConfig placementConfig)
         {
             var memSeg = new MemorySegment();
             var curNode = new TreeNode<MemorySegment>(memSeg);
             parentMemSegment.AddChild(curNode);
 
             // get segment size
-            if (placementConfig.ChunkSizeStrategy == ConfigBase.PlacementConfig.SizeStrategy.ChunkRndSize)
+            if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkRndSize)
             {
                 // get random meta of placementConfig.ChunkEntityType
                 var filter = new MetaProvider.Filter(entFlags: placementConfig.ChunkEntityType,
@@ -189,13 +189,13 @@ namespace TowerGenerator
 
                 return curNode;
             }
-            else if (placementConfig.ChunkSizeStrategy == ConfigBase.PlacementConfig.SizeStrategy.ChunkMaxSize)
+            else if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkMaxSize)
             {
                 // take all last aabbs that is inside restrictions
                 throw new NotImplementedException();
 
             }
-            else if (placementConfig.ChunkSizeStrategy == ConfigBase.PlacementConfig.SizeStrategy.ChunkMinSize)
+            else if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkMinSize)
             {
                 // take all first aabbs that is inside restrictions
                 throw new NotImplementedException();

@@ -22,7 +22,7 @@ namespace TowerGenerator
 
     public class GeneratorLineUp : GeneratorBase
     {
-        public GeneratorLineUp(long seed, TreeNode<Blueprint.Segment> trunkNode, ConfigBase cfg, TopologyGeneratorsManifoldBase manifold) 
+        public GeneratorLineUp(long seed, TreeNode<Blueprint.Segment> trunkNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold) 
             : base(seed, trunkNode, cfg, manifold)
         {
         }
