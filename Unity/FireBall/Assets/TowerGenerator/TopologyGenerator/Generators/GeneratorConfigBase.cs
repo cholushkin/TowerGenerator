@@ -27,7 +27,7 @@ namespace TowerGenerator
             }
             public Entity.EntityType ChunkEntityType;
             public SizeStrategy ChunkSizeStrategy;
-            public bool IgnoreChunkSizeRestrictions;
+            public bool IgnoreChunkSizeRestrictions; // todo: use zero ranges instead
             public Range SegmentsSizeBreadth;
             public Range SegmentsSizeHeight;
             // todo: tags

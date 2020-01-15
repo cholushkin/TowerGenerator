@@ -13,6 +13,15 @@ namespace TowerGenerator
 
         public TopologyGeneratorsManifoldBase TopologyGeneratorManifold;
 
+        void Reset()
+        {
+            SeedTopology = -1;
+            SeedVisual = -1;
+            SeedContent = -1;
+            GenererateOnStart = true;
+            TopologyGeneratorManifold = GetComponentInChildren<TopologyGeneratorsManifoldBase>();
+        }
+
         void Start()
         {
             Assert.IsNotNull(TopologyGeneratorManifold);

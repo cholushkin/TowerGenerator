@@ -29,7 +29,7 @@ namespace TowerGenerator
 
         public override IEnumerable<TopGenStep> GenerateTower()
         {
-            if (Iteration == 0)
+            //if (Iteration == 0)
             {
                 foreach (var topGenStep in GenerateTrunk()) 
                     yield return topGenStep;
@@ -57,7 +57,7 @@ namespace TowerGenerator
             // deadlock
             if (!segBuilder.IsProjectInRange())
             {
-                State.IsStillGeneratingTrunk = false;
+                //State.IsStillGeneratingTrunk = false;
                 State.TrunkDeadlock = State.GetOpenedTrunkNode();
                 yield return null;
             }
@@ -67,7 +67,7 @@ namespace TowerGenerator
             // build trunk
             foreach (var segment in segBuilder.Build())
                 yield return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
-            State.IsStillGeneratingTrunk = false;
+            //State.IsStillGeneratingTrunk = false;
         }
     }
 }

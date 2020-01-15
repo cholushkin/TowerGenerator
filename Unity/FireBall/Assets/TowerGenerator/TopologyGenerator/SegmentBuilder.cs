@@ -53,7 +53,7 @@ namespace TowerGenerator
             GeneratorConfigBase.PlacementConfig intermediatePlacementConfig,
             GeneratorConfigBase.PlacementConfig lastPlacementConfig)
         {
-            TreeNode<MemorySegment> proxyMemSegment = null;
+            TreeNode<MemorySegment> proxyMemSegment = null; // todo: implicit constructor
             if (from != null)
                 proxyMemSegment = new TreeNode<MemorySegment>(new MemorySegment(from));
 

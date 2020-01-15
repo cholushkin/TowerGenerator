@@ -51,25 +51,27 @@ namespace TowerGenerator
                 return Created.FirstOrDefault(x => x.Data.Topology.IsOpenedForGenerator && x.BranchLevel == 0);
             }
 
-            public bool IsStillGeneratingTrunk { get; internal set; }
+            public int Iteration { get; internal set; }
+
+            // todo:
+            // iteration
+            // starting node
         }
 
-        public int Iteration { get; internal set; }
         public GeneratorState State { get; protected set; }
-        public GeneratorConfigBase Config;
+        public GeneratorConfigBase Config { get; private set; }
         protected RandomHelper _rnd;
-        private static readonly Bounds ZeroBounds = new Bounds(Vector3.zero, Vector3.zero);
         private TopologyGeneratorsManifoldBase _manifold;
-        protected TreeNode<Blueprint.Segment> _startingNode;
 
-        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> startingNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
+
+        protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> genFromNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
         {
             _rnd = new RandomHelper(seed);
             State = new GeneratorState();
             Config = cfg;
             _manifold = manifold;
-            _startingNode = startingNode;
-            State.IsStillGeneratingTrunk = true;
+            //_startingNode = startingNode;
+            //State.IsStillGeneratingTrunk = true;
         }
 
         public long GetCurrentSeed()
@@ -77,7 +79,7 @@ namespace TowerGenerator
             return _rnd.GetCurrentSeed();
         }
 
-        public virtual TopGenStep EstablishTower()
+        public virtual TopGenStep EstablishTower() // todo: consider generate different towers from one tower by establishing new towers on branches of parent one
         {
             SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
 
@@ -104,7 +106,7 @@ namespace TowerGenerator
 
         public virtual TopGenStep FinalizeTrunk()
         {
-            Assert.IsFalse(State.IsStillGeneratingTrunk);
+            //Assert.IsFalse(State.IsStillGeneratingTrunk);
             SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
             var from = State.GetOpenedTrunkNode();
 

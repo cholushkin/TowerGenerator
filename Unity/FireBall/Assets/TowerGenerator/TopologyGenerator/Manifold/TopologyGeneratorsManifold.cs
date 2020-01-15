@@ -20,21 +20,27 @@ namespace TowerGenerator
                 Done
             }
 
-            public List<GeneratorBase> Generators;
+            public List<GeneratorBase> ActiveGenerators;
             public ManifoldStatus Status;
         }
 
-
+        // main configs
+        [Header("Main configs")]
         [Tooltip("-1 is infinite")]
-        public int CyclesCount;
-        public CyclerType GeneratorConfigCycler;
+        public int MainCfgChooserCyclesCount;
+        public CyclerType MainCfgCycler;
+        public Transform MainConfigs;
 
+        // branch finalizers configs
+        [Header("Branch finalizer configs")]
+        [Tooltip("-1 is infinite")]
+        public int BranchCfgCyclesCount;
+        public CyclerType BranchCfgCycler;
+        public Transform BranchConfigs;
 
-        
-
+        [Space(12)]
         public TopologyGeneratorsVisualizer TopologyVisualizer;
         public VisualBuilder VisualBuilder;
-
 
 #if UNITY_EDITOR
         public bool IsGizmoDrawPointers;
@@ -42,27 +48,46 @@ namespace TowerGenerator
 
         public ManifoldState State { get; protected set; }
         
+        // main cfg chooser
+        private GeneratorConfigBase[] _configsMain;
+        private Chooser<GeneratorConfigBase> _chooserMain;
 
-        public Transform TopologyGeneratorConfigsTransform;
-        private GeneratorConfigBase[] _topologyGeneratorConfigs;
-        private Chooser<GeneratorConfigBase> _genConfigChooser;
+        // branch cfg chooser
+        private GeneratorConfigBase[] _configsBranches;
+        private Chooser<GeneratorConfigBase> _chooserBranch;
 
+
+
+
+        private void Init(uint seed)
+        {
+            Debug.Log("TopologyGeneratorsManifold.Init");
+
+            // main chooser init
+            _configsMain = MainConfigs.GetComponents<GeneratorConfigBase>();
+            Assert.IsTrue(_configsMain.Length > 0);
+            _chooserMain = new Chooser<GeneratorConfigBase>(_configsMain, MainCfgCycler, seed, MainCfgChooserCyclesCount);
+
+            // branch chooser init
+            if (BranchConfigs != null)
+            {
+                _configsBranches = BranchConfigs.GetComponents<GeneratorConfigBase>();
+                Assert.IsTrue(_configsBranches.Length > 0);
+                _chooserBranch =
+                    new Chooser<GeneratorConfigBase>(_configsBranches, BranchCfgCycler, seed, BranchCfgCyclesCount);
+            }
+            else
+            {
+                Debug.LogFormat($"No branch configs specified found. Manifold '{transform.GetDebugName(false)}' will use main configs for branches");
+                _chooserBranch = _chooserMain;
+            }
+        }
 
         public override void StartGenerate(uint seed)
         {
             Debug.LogFormat($"StartGenerate: seed:{seed}, transform:{transform.GetDebugName()}");
             StartCoroutine(GenerateTopology(seed));
         }
-
-        private void Init(uint seed)
-        {
-            Debug.Log("TopologyGeneratorsManifold.Init");
-            _topologyGeneratorConfigs = TopologyGeneratorConfigsTransform.GetComponents<GeneratorConfigBase>();
-            Assert.IsTrue(_topologyGeneratorConfigs.Length > 0);
-            _genConfigChooser = new Chooser<GeneratorConfigBase>(_topologyGeneratorConfigs, GeneratorConfigCycler, seed, CyclesCount);
-        }
-
-
 
         protected override IEnumerator GenerateTopology(uint seed)
         {
@@ -74,9 +99,9 @@ namespace TowerGenerator
 
             // get first generator and establish a tower
             {
-                var cfg = _genConfigChooser.GetCurrent();
+                var cfg = _chooserMain.GetCurrent();
                 var firstGenerator = cfg.CreateGenerator(seed, null, this);
-                State.Generators.Add(firstGenerator);
+                State.ActiveGenerators.Add(firstGenerator);
                 var firstStep = firstGenerator.EstablishTower();
                 Assert.IsNull(_bp.Tree);
                 Assert.IsTrue(firstStep.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn);
@@ -88,7 +113,7 @@ namespace TowerGenerator
                 yield return TopologyVisualizer.Wait();
             Pointers.SetInitialPointers();
             TopologyVisualizer?.Begin(_bp.Tree);
-            TopologyVisualizer?.ChangeGenerator(State.Generators.First());
+            TopologyVisualizer?.ChangeGenerator(State.ActiveGenerators.First());
             VisualBuilder?.Begin(_bp.Tree);
             yield return null;
 
@@ -96,54 +121,55 @@ namespace TowerGenerator
             bool isWaitingForBranchFinalization = false;
             do
             {
-                List<GeneratorBase> newActiveGenerators = new List<GeneratorBase>();
-                foreach (var activeGenerator in State.Generators)
+                // generate
+                foreach (var activeGenerator in State.ActiveGenerators)
                 {
                     foreach (var step in activeGenerator.GenerateTower())
                     {
                         TopologyVisualizer?.Step(step);
                     }
-                    activeGenerator.Iteration++;
+                    activeGenerator.State.Iteration++;
                 }
 
                 var index = 0;
-                foreach (var activeGenerator in State.Generators)
+                List<GeneratorBase> newActiveGenerators = new List<GeneratorBase>();
+                foreach (var activeGenerator in State.ActiveGenerators)
                 {
                     if (index == 0)
                     {
-                        if( activeGenerator.State.IsStillGeneratingTrunk )
-                            newActiveGenerators.Add(activeGenerator);
-                        else
-                        {
-                            _genConfigChooser.Step();
-                            var cfg = _genConfigChooser.GetCurrent();
-                            if (cfg != null)
-                            {
-                                var generator = cfg.CreateGenerator(
-                                    activeGenerator.GetCurrentSeed(),
-                                    activeGenerator.State.GetOpenedTrunkNode(),
-                                    this
-                                );
-                                newActiveGenerators.Add(generator);
-                                TopologyVisualizer?.ChangeGenerator(generator);
-                            }
-                            else // no more generators in chain, but we still need to wait for branch generators to complete
-                            {
-                                // finalize trunk
-                                var step = activeGenerator.FinalizeTrunk();
-                                TopologyVisualizer?.Step(step);
-                                isWaitingForBranchFinalization = true;
-                            }
-                        }
+                        //if( activeGenerator.State.IsStillGeneratingTrunk )
+                        //    newActiveGenerators.Add(activeGenerator);
+                        //else
+                        //{
+                        //    _genConfigChooser.Step();
+                        //    var cfg = _genConfigChooser.GetCurrent();
+                        //    if (cfg != null)
+                        //    {
+                        //        var generator = cfg.CreateGenerator(
+                        //            activeGenerator.GetCurrentSeed(),
+                        //            activeGenerator.State.GetOpenedTrunkNode(),
+                        //            this
+                        //        );
+                        //        newActiveGenerators.Add(generator);
+                        //        TopologyVisualizer?.ChangeGenerator(generator);
+                        //    }
+                        //    else // no more generators in chain, but we still need to wait for branch generators to complete
+                        //    {
+                        //        // finalize trunk
+                        //        var step = activeGenerator.FinalizeTrunk();
+                        //        TopologyVisualizer?.Step(step);
+                        //        isWaitingForBranchFinalization = true;
+                        //    }
+                        //}
                         continue;
                     }
-                    Assert.IsFalse(activeGenerator.State.IsStillGeneratingTrunk);
+                    //Assert.IsFalse(activeGenerator.State.IsStillGeneratingTrunk);
                     if(activeGenerator.State.GetOpenedForGeneration().Any())
                         newActiveGenerators.Add(activeGenerator);
                     ++index;
                 }
 
-                if (State.Generators.Count == 0)
+                if (State.ActiveGenerators.Count == 0)
                     State.Status = ManifoldState.ManifoldStatus.Done;
             } while (State.Status != ManifoldState.ManifoldStatus.Done);
 
