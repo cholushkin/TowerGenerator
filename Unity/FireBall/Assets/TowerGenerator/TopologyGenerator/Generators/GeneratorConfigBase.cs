@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GameLib.DataStructures;
@@ -37,7 +36,6 @@ namespace TowerGenerator
         [Serializable]
         public class ChunkSpecificPlacement
         {
-            
             public PlacementConfig PlacementConfig;
         }
 

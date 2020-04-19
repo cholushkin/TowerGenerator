@@ -38,24 +38,19 @@ namespace TowerGenerator
 
         public class GeneratorState
         {
-            public Stack<TreeNode<Blueprint.Segment>> Created = new Stack<TreeNode<Blueprint.Segment>>(16);
-            public TreeNode<Blueprint.Segment> TrunkDeadlock;
-
-            public List<TreeNode<Blueprint.Segment>> GetOpenedForGeneration()
+            public GeneratorState(TreeNode<Blueprint.Segment> entryNode)
             {
-                return Created.Where(x => x.Data.Topology.IsOpenedForGenerator).ToList();
+                NodeEntry = entryNode;
             }
 
-            public TreeNode<Blueprint.Segment> GetOpenedTrunkNode()
-            {
-                return Created.FirstOrDefault(x => x.Data.Topology.IsOpenedForGenerator && x.BranchLevel == 0);
-            }
+            public List<TreeNode<Blueprint.Segment>> SegmentsActive = new List<TreeNode<Blueprint.Segment>>(16);
+            public List<TreeNode<Blueprint.Segment>> SegmentsOpened = new List<TreeNode<Blueprint.Segment>>(16);
+            public List<TreeNode<Blueprint.Segment>> SegmentsCreated = new List<TreeNode<Blueprint.Segment>>(16);
+
+            public TreeNode<Blueprint.Segment> NodeDeadlock;
+            public TreeNode<Blueprint.Segment> NodeEntry;
 
             public int Iteration { get; internal set; }
-
-            // todo:
-            // iteration
-            // starting node
         }
 
         public GeneratorState State { get; protected set; }
@@ -67,11 +62,9 @@ namespace TowerGenerator
         protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> genFromNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
         {
             _rnd = new RandomHelper(seed);
-            State = new GeneratorState();
+            State = new GeneratorState(genFromNode);
             Config = cfg;
             _manifold = manifold;
-            //_startingNode = startingNode;
-            //State.IsStillGeneratingTrunk = true;
         }
 
         public long GetCurrentSeed()
@@ -79,7 +72,7 @@ namespace TowerGenerator
             return _rnd.GetCurrentSeed();
         }
 
-        public virtual TopGenStep EstablishTower() // todo: consider generate different towers from one tower by establishing new towers on branches of parent one
+        public virtual TopGenStep EstablishTower()
         {
             SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
 
@@ -106,62 +99,65 @@ namespace TowerGenerator
 
         public virtual TopGenStep FinalizeTrunk()
         {
-            //Assert.IsFalse(State.IsStillGeneratingTrunk);
-            SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
-            var from = State.GetOpenedTrunkNode();
+            throw new NotImplementedException();
+            //var nodes = State.SegmentsOpened.AddRange(State.SegmentsActive);
+            ////Assert.IsFalse(State.IsStillGeneratingTrunk);
+            //SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
+            //var from = State.GetOpenedTrunkNode();
 
-            segmentBuilder.Project(
-                from,
-                Range.One,
-                Vector3.up,
-                Vector3.zero,
-                Config.GetPlacementConfig(Entity.EntityType.ChunkRoofPeak),
-                null,
-                null
-            );
+            //segmentBuilder.Project(
+            //    from,
+            //    Range.One,
+            //    Vector3.up,
+            //    Vector3.zero,
+            //    Config.GetPlacementConfig(Entity.EntityType.ChunkRoofPeak),
+            //    null,
+            //    null
+            //);
 
-            if (segmentBuilder.GetProjectVariantsNumber() == 0) // if we can't propagate up just replace opened segment with roof (ignoring placementConfig)
-            {
-                from.Data.Topology.Geometry.EntityType = Entity.EntityType.ChunkRoofPeak;
-                from.Data.Topology.IsOpenedForGenerator = false;
-                return TopGenStep.DoStep(from, TopGenStep.Cmd.SegChangeState);
-            }
-            segmentBuilder.ApplyProject(0);
-            var segment = segmentBuilder.Build().First();
-            Assert.IsNotNull(segment);
-            return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
+            //if (segmentBuilder.GetProjectVariantsNumber() == 0) // if we can't propagate up just replace opened segment with roof (ignoring placementConfig)
+            //{
+            //    from.Data.Topology.Geometry.EntityType = Entity.EntityType.ChunkRoofPeak;
+            //    from.Data.Topology.IsOpenedForGenerator = false;
+            //    return TopGenStep.DoStep(from, TopGenStep.Cmd.SegChangeState);
+            //}
+            //segmentBuilder.ApplyProject(0);
+            //var segment = segmentBuilder.Build().First();
+            //Assert.IsNotNull(segment);
+            //return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
         }
 
 
         public virtual IEnumerable<TopGenStep> FinalizeWholeTower()
         {
-            var opened = State.GetOpenedForGeneration();
+            throw new NotImplementedException();
+            //var opened = State.GetOpenedForGeneration();
 
-            foreach (var openedNode in opened)
-            {
-                SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
-                segmentBuilder.Project(
-                    openedNode,
-                    Range.One,
-                    Vector3.up,
-                    Vector3.zero,
-                    Config.GetPlacementConfig(Entity.EntityType.ChunkRoofPeak),
-                    null,
-                    null
-                );
+            //foreach (var openedNode in opened)
+            //{
+            //    SegmentBuilder segmentBuilder = new SegmentBuilder(this, _rnd.ValueInt());
+            //    segmentBuilder.Project(
+            //        openedNode,
+            //        Range.One,
+            //        Vector3.up,
+            //        Vector3.zero,
+            //        Config.GetPlacementConfig(Entity.EntityType.ChunkRoofPeak),
+            //        null,
+            //        null
+            //    );
 
-                if (segmentBuilder.GetProjectVariantsNumber() == 0) // if we can't propagate up just replace opened segment with roof (ignoring placementConfig)
-                {
-                    openedNode.Data.Topology.Geometry.EntityType = Entity.EntityType.ChunkRoofPeak;
-                    openedNode.Data.Topology.IsOpenedForGenerator = false;
-                    yield return TopGenStep.DoStep(openedNode, TopGenStep.Cmd.SegChangeState);
-                    continue;
-                }
-                segmentBuilder.ApplyProject(0);
-                var segment = segmentBuilder.Build().First();
-                Assert.IsNotNull(segment);
-                yield return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
-            }
+            //    if (segmentBuilder.GetProjectVariantsNumber() == 0) // if we can't propagate up just replace opened segment with roof (ignoring placementConfig)
+            //    {
+            //        openedNode.Data.Topology.Geometry.EntityType = Entity.EntityType.ChunkRoofPeak;
+            //        openedNode.Data.Topology.IsOpenedForGenerator = false;
+            //        yield return TopGenStep.DoStep(openedNode, TopGenStep.Cmd.SegChangeState);
+            //        continue;
+            //    }
+            //    segmentBuilder.ApplyProject(0);
+            //    var segment = segmentBuilder.Build().First();
+            //    Assert.IsNotNull(segment);
+            //    yield return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
+            //}
         }
 
         public TreeNode<Blueprint.Segment> CreateSegment(
@@ -219,7 +215,7 @@ namespace TowerGenerator
             Assert.IsTrue(segment.Topology.Connection == Vector3.zero);
             segment.Topology.Connection = -chunkGeometry.BuildDirection;
 
-            State.Created.Push(node);
+            //State.Created.Push(node);
             return node;
         }
 

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace TowerGenerator
+namespace TowerGenerator.ChunkImporter
 {
     public class ContentPackPropertiesImporter : AssetPostprocessor
     {

@@ -164,8 +164,8 @@ namespace TowerGenerator
                         continue;
                     }
                     //Assert.IsFalse(activeGenerator.State.IsStillGeneratingTrunk);
-                    if(activeGenerator.State.GetOpenedForGeneration().Any())
-                        newActiveGenerators.Add(activeGenerator);
+                    //if(activeGenerator.State.GetOpenedForGeneration().Any())
+                    //    newActiveGenerators.Add(activeGenerator);
                     ++index;
                 }
 

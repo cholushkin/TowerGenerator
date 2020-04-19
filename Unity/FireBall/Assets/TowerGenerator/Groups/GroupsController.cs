@@ -27,7 +27,7 @@ namespace TowerGenerator
 
         public GroupStack GroupSizeStack;
 
-        public void Init()
+        public void Init() // configure
         {
             //if (Seed == -1)
             //    Seed = Random.Range(0, Int32.MaxValue);

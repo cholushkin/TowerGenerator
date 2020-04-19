@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameLib.DataStructures;
 using UnityEngine;
 
@@ -29,45 +30,47 @@ namespace TowerGenerator
 
         public override IEnumerable<TopGenStep> GenerateTower()
         {
-            //if (Iteration == 0)
-            {
-                foreach (var topGenStep in GenerateTrunk()) 
-                    yield return topGenStep;
+            throw new NotImplementedException();
+            ////if (Iteration == 0)
+            //{
+            //    foreach (var topGenStep in GenerateTrunk()) 
+            //        yield return topGenStep;
                 
-                // start island
-                if (State.Created.Count <= 3)
-                    yield return null;
-            }
+            //    // start island
+            //    if (State.Created.Count <= 3)
+            //        yield return null;
+            //}
         }
 
         private IEnumerable<TopGenStep> GenerateTrunk()
         {
-            var segBuilder = new SegmentBuilder(this, _rnd.ValueInt());
+            throw new NotImplementedException();
+            //var segBuilder = new SegmentBuilder(this, _rnd.ValueInt());
 
-            segBuilder.Project(
-                State.GetOpenedTrunkNode(),
-                Config.SegmentsBudget,
-                Vector3.up,
-                Vector3.zero,
-                Config.GetPlacementConfig(Entity.EntityType.ChunkStd),
-                Config.GetPlacementConfig(Entity.EntityType.ChunkStd),
-                Config.GetPlacementConfig(Entity.EntityType.ChunkStd)
-            );
+            //segBuilder.Project(
+            //    State.GetOpenedTrunkNode(),
+            //    Config.SegmentsBudget,
+            //    Vector3.up,
+            //    Vector3.zero,
+            //    Config.GetPlacementConfig(Entity.EntityType.ChunkStd),
+            //    Config.GetPlacementConfig(Entity.EntityType.ChunkStd),
+            //    Config.GetPlacementConfig(Entity.EntityType.ChunkStd)
+            //);
 
-            // deadlock
-            if (!segBuilder.IsProjectInRange())
-            {
-                //State.IsStillGeneratingTrunk = false;
-                State.TrunkDeadlock = State.GetOpenedTrunkNode();
-                yield return null;
-            }
+            //// deadlock
+            //if (!segBuilder.IsProjectInRange())
+            //{
+            //    //State.IsStillGeneratingTrunk = false;
+            //    State.TrunkDeadlock = State.GetOpenedTrunkNode();
+            //    yield return null;
+            //}
 
-            segBuilder.ApplyProjectRnd();
+            //segBuilder.ApplyProjectRnd();
 
-            // build trunk
-            foreach (var segment in segBuilder.Build())
-                yield return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
-            //State.IsStillGeneratingTrunk = false;
+            //// build trunk
+            //foreach (var segment in segBuilder.Build())
+            //    yield return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
+            ////State.IsStillGeneratingTrunk = false;
         }
     }
 }
