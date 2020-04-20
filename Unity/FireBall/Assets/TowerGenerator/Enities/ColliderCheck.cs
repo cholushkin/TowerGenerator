@@ -19,10 +19,9 @@ namespace TowerGenerator
         public CollisionCheckType CollisionCheck;
 
         public virtual void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
-        {
-
-            PropertyParserHelper.CheckPropNames(scriptProperties, PropertyParserHelper.PropNameCollisionCheck);
-            var propCollisionCheck = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameCollisionCheck);
+        {	
+	        ChunkImporterHelper.CheckPropNames(scriptProperties, ChunkImporterHelper.PropNameCollisionCheck);
+            var propCollisionCheck = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameCollisionCheck);
             Assert.IsNotNull(propCollisionCheck);
 
             var lowered = propCollisionCheck.PropValue.ToLower();

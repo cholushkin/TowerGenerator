@@ -4,7 +4,6 @@ using System.Linq;
 using GameLib.Random;
 using TowerGenerator.ChunkImporter;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
@@ -20,8 +19,8 @@ namespace TowerGenerator
             base.Configure(entityRoot,scriptProperties);
 
             // get domain properties
-            var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameMinObjectsSelected);
-            var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameMaxObjectsSelected);
+            var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameMinObjectsSelected);
+            var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameMaxObjectsSelected);
 
 
             if (propMaxObjectsSelected != null)

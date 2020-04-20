@@ -17,18 +17,18 @@ namespace TowerGenerator
         public virtual void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
         {
 #if UNITY_EDITOR
-            if (!PropertyParserHelper.CheckPropNames(
+            if (!ChunkImporterHelper.CheckPropNames(
                 scriptProperties,
-                PropertyParserHelper.PropNamePropagatedTo,
-                PropertyParserHelper.PropNameHost,
-                PropertyParserHelper.PropNameMaxObjectsSelected,
-                PropertyParserHelper.PropNameMinObjectsSelected
+                ChunkImporterHelper.PropNamePropagatedTo,
+                ChunkImporterHelper.PropNameHost,
+                ChunkImporterHelper.PropNameMaxObjectsSelected,
+                ChunkImporterHelper.PropNameMinObjectsSelected
             ))
                 Debug.LogError($"Bad property name on '{transform.GetDebugName()}'");
 #endif
             // get domain properties
-            var propPropagatedTo = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNamePropagatedTo);
-            var propHost = scriptProperties.FirstOrDefault(x => x.PropName == PropertyParserHelper.PropNameHost);
+            var propPropagatedTo = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNamePropagatedTo);
+            var propHost = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameHost);
 
             // ----- get host group
             if (propHost == null)
@@ -108,7 +108,7 @@ namespace TowerGenerator
             }
 
 
-            if (!PropertyParserHelper.ParseInt(propValue, out propIndex))
+            if (!ChunkImporterHelper.ParseInt(propValue, out propIndex))
                 Debug.LogError($"Parsing int error for value {propValue}");
             var clampedPropIndex = Mathf.Clamp(propIndex, -1, Host.GetItemsCount() - 1);
             if (propIndex != clampedPropIndex)
