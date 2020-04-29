@@ -39,8 +39,8 @@ namespace TowerGenerator
         {
             // get any random meta of appropriate chunk type
             MetaBase meta = MetaProvider.Instance.Metas.Select(x => x as MetaChunk)
-                .FirstOrDefault(x => x.EntityType == node.Data.Topology.Geometry.EntityType);
-            var visSegPrefab = Resources.Load("Ents/" + meta.EntName);
+                .FirstOrDefault(x => x.TopologyType == node.Data.Topology.Geometry.TopologyType);
+            var visSegPrefab = Resources.Load("Chunks/" + meta.ChunkName);
             var visSegment = (GameObject) Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;
 
@@ -65,9 +65,9 @@ namespace TowerGenerator
             segBB.center = visSegment.transform.position;
 
             // snapping
-            if (node.Data.Topology.Geometry.EntityType == Entity.EntityType.ChunkRoofPeak)
+            if (node.Data.Topology.Geometry.TopologyType == TopologyType.ChunkPeak)
                 segBB = SnapBBPos( Vector3.down, new Bounds(visSegment.transform.position, MaxBB), segBB);
-            else if (node.Data.Topology.Geometry.EntityType == Entity.EntityType.ChunkIslandAndBasement)
+            else if (node.Data.Topology.Geometry.TopologyType.HasFlag(TopologyType.ChunkIsland))
                 segBB = SnapBBPos(Vector3.up, new Bounds(visSegment.transform.position, MaxBB), segBB);
 
             visSegment.transform.position = segBB.center;

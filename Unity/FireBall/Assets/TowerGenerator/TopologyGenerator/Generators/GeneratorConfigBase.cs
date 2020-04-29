@@ -24,7 +24,7 @@ namespace TowerGenerator
                 ChunkMaxSize,
                 ChunkMinSize
             }
-            public Entity.EntityType ChunkEntityType;
+            public TopologyType TopologyType;
             public SizeStrategy ChunkSizeStrategy;
             public bool IgnoreChunkSizeRestrictions; // todo: use zero ranges instead
             public Range SegmentsSizeBreadth;
@@ -62,10 +62,10 @@ namespace TowerGenerator
         };
 
 
-        public PlacementConfig GetPlacementConfig(Entity.EntityType entType)
+        public PlacementConfig GetPlacementConfig(TopologyType topType)
         {
-            var cfg = PlacementConfigs.FirstOrDefault(x => x.ChunkEntityType == entType) ?? 
-                      PlacementConfigs.FirstOrDefault(x => x.ChunkEntityType == Entity.EntityType.Undefined); // default
+            var cfg = PlacementConfigs.FirstOrDefault(x => x.TopologyType.HasFlag(topType)) ?? 
+                      PlacementConfigs.FirstOrDefault(x => x.TopologyType == TopologyType.Undefined); // default
             return cfg;
         }
 

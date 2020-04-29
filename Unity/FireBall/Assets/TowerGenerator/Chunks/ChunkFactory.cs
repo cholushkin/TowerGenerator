@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Alg;
-using GameLib.Random;
+﻿using GameLib.Random;
 using UnityEngine;
 
 namespace TowerGenerator
 {
-
-    public class EntityConstructor 
+    public class ChunkFactory 
     {
         private static RandomHelper _rnd = new RandomHelper(-1);
         private static readonly float[] _angles = { 0f, 90f, 180f, 270f };
@@ -17,9 +13,9 @@ namespace TowerGenerator
             return Vector3.zero;
         }
 
-        public static GameObject ConstructEntity( MetaBase meta, long seed, Transform parent)
+        public static GameObject CreateChunk( MetaBase meta, long seed, Transform parent)
         {
-            var visSegPrefab = (GameObject)Resources.Load("Ents/" + meta.EntName);
+            var visSegPrefab = (GameObject)Resources.Load("Chunks/" + meta.ChunkName);
             var visSegment = Object.Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;
 

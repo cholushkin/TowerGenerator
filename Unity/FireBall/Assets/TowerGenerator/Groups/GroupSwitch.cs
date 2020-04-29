@@ -11,6 +11,11 @@ namespace TowerGenerator
     {
         public int ItemIndexSelected;
 
+        public override bool IsValid()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override int GetNumberOfPermutations()
         {
             return GetItemsCount();

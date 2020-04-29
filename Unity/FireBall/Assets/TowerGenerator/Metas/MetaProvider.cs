@@ -16,8 +16,7 @@ namespace TowerGenerator
         public class Filter
         {
             private readonly Range _generation;
-            private readonly Entity.EntityType _entTypes;
-            private readonly Expression _expressionPass;
+            private readonly TopologyType _topologyType;
             private readonly Range _breadthRange;
             private readonly Range _heightRange;
             private readonly string _wildcard;
@@ -38,13 +37,13 @@ namespace TowerGenerator
                 }
             }
 
-            public Filter(Range generationRange = null,
-                Entity.EntityType entFlags = (Entity.EntityType)0b1111111111111111,
+            public Filter( Range generationRange = null,
+                TopologyType topology = (TopologyType) 0b1111111111111111,
                 string wildCard = null, string tagExpression = null, Range breadthRange = null,
-                Range heightRange = null)
+                Range heightRange = null )
             {
                 _generation = generationRange;
-                _entTypes = entFlags;
+                _topologyType = topology;
                 _wildcard = wildCard;
                 _breadthRange = breadthRange;
                 _heightRange = heightRange;
@@ -60,7 +59,7 @@ namespace TowerGenerator
 
             public IEnumerable<MetaBase> FilterEntType(IEnumerable<MetaBase> metas)
             {
-                return metas.Where(m => (_entTypes & m.EntityType) != 0);
+                return metas.Where(m => (_topologyType & m.TopologyType) != 0);
             }
 
             public IEnumerable<MetaBase> FilterNameWildcard(IEnumerable<MetaBase> metas)
@@ -68,7 +67,7 @@ namespace TowerGenerator
                 if (string.IsNullOrEmpty(_wildcard))
                     return metas;
                 var wildcard = _wildCardToRegular(_wildcard);
-                return metas.Where(m => Regex.IsMatch(m.EntName, wildcard));
+                return metas.Where(m => Regex.IsMatch(m.ChunkName, wildcard));
             }
 
             public IEnumerable<MetaBase> FilterTagExpression(IEnumerable<MetaBase> metas)
@@ -100,7 +99,7 @@ namespace TowerGenerator
                 if (meta.TagSet == null || meta.TagSet.IsEmpty())
                     return false;
 
-                var metaParameters = meta.TagSet.AsDictionary();
+                var metaParameters = meta.TagSet.AsNCalcDictionary();
                 Assert.IsNotNull(metaParameters);
                 interpreter.Parameters = metaParameters;
                 return (bool)interpreter.Evaluate();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameLib.Random;
-using TowerGenerator.ChunkImporter;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -14,24 +13,37 @@ namespace TowerGenerator
         public int MaxObjectsSelected; // default transform.childCount
         public int ItemsSelectedAmount;
 
-        public override void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
+        //public override void Configure(Transform entityRoot, List<FbxProps.ScriptToAdd.ScriptProperty> scriptProperties)
+        //{
+        //    base.Configure(entityRoot,scriptProperties);
+
+        //    // get domain properties
+        //    var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameMinObjectsSelected);
+        //    var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameMaxObjectsSelected);
+
+
+        //    if (propMaxObjectsSelected != null)
+        //        MaxObjectsSelected = GetMaxObjectsSelectedFromString(propMaxObjectsSelected.PropValue);
+        //    else
+        //        MaxObjectsSelected = GetItemsCount();
+
+        //    if (propMinObjectsSelected != null)
+        //        MinObjectsSelected = GetMinObjectsSelectedFromString(propMinObjectsSelected.PropValue);
+        //    else
+        //        MinObjectsSelected = 0;
+        //}
+
+        public override bool IsValid()
         {
-            base.Configure(entityRoot,scriptProperties);
+            if (MinObjectsSelected < 0)
+                return false;
+            if (MinObjectsSelected > MaxObjectsSelected)
+                return false;
+            if (MaxObjectsSelected < 0)
+                return false;
 
-            // get domain properties
-            var propMinObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameMinObjectsSelected);
-            var propMaxObjectsSelected = scriptProperties.FirstOrDefault(x => x.PropName == ChunkImporterHelper.PropNameMaxObjectsSelected);
 
-
-            if (propMaxObjectsSelected != null)
-                MaxObjectsSelected = GetMaxObjectsSelectedFromString(propMaxObjectsSelected.PropValue);
-            else
-                MaxObjectsSelected = GetItemsCount();
-
-            if (propMinObjectsSelected != null)
-                MinObjectsSelected = GetMinObjectsSelectedFromString(propMinObjectsSelected.PropValue);
-            else
-                MinObjectsSelected = 0;
+            return true;
         }
 
         public override int GetNumberOfPermutations()

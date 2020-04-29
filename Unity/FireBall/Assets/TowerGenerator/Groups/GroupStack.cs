@@ -8,6 +8,11 @@ namespace TowerGenerator
     {
         public int LayerIndexSelected;
 
+        public override bool IsValid()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override int GetNumberOfPermutations()
         {
             return GetItemsCount(); 

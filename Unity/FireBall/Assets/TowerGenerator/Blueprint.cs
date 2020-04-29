@@ -22,7 +22,7 @@ namespace TowerGenerator
             {
                 public class ChunkGeometry
                 {
-                    public Entity.EntityType EntityType;
+                    public TopologyType TopologyType;
                     public Bounds Bounds; // position and aspects
                     public Vector3 BuildDirection;
                     public string Meta;
@@ -38,7 +38,7 @@ namespace TowerGenerator
 
                 public override string ToString()
                 {
-                    return $"{Geometry.EntityType}";
+                    return $"{Geometry.TopologyType}";
                 }
             }
 

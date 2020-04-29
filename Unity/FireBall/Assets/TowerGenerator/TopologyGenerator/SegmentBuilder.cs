@@ -159,7 +159,7 @@ namespace TowerGenerator
             if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkRndSize)
             {
                 // get random meta of placementConfig.ChunkEntityType
-                var filter = new MetaProvider.Filter(entFlags: placementConfig.ChunkEntityType,
+                var filter = new MetaProvider.Filter(topology: placementConfig.TopologyType,
                     breadthRange: placementConfig.IgnoreChunkSizeRestrictions
                         ? null
                         : placementConfig.SegmentsSizeBreadth,
@@ -178,7 +178,7 @@ namespace TowerGenerator
                 var memoryBounds = _blueprintTree.TraverseDepthFirstPostOrder().Select(x => x.Data.ChunkGeometry.Bounds); // in addition to tree collision check we also need to check for self collision
                 var hasCollision = _generator.CheckCollisions(childBounds, memoryBounds);
 
-                memSeg.ChunkGeometry.EntityType = placementConfig.ChunkEntityType;
+                memSeg.ChunkGeometry.TopologyType = placementConfig.TopologyType;
                 memSeg.ChunkGeometry.Bounds = childBounds;
                 memSeg.ChunkGeometry.BuildDirection = buildDirection;
                 memSeg.ChunkGeometry.Meta = meta.name;

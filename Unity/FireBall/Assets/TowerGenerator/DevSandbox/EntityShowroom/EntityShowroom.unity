@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -139,11 +140,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 151939626403982762, guid: 9320f212596a79d46a1891961f5e49d6,
-        type: 3}
-      propertyPath: m_Name
-      value: ShowRoom
-      objectReference: {fileID: 0}
     - target: {fileID: 151939626403982760, guid: 9320f212596a79d46a1891961f5e49d6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -249,6 +245,11 @@ PrefabInstance:
       propertyPath: State.MetaControlPanelState.ChunkConnectorVertical
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982762, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: m_Name
+      value: ShowRoom
+      objectReference: {fileID: 0}
     - target: {fileID: 6391237939642824950, guid: 9320f212596a79d46a1891961f5e49d6,
         type: 3}
       propertyPath: CameraEntShowroomController
@@ -275,11 +276,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 481525083584476475, guid: 0493819dd97853f4199660f0fa829b97,
-        type: 3}
-      propertyPath: m_Name
-      value: CameraHolder
-      objectReference: {fileID: 0}
     - target: {fileID: 481525083584476468, guid: 0493819dd97853f4199660f0fa829b97,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -335,6 +331,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 481525083584476475, guid: 0493819dd97853f4199660f0fa829b97,
+        type: 3}
+      propertyPath: m_Name
+      value: CameraHolder
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0493819dd97853f4199660f0fa829b97, type: 3}
 --- !u!1001 &2363361772295146235
@@ -344,11 +345,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2363361773598143491, guid: ee25dbe6afe4ddf4399388a76e9fa30a,
-        type: 3}
-      propertyPath: m_Name
-      value: MetaProvider
-      objectReference: {fileID: 0}
     - target: {fileID: 2363361773598143489, guid: ee25dbe6afe4ddf4399388a76e9fa30a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -403,6 +399,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2363361773598143491, guid: ee25dbe6afe4ddf4399388a76e9fa30a,
+        type: 3}
+      propertyPath: m_Name
+      value: MetaProvider
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee25dbe6afe4ddf4399388a76e9fa30a, type: 3}

@@ -58,8 +58,8 @@ namespace TowerGenerator.ChunkImporter
 
 		private static void ExtractEntities(GameObject assetObject, string packName)
 		{
-			// --- delete all (previous) ents of this content pack and their metas
-			DirectoryInfo dir = new DirectoryInfo(TowerGeneratorConstants.PathEnts);
+			// --- delete all (previous) chunks of this content pack and their metas
+			DirectoryInfo dir = new DirectoryInfo(TowerGeneratorConstants.PathChunks);
 			FileInfo[] info = dir.GetFiles(packName + ".*");
 			foreach (FileInfo f in info)
 			{
@@ -72,7 +72,7 @@ namespace TowerGenerator.ChunkImporter
 			foreach (Transform ent in assetObject.transform)
 			{
 				var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
-				ExtractEnt(ent, TowerGeneratorConstants.PathEnts, fullEntName);
+				ExtractEnt(ent, TowerGeneratorConstants.PathChunks, fullEntName);
 			}
 			AssetDatabase.Refresh();
 		}
@@ -83,8 +83,8 @@ namespace TowerGenerator.ChunkImporter
 			var entInst = Object.Instantiate(ent.gameObject);
 			entInst.name = entName;
 
-			entInst = EntCooker.Cook(entInst);
-			EntCooker.CreateMeta(entInst, dirToImort, entName);
+			entInst = ChunkCooker.Cook(entInst);
+			ChunkMetaCooker.Cook(entInst, dirToImort, entName);
 
 			PrefabUtility.SaveAsPrefabAsset(entInst, Path.Combine(dirToImort, entName + ".prefab"));
 			Object.DestroyImmediate(entInst);

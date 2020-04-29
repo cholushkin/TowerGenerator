@@ -81,7 +81,7 @@ namespace TowerGenerator
                 Range.One, 
                 Vector3.up, 
                 Vector3.zero, 
-                Config.GetPlacementConfig(Entity.EntityType.ChunkIslandAndBasement), 
+                Config.GetPlacementConfig(TopologyType.ChunkIsland), 
                 null, 
                 null
             );
@@ -162,7 +162,7 @@ namespace TowerGenerator
 
         public TreeNode<Blueprint.Segment> CreateSegment(
             TreeNode<Blueprint.Segment> parent,
-            Entity.EntityType chunkType,
+            TopologyType topologyType,
             Vector3 attachDirection,
             Vector3 aspectRatio,
             Vector3 offset)

@@ -21,7 +21,7 @@ namespace TowerGenerator
 
         public class VisualizationSegment
         {
-            public Entity.EntityType SegType;
+            public TopologyType TopologyType;
             public GameObject Chunk;
             public GameObject OpenedMarker;
             public GameObject[] Connectors;
@@ -102,7 +102,7 @@ namespace TowerGenerator
                 var gotSeg = _visNodes.TryGetValue(step.Segment, out visSeg);
                 Assert.IsTrue(gotSeg, $"can't get {step.Segment} while trying to change");
                 Assert.IsNotNull(visSeg);
-                if (visSeg.SegType != step.Segment.Data.Topology.Geometry.EntityType)
+                if (visSeg.TopologyType != step.Segment.Data.Topology.Geometry.TopologyType)
                 {
                     var newVisSeg = BuildTopologyVis(step.Segment); // spawn new one segment and marker(if needed)
                     newVisSeg.Chunk.transform.DOScale(Vector3.zero, StepDelay).From(); // appear animation
@@ -146,15 +146,15 @@ namespace TowerGenerator
             // create segment
             if (segTopology.HasCollision)
                 segment = Instantiate(prefabSegCollision);
-            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkRoofPeak)
+            else if (segTopology.Geometry.TopologyType == TopologyType.ChunkPeak)
                 segment = Instantiate(prefabSegChunkRoofPeak);
-            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkStd)
+            else if (segTopology.Geometry.TopologyType == TopologyType.ChunkStd)
                 segment = Instantiate(prefabSegChunkStd);
-            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkIslandAndBasement)
+            else if (segTopology.Geometry.TopologyType.HasFlag(TopologyType.ChunkIsland))
                 segment = Instantiate(prefabSegChunkIslandAndBasement);
-            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkSideEar)
+            else if (segTopology.Geometry.TopologyType == TopologyType.ChunkSideEar)
                 segment = Instantiate(prefabSegChunkSideEar);
-            else if (segTopology.Geometry.EntityType == Entity.EntityType.ChunkBottomEar)
+            else if (segTopology.Geometry.TopologyType == TopologyType.ChunkBottomEar)
                 segment = Instantiate(prefabSegChunkBottomEar);
 
             // create connector
@@ -209,7 +209,7 @@ namespace TowerGenerator
 
             visSeg.Chunk = segment;
             visSeg.OpenedMarker = opened;
-            visSeg.SegType = segTopology.Geometry.EntityType;
+            visSeg.TopologyType = segTopology.Geometry.TopologyType;
 
             return visSeg;
         }

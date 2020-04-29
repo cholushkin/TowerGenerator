@@ -5,6 +5,11 @@ namespace TowerGenerator
 {
     public class GroupUser : Group
     {
+        public override bool IsValid()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override int GetNumberOfPermutations()
         {
             return 0;
