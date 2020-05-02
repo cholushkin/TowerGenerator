@@ -19,7 +19,7 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public List<Property> Properties { get; private set; }
+        public List<Property> Properties;
 
         public void AddProperty(string name, string value)
         {

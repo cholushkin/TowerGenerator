@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace TowerGenerator.ChunkImporter
@@ -37,7 +39,7 @@ namespace TowerGenerator.ChunkImporter
 					}
 
 					// extracting entities from the pack
-					ExtractEntities(assetObj, packName);
+					ExtractChunks(assetObj, packName);
 				}
 			}
 			//EditorUtility.SetDirty(_metas);
@@ -56,7 +58,7 @@ namespace TowerGenerator.ChunkImporter
 
 
 
-		private static void ExtractEntities(GameObject assetObject, string packName)
+		private static void ExtractChunks(GameObject assetObject, string packName)
 		{
 			// --- delete all (previous) chunks of this content pack and their metas
 			DirectoryInfo dir = new DirectoryInfo(TowerGeneratorConstants.PathChunks);
@@ -72,22 +74,31 @@ namespace TowerGenerator.ChunkImporter
 			foreach (Transform ent in assetObject.transform)
 			{
 				var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
-				ExtractEnt(ent, TowerGeneratorConstants.PathChunks, fullEntName);
+				ExtractChunk(ent, TowerGeneratorConstants.PathChunks, fullEntName);
 			}
 			AssetDatabase.Refresh();
 		}
 
 		// write patterns, add design-time stuff, do hierarchy reorganizations
-		private static void ExtractEnt(Transform ent, string dirToImort, string entName)
+		private static void ExtractChunk(Transform chunkTransform, string dirToImort, string entName)
 		{
-			var entInst = Object.Instantiate(ent.gameObject);
-			entInst.name = entName;
+            var chunk = Object.Instantiate(chunkTransform.gameObject);
 
-			entInst = ChunkCooker.Cook(entInst);
-			ChunkMetaCooker.Cook(entInst, dirToImort, entName);
-
-			PrefabUtility.SaveAsPrefabAsset(entInst, Path.Combine(dirToImort, entName + ".prefab"));
-			Object.DestroyImmediate(entInst);
+            try
+            {
+                chunk.name = entName;
+                chunk = ChunkCooker.Cook(chunk);
+                ChunkMetaCooker.Cook(chunk, dirToImort, entName);
+                PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(dirToImort, entName + ".prefab"));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error during extract chunk {chunk} chunk: {e}");
+            }
+            finally
+            {
+                Object.DestroyImmediate(chunk);
+            }
 		}
 
 		// removes <> from name

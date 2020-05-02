@@ -546,6 +546,7 @@ namespace TowerGenerator.ChunkImporter
         {
             Assert.IsNotNull(fromFbxProps);
             Assert.IsNotNull(gameObject);
+            Assert.IsNotNull(fromFbxProps.Properties, $"empty props on {gameObject}");
 
             foreach (var property in fromFbxProps.Properties)
             {
@@ -554,7 +555,7 @@ namespace TowerGenerator.ChunkImporter
                 var payloadParameters = ParsePayloadParameters(property);
 
                 var cmd = _fbxCommands.FirstOrDefault( x => x.GetFbxCommandName() == fbxCmdName && x.GetPayloadCommandName() == payloadCmd);
-                Assert.IsNotNull(cmd, $"can't find cmd {payloadCmd}");
+                Assert.IsNotNull(cmd, $"can't find cmd: fbxCmd = '{fbxCmdName}', payloadCmd = '{payloadCmd}', payloadParameters = '{payloadParameters}'");
                 cmd.ParseParameters(payloadParameters, gameObject);
                 cmd.Execute(gameObject);
             }
