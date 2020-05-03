@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
@@ -91,7 +90,7 @@ namespace TowerGenerator.ChunkImporter
         #endregion
 
         #region Groups
-        private class GroupStack :  FbxCommandAddComponent
+        private class GroupStack : FbxCommandAddComponent
         {
 
             public override string GetPayloadCommandName()
@@ -123,10 +122,10 @@ namespace TowerGenerator.ChunkImporter
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
                 // set defaults parameters first
-                _minObjectsSelected = new Parameter<int> { Name = "MinObjectsSelected", Value = 0};
-                _maxObjectsSelected = new Parameter<int> { Name = "MaxObjectsSelected", Value = gameObject.transform.childCount};
+                _minObjectsSelected = new Parameter<int> { Name = "MinObjectsSelected", Value = 0 };
+                _maxObjectsSelected = new Parameter<int> { Name = "MaxObjectsSelected", Value = gameObject.transform.childCount };
 
-                if(string.IsNullOrWhiteSpace(parameters))
+                if (string.IsNullOrWhiteSpace(parameters))
                     return;
 
                 var actualParams = parameters.Split(',');
@@ -149,23 +148,23 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        private class GroupUser : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "GroupUser";
-            }
+        //private class GroupUser : FbxCommandAddComponent
+        //{
+        //    public override string GetPayloadCommandName()
+        //    {
+        //        return "GroupUser";
+        //    }
 
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
+        //    public override void ParseParameters(string parameters, GameObject gameObject)
+        //    {
+        //        Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
+        //    }
 
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.GroupUser>();
-            }
-        }
+        //    public override void Execute(GameObject gameObject)
+        //    {
+        //        gameObject.AddComponent<global::TowerGenerator.GroupUser>();
+        //    }
+        //}
 
         private class GroupSwitch : FbxCommandAddComponent
         {
@@ -353,7 +352,7 @@ namespace TowerGenerator.ChunkImporter
 
                 Assert.IsTrue(parameters.All(char.IsLetter));
 
-                _collisionMode.Value = ConvertEnum< global::TowerGenerator.CollisionDependant.CollisionCheckMode>(parameters);
+                _collisionMode.Value = ConvertEnum<global::TowerGenerator.CollisionDependant.CollisionCheckMode>(parameters);
             }
 
             public override void Execute(GameObject gameObject)
@@ -518,7 +517,7 @@ namespace TowerGenerator.ChunkImporter
             // Groups
             new GroupStack(),
             new GroupSet(), 
-            new GroupUser(), 
+            //new GroupUser(), 
             new GroupSwitch(),
 
             // Chunk types
@@ -543,7 +542,6 @@ namespace TowerGenerator.ChunkImporter
             new AddTag()
         };
 
-
         public static void Execute(FbxProps fromFbxProps, GameObject gameObject)
         {
             Assert.IsNotNull(fromFbxProps);
@@ -556,18 +554,11 @@ namespace TowerGenerator.ChunkImporter
                 string payloadCmd = ParsePayloadCommand(property);
                 string payloadParameters = ParsePayloadParameters(property);
 
-                try
-                {
-                    var cmd = _fbxCommands.FirstOrDefault(x => x.GetFbxCommandName() == fbxCmdName && x.GetPayloadCommandName() == payloadCmd);
-                    cmd.ParseParameters(payloadParameters, gameObject);                                                                                                                 
-                    cmd.Execute(gameObject);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"'{fbxCmdName}', payloadCmd = '{payloadCmd}', payloadParameters = '{payloadParameters}', object = '{gameObject.transform.GetDebugName()}'");
-                    throw;
-                }
-                
+                var cmd = _fbxCommands.FirstOrDefault(x => x.GetFbxCommandName() == fbxCmdName && x.GetPayloadCommandName() == payloadCmd);
+                if (cmd == null)
+                    Debug.LogError($"Unable to find cmd '{fbxCmdName}', payloadCmd = '{payloadCmd}', payloadParameters = '{payloadParameters}', object = '{gameObject.transform.GetDebugName()}' ");
+                cmd.ParseParameters(payloadParameters, gameObject);
+                cmd.Execute(gameObject);
             }
         }
 

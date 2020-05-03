@@ -1,6 +1,6 @@
 ﻿namespace TowerGenerator
 {
-    public class ChunkTowerIslandAndBasementSegment : ChunkBase
+    public class ChunkTowerIslandAndBasementSegment : ChunkTowerBase
     {
         public override TopologyType GetTopologyType()
         {

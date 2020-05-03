@@ -1,6 +1,6 @@
 ﻿namespace TowerGenerator
 {
-    public class ChunkTowerBottomEarSegment : ChunkBase
+    public class ChunkTowerBottomEarSegment : ChunkTowerBase
     {
         public override TopologyType GetTopologyType()
         {

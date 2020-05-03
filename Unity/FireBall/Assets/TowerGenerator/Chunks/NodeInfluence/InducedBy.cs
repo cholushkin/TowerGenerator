@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace TowerGenerator
 {
 
@@ -10,7 +8,16 @@ namespace TowerGenerator
 
         public override bool IsValid()
         {
-            throw new System.NotImplementedException();
+            if (InductionLabels == null)
+                return false;
+            if (InductionLabels.Length < 1)
+                return false;
+
+            foreach (var inductionLabel in InductionLabels)
+                if (!GroupsController.HasInductionLabel(inductionLabel))
+                    return false;
+
+            return true;
         }
     }
 }

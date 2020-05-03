@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,6 +23,13 @@ namespace TowerGenerator.ChunkImporter
 
         private void ProcessFbxProps(GameObject gObj, string[] names, object[] values)
         {
+            var isIgnore = names.FirstOrDefault(x => x == "IgnoreImport") != null;
+            if (isIgnore)
+            {
+                Object.DestroyImmediate(gObj);
+                return;
+            }
+
             Assert.IsTrue(names.Length == values.Length);
             Assert.IsTrue(names.Length > 0);
             Assert.IsNotNull(gObj);

@@ -31,7 +31,6 @@ namespace TowerGenerator
 #if DEBUG
             Validate();
 #endif
-            SetConfiguration();
         }
 
         public Bounds CalculateBB()
@@ -61,8 +60,8 @@ namespace TowerGenerator
 
             // get active connectors 
             var connectors = transform.GetComponentsInChildren<Connectors>(false);
-            Assert.IsNotNull(connectors);
-            Assert.IsTrue(connectors.Length == 1);
+            Assert.IsNotNull(connectors,"Can't find active connectors component after setting a configuration");
+            Assert.IsTrue(connectors.Length == 1, "Wrong amount of active connectors after setting a configuration");
             Connectors = connectors[0];
             Assert.IsNotNull(Connectors);
         }
@@ -128,12 +127,24 @@ namespace TowerGenerator
 
         private void Validate()
         {
-            var validators = GetComponentsInChildren<GroupStack>(true);
+            var validators = GetComponentsInChildren<BaseComponent>(true);
             foreach (var validator in validators)
             {
                 if( !validator.IsValid() )
                     Debug.LogError($"Node is not valid {validator.transform.GetDebugName()}");
             }
+        }
+
+        public bool HasSuppressionLabel(string label)
+        {
+            Assert.IsNotNull(_suppression);
+            return _suppression.ContainsKey(label);
+        }
+
+        public bool HasInductionLabel(string label)
+        {
+            Assert.IsNotNull(_induction);
+            return _induction.ContainsKey(label);
         }
 
         public void Induce(string inductionLabel)

@@ -23,19 +23,35 @@ namespace TowerGenerator
 
             if (MinObjectsSelected > MaxObjectsSelected)
             {
-                Debug.LogError($"MinObjectsSelected is greater than MaxObjectsSelected");
+                Debug.LogError($"MinObjectsSelected is greater than MaxObjectsSelected: {MinObjectsSelected} > {MaxObjectsSelected}");
                 return false;
             }
 
             if (MaxObjectsSelected < 0)
+            {
+                Debug.LogError($"MaxObjectsSelected is less than zero: {MaxObjectsSelected}");
                 return false;
-            var childCount = GetItemsCount();
-            if (childCount < 1)
+            }
+
+            var itemsCount = GetItemsCount();
+            if (itemsCount < 1)
+            {
+                Debug.LogError($"Items count is less than 1: {itemsCount}");
                 return false;
-            if (MaxObjectsSelected > childCount)
+            }
+
+            if (MaxObjectsSelected > itemsCount)
+            {
+                Debug.LogError($"MaxObjectsSelected is greater than items count: {MaxObjectsSelected} > {itemsCount}");
                 return false;
-            if (MinObjectsSelected > childCount)
+            }
+
+            if (MinObjectsSelected > itemsCount)
+            {
+                Debug.LogError($"MinObjectsSelected is greater than items count: {MinObjectsSelected} > {itemsCount}");
                 return false;
+            }
+
             return true;
         }
 
