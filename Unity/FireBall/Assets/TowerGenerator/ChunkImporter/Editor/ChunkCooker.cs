@@ -1,5 +1,6 @@
 ﻿using Assets.Plugins.Alg;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator.ChunkImporter
 {
@@ -32,14 +33,18 @@ namespace TowerGenerator.ChunkImporter
         private static void BuildGroupsController(GameObject ent)
         {
             var groupController = ent.AddComponent<GroupsController>();
+            var baseChunk = ent.GetComponent<ChunkBase>();
+            Assert.IsNotNull(groupController);
+            Assert.IsNotNull(baseChunk);
+
+            var baseComponents = ent.GetComponentsInChildren<BaseComponent>(true);
+            foreach (var baseComponent in baseComponents)
+            {
+                baseComponent.Chunk = baseChunk;
+                baseComponent.GroupsController = groupController;
+            }
+
             groupController.Init();
-            groupController.BuildImpactTree();
-            //groupController.CalculateBBMax();
-            //groupController.CalculateBBMin();
         }
-
-        
-
-
     }
 }

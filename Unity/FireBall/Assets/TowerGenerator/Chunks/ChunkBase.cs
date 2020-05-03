@@ -2,7 +2,7 @@
 
 namespace TowerGenerator
 {
-    public abstract class ChunkBase : MonoBehaviour
+    public abstract class ChunkBase : BaseComponent
     {
         public abstract TopologyType GetTopologyType();
     }

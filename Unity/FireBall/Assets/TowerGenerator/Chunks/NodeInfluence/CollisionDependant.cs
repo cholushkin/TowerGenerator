@@ -3,7 +3,7 @@
 namespace TowerGenerator
 {
     // todo: add scale for collision geometry
-    public class CollisionDependent : MonoBehaviour, INodeValidation
+    public class CollisionDependant : BaseComponent
     {
         public enum CollisionCheckMode
         {
@@ -11,18 +11,11 @@ namespace TowerGenerator
             AABBBased
         }
 
-        
-
         public CollisionCheckMode CollisionCheck;
 
-        public bool IsValid()
+        public override bool IsValid()
         {
-            throw new System.NotImplementedException();
-        }
-
-        public void Fix()
-        {
-            throw new System.NotImplementedException();
+            return true;
         }
     }
 }

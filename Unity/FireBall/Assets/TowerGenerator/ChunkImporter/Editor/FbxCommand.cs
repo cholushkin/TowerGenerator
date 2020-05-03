@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Assets.Plugins.Alg;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -127,7 +129,7 @@ namespace TowerGenerator.ChunkImporter
                 if(string.IsNullOrWhiteSpace(parameters))
                     return;
 
-                var actualParams = parameters.Split();
+                var actualParams = parameters.Split(',');
                 Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2);
                 if (actualParams.Length >= 1)
                 {
@@ -331,18 +333,18 @@ namespace TowerGenerator.ChunkImporter
         #endregion
 
         #region Node attributes
-        private class CollisionDependent : FbxCommandAddNodeAttribute
+        private class CollisionDependant : FbxCommandAddNodeAttribute
         {
-            private Parameter<global::TowerGenerator.CollisionDependent.CollisionCheckMode> _collisionMode;
+            private Parameter<global::TowerGenerator.CollisionDependant.CollisionCheckMode> _collisionMode;
             public override string GetPayloadCommandName()
             {
-                return "CollisionDependent";
+                return "CollisionDependant";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
                 // set default values first
-                _collisionMode = new Parameter<global::TowerGenerator.CollisionDependent.CollisionCheckMode> { Name = "CollisionMode", Value = global::TowerGenerator.CollisionDependent.CollisionCheckMode.MeshBased };
+                _collisionMode = new Parameter<global::TowerGenerator.CollisionDependant.CollisionCheckMode> { Name = "CollisionMode", Value = global::TowerGenerator.CollisionDependant.CollisionCheckMode.MeshBased };
 
                 if (string.IsNullOrWhiteSpace(parameters))
                     return;
@@ -351,12 +353,12 @@ namespace TowerGenerator.ChunkImporter
 
                 Assert.IsTrue(parameters.All(char.IsLetter));
 
-                _collisionMode.Value = ConvertEnum< global::TowerGenerator.CollisionDependent.CollisionCheckMode>(parameters);
+                _collisionMode.Value = ConvertEnum< global::TowerGenerator.CollisionDependant.CollisionCheckMode>(parameters);
             }
 
             public override void Execute(GameObject gameObject)
             {
-                var comp = gameObject.AddComponent<global::TowerGenerator.CollisionDependent>();
+                var comp = gameObject.AddComponent<global::TowerGenerator.CollisionDependant>();
                 comp.CollisionCheck = _collisionMode.Value;
             }
         }
@@ -373,7 +375,7 @@ namespace TowerGenerator.ChunkImporter
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
                 Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
-                _suppressionLabels = parameters.Split();
+                _suppressionLabels = parameters.Split(',');
             }
 
             public override void Execute(GameObject gameObject)
@@ -394,7 +396,7 @@ namespace TowerGenerator.ChunkImporter
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
                 Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
-                _suppressionLabels = parameters.Split();
+                _suppressionLabels = parameters.Split(',');
             }
 
             public override void Execute(GameObject gameObject)
@@ -415,7 +417,7 @@ namespace TowerGenerator.ChunkImporter
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
                 Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
-                _inductionLabels = parameters.Split();
+                _inductionLabels = parameters.Split(',');
             }
 
             public override void Execute(GameObject gameObject)
@@ -436,7 +438,7 @@ namespace TowerGenerator.ChunkImporter
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
                 Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
-                _inductionLabels = parameters.Split();
+                _inductionLabels = parameters.Split(',');
             }
 
             public override void Execute(GameObject gameObject)
@@ -484,7 +486,7 @@ namespace TowerGenerator.ChunkImporter
 
                 Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
 
-                var actualParams = parameters.Split();
+                var actualParams = parameters.Split(',');
                 Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2);
 
                 if (actualParams.Length >= 1)
@@ -530,7 +532,7 @@ namespace TowerGenerator.ChunkImporter
             new ChunkTowerConnectorHorizontal(),
 
             // Node attributes
-            new CollisionDependent(),
+            new CollisionDependant(),
             new Suppression(),
             new SuppressedBy(),
             new Induction(),
@@ -550,14 +552,22 @@ namespace TowerGenerator.ChunkImporter
 
             foreach (var property in fromFbxProps.Properties)
             {
-                var fbxCmdName = ParseFbxCommand(property);
-                var payloadCmd = ParsePayloadCommand(property);
-                var payloadParameters = ParsePayloadParameters(property);
+                string fbxCmdName = ParseFbxCommand(property);
+                string payloadCmd = ParsePayloadCommand(property);
+                string payloadParameters = ParsePayloadParameters(property);
 
-                var cmd = _fbxCommands.FirstOrDefault( x => x.GetFbxCommandName() == fbxCmdName && x.GetPayloadCommandName() == payloadCmd);
-                Assert.IsNotNull(cmd, $"can't find cmd: fbxCmd = '{fbxCmdName}', payloadCmd = '{payloadCmd}', payloadParameters = '{payloadParameters}'");
-                cmd.ParseParameters(payloadParameters, gameObject);
-                cmd.Execute(gameObject);
+                try
+                {
+                    var cmd = _fbxCommands.FirstOrDefault(x => x.GetFbxCommandName() == fbxCmdName && x.GetPayloadCommandName() == payloadCmd);
+                    cmd.ParseParameters(payloadParameters, gameObject);                                                                                                                 
+                    cmd.Execute(gameObject);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"'{fbxCmdName}', payloadCmd = '{payloadCmd}', payloadParameters = '{payloadParameters}', object = '{gameObject.transform.GetDebugName()}'");
+                    throw;
+                }
+                
             }
         }
 

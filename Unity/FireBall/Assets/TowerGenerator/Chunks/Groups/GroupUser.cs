@@ -7,12 +7,10 @@ namespace TowerGenerator
     {
         public override bool IsValid()
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override int GetNumberOfPermutations()
-        {
-            return 0;
+            var childCount = GetItemsCount();
+            if (childCount < 1)
+                return false;
+            return true;
         }
 
         public override void DoChoice(params int[] index)
@@ -22,12 +20,7 @@ namespace TowerGenerator
 
         public override void DoRndChoice(ref RandomHelper rnd)
         {
-            DisableItems();
-        }
-
-        public override void DoRndMinimalChoice(ref RandomHelper rnd)
-        {
-            DisableItems();
+            throw new System.NotImplementedException();
         }
     }
 }

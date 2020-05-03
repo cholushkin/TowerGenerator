@@ -146,7 +146,7 @@ namespace TowerGenerator
             }
             else
             {
-                Metas = Resources.LoadAll<MetaBase>("Ents");
+                Metas = Resources.LoadAll<MetaBase>(TowerGeneratorConstants.Chunks);
                 Debug.Log($"Metas loaded: {Metas.Length}");
             }
         }

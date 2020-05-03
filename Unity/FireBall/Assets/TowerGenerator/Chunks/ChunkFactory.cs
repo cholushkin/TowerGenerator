@@ -27,7 +27,7 @@ namespace TowerGenerator
 
             var visSegController = visSegment.GetComponent<GroupsController>();
             visSegController.Seed = seed;
-            visSegController.SetRndConfiguration();
+            visSegController.SetConfiguration();
 
             // centering
             var segBB = visSegController.CalculateBB();

@@ -21,8 +21,10 @@ namespace TowerGenerator
         // * Assets/!Import/ChunkFbx/Monsters/Cute/Chunks_small_001.fbx - any amount of subfolders under ChunkFbx
         public static readonly Regex ChunkPackRegex = new Regex(@"(Assets/!Import/ChunksFbx/)([a-zA-Z0-9]+/)*(Chunks_)([a-zA-Z0-9]+_)?(\d+).fbx"); // regex to much chunks fbx 
 
-
         public const string PathChunks = "Assets/!Prefabs/Resources/Chunks";
+
+        public const string Chunks = "Chunks";
+
         #endregion
     }
 }

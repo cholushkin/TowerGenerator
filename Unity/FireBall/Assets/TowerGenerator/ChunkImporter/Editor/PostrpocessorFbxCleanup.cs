@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace TowerGenerator.ChunkImporter
@@ -20,7 +21,9 @@ namespace TowerGenerator.ChunkImporter
 
         private void RemoveObjectWithoutFbxProps(GameObject gObj)
         {
-            if (gObj.GetComponent<FbxProps>() == null)
+            var fbxProbs = gObj.GetComponent<FbxProps>();
+
+            if (fbxProbs == null || (fbxProbs.Properties.FirstOrDefault(x => x.Name == "IgnoreImport") != null))
                 GameObject.DestroyImmediate(gObj);
         }
     }

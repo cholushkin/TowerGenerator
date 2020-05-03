@@ -25,9 +25,9 @@ namespace TowerGenerator.ChunkImporter
                 // todo: TagSet
 
                 // AABBs
-                for (int i = 0; i < groupController.GroupSizeStack.GetItemsCount(); ++i)
+                for (int i = 0; i < groupController.DimensionStack.GetItemsCount(); ++i)
                 {
-                    groupController.GroupSizeStack.DoChoice(i);
+                    groupController.DimensionStack.DoChoice(i);
                     AddAabb(asset, groupController.CalculateBB().size);
                 }
 

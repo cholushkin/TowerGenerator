@@ -1,0 +1,36 @@
+﻿using GameLib.Random;
+using UnityEngine.Assertions;
+
+
+namespace TowerGenerator
+{
+    public class GroupStack : Group
+    {
+        public int ItemStacked { get; private set; }
+
+        public override bool IsValid()
+        {
+            var childCount = GetItemsCount();
+            if (childCount < 2)
+                return false;
+            return true;
+        }
+
+        public override void DoChoice(params int[] index)
+        {
+            Assert.IsTrue(index.Length == 1);
+            ItemStacked = index[0];
+            Assert.IsTrue(ItemStacked >= 0);
+            Assert.IsTrue(ItemStacked < GetItemsCount());
+
+            DisableItems();
+            for (int i = 0; i <= ItemStacked; ++i)
+                transform.GetChild(i).gameObject.SetActive(true);
+        }
+
+        public override void DoRndChoice(ref RandomHelper rnd)
+        {
+            DoChoice(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
+        }
+    }
+}

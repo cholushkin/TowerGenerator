@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GameLib.Random;
+using UnityEngine;
+
+namespace TowerGenerator
+{
+    // Randomly enables some options from the group
+    public class GroupSet : Group
+    {
+        public int MinObjectsSelected; // default 0
+        public int MaxObjectsSelected; // default transform.childCount
+        public int ItemsSelectedAmount { get; private set; }
+
+        public override bool IsValid()
+        {
+            if (MinObjectsSelected < 0)
+            {
+                Debug.LogError($"MinObjectSelected is less than zero: {MinObjectsSelected}");
+                return false;
+            }
+
+            if (MinObjectsSelected > MaxObjectsSelected)
+            {
+                Debug.LogError($"MinObjectsSelected is greater than MaxObjectsSelected");
+                return false;
+            }
+
+            if (MaxObjectsSelected < 0)
+                return false;
+            var childCount = GetItemsCount();
+            if (childCount < 1)
+                return false;
+            if (MaxObjectsSelected > childCount)
+                return false;
+            if (MinObjectsSelected > childCount)
+                return false;
+            return true;
+        }
+
+        public override void DoChoice(params int[] indexes)
+        {
+            DisableItems();
+            ItemsSelectedAmount = indexes.Length;
+            foreach (var t in indexes)
+                transform.GetChild(t).gameObject.SetActive(true);
+        }
+
+        public override void DoRndChoice(ref RandomHelper rnd)
+        {   
+            int[] itemsIndexes = new int[GetItemsCount()];
+            for (int i = 0; i < GetItemsCount(); ++i)
+                itemsIndexes[i] = i;
+            var choices = rnd.FromArray(itemsIndexes, rnd.FromRangeIntInclusive(MinObjectsSelected, MaxObjectsSelected));
+            DoChoice(choices);
+        }
+    }
+}

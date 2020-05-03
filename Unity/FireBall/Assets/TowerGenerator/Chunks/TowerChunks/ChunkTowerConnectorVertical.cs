@@ -1,10 +1,15 @@
 ﻿namespace TowerGenerator
 {
-    public class ChunkTowerConnectorVertical : ChunkTowerBase
+    public class ChunkTowerConnectorVertical : ChunkBase
     {
         public override TopologyType GetTopologyType()
         {
             return TopologyType.ChunkConnectorVertical;
+        }
+
+        public override bool IsValid()
+        {
+            return true;
         }
     }
 }
