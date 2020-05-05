@@ -30,14 +30,14 @@ namespace TowerGenerator.ChunkImporter
             semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);
         }
 
-        private static void BuildGroupsController(GameObject ent)
+        private static void BuildGroupsController(GameObject chunk)
         {
-            var groupController = ent.AddComponent<GroupsController>();
-            var baseChunk = ent.GetComponent<ChunkBase>();
+            var groupController = chunk.AddComponent<RootGroupsController>();
+            var baseChunk = chunk.GetComponent<ChunkBase>();
             Assert.IsNotNull(groupController);
             Assert.IsNotNull(baseChunk);
 
-            var baseComponents = ent.GetComponentsInChildren<BaseComponent>(true);
+            var baseComponents = chunk.GetComponentsInChildren<BaseComponent>(true);
             foreach (var baseComponent in baseComponents)
             {
                 baseComponent.Chunk = baseChunk;

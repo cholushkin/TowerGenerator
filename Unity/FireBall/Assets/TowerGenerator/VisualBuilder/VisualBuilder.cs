@@ -50,7 +50,7 @@ namespace TowerGenerator
             // calculate BB for vis segment
             Vector3 MaxBB = node.Data.Topology.Geometry.Bounds.size - ConnectorMargin;
 
-            var visSegController = visSegment.GetComponent<GroupsController>();
+            var visSegController = visSegment.GetComponent<RootGroupsController>();
             //var isOK = visSegController.SetMaximizedFitRndConfiguration(MaxBB);
             //if (!isOK)
             //    visSegment.name += "error:missfit";

@@ -8,6 +8,8 @@ namespace TowerGenerator
 
         public override bool IsValid()
         {
+            if (!base.IsValid())
+                return false;
             if (InductionLabels == null)
                 return false;
             if (InductionLabels.Length < 1)

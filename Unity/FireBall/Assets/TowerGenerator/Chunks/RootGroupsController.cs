@@ -10,7 +10,8 @@ using Random = UnityEngine.Random;
 
 namespace TowerGenerator
 {
-    public class GroupsController : MonoBehaviour
+    // controls all groups started from DimensionStack. Also system allows to have groups and objects beside the main group, but they should take
+    public class RootGroupsController : MonoBehaviour
     {
         public long Seed = -1;
         public GroupStack DimensionStack { get; private set; }
@@ -28,6 +29,7 @@ namespace TowerGenerator
             DimensionStack = GetComponentInChildren<GroupStack>();
             Assert.IsNotNull(DimensionStack, $"{gameObject.transform.GetDebugName()}");
             BuildImpactTree();
+            DbgPrintImpactTree();
 #if DEBUG
             Validate();
 #endif
@@ -59,16 +61,20 @@ namespace TowerGenerator
             }
 
             // get active connectors 
-            var connectors = transform.GetComponentsInChildren<Connectors>(false);
-            Assert.IsNotNull(connectors,"Can't find active connectors component after setting a configuration");
-            Assert.IsTrue(connectors.Length == 1, "Wrong amount of active connectors after setting a configuration");
-            Connectors = connectors[0];
+            Connectors = GetActiveConnectors();
             Assert.IsNotNull(Connectors);
+        }
+
+        private Connectors GetActiveConnectors()
+        {
+            var activeConnectors = GetComponentsInChildren<Connectors>(false);
+            Assert.IsTrue(activeConnectors.Length > 0);
+            return activeConnectors[activeConnectors.Length - 1];
         }
 
         private void BuildImpactTree()
         {
-            _tree = ForEachChildrenRecursive(transform, null);
+            _tree = BuildStepRecursive(DimensionStack.transform, null, null);
 
             // fill up _induction
             {
@@ -113,16 +119,28 @@ namespace TowerGenerator
             }
         }
 
-        private TreeNode<Group> ForEachChildrenRecursive(Transform iTrans, TreeNode<Group> parent)
+        private void DbgPrintImpactTree()
+        {
+            Debug.Log(">>>>> Impact tree");
+            foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
+                Debug.Log($"{treeNode.Data.transform.GetDebugName()}: level:{treeNode.Level} branch level:{treeNode.BranchLevel} ");
+        }
+
+        private TreeNode<Group> BuildStepRecursive(Transform iTrans, Transform parent, TreeNode<Group> impactParent)
         {
             var group = iTrans.GetComponent<Group>();
-            var newTreeNode = new TreeNode<Group>(group);
-            parent?.AddChild(group);
+
+            if (group != null)
+            {
+                var newGroup = new TreeNode<Group>(group);
+                impactParent?.AddChild(newGroup);
+                impactParent = newGroup;
+            }
 
             for (int i = 0; iTrans.childCount != i; ++i)
-                ForEachChildrenRecursive(iTrans.GetChild(i), newTreeNode);
+                BuildStepRecursive(iTrans.GetChild(i), iTrans, impactParent);
 
-            return newTreeNode;
+            return impactParent;
         }
 
         private void Validate()
@@ -149,16 +167,16 @@ namespace TowerGenerator
 
         public void Induce(string inductionLabel)
         {
-            var influncedObjects =_induction[inductionLabel];
-            foreach (var influncedObject in influncedObjects)
-                transform.gameObject.SetActive(true);
+            var influencedObjects =_induction[inductionLabel];
+            foreach (var influencedObject in influencedObjects)
+                influencedObject.gameObject.SetActive(true);
         }
 
         public void Suppress(string suppressionLabel)
         {
-            var influncedObjects = _suppression[suppressionLabel];
-            foreach (var influncedObject in influncedObjects)
-                transform.gameObject.SetActive(false);
+            var influencedObjects = _suppression[suppressionLabel];
+            foreach (var influencedObject in influencedObjects)
+                influencedObject.gameObject.SetActive(false);
         }
     }
 }

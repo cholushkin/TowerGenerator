@@ -148,24 +148,6 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        //private class GroupUser : FbxCommandAddComponent
-        //{
-        //    public override string GetPayloadCommandName()
-        //    {
-        //        return "GroupUser";
-        //    }
-
-        //    public override void ParseParameters(string parameters, GameObject gameObject)
-        //    {
-        //        Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-        //    }
-
-        //    public override void Execute(GameObject gameObject)
-        //    {
-        //        gameObject.AddComponent<global::TowerGenerator.GroupUser>();
-        //    }
-        //}
-
         private class GroupSwitch : FbxCommandAddComponent
         {
             public override string GetPayloadCommandName()
@@ -362,6 +344,25 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
+        private class DimensionsIgnorant : FbxCommandAddNodeAttribute
+        {
+            public override string GetPayloadCommandName()
+            {
+                return "DimensionsIgnorant";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
+            }
+
+            public override void Execute(GameObject gameObject)
+            {
+                gameObject.AddComponent<global::TowerGenerator.GroupStack>();
+            }
+
+        }
+
         private class Suppression : FbxCommandAddNodeAttribute
         {
             private string[] _suppressionLabels;
@@ -517,7 +518,6 @@ namespace TowerGenerator.ChunkImporter
             // Groups
             new GroupStack(),
             new GroupSet(), 
-            //new GroupUser(), 
             new GroupSwitch(),
 
             // Chunk types
@@ -532,6 +532,7 @@ namespace TowerGenerator.ChunkImporter
 
             // Node attributes
             new CollisionDependant(),
+            new DimensionsIgnorant(),
             new Suppression(),
             new SuppressedBy(),
             new Induction(),

@@ -6,7 +6,7 @@ namespace TowerGenerator
     public class EntityPlace : MonoBehaviour
     {
         private GameObject _current;
-        private GroupsController _groupController;
+        private RootGroupsController _groupController;
         public CameraEntShowroomController CameraEntShowroomController;
 
         public void Place(MetaBase metaToPlace, long seed)
@@ -19,7 +19,7 @@ namespace TowerGenerator
             CameraEntShowroomController.FitView(_current);
             _current.transform.localScale = Vector3.zero;
             _current.transform.DOScale(100f, 1f).SetEase(Ease.OutElastic);
-            _groupController = _current.GetComponent<GroupsController>();
+            _groupController = _current.GetComponent<RootGroupsController>();
 
         }
 

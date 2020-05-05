@@ -7,9 +7,5 @@ namespace TowerGenerator
 {
     public class Connectors : BaseComponent
     {
-        public override bool IsValid()
-        {
-            return true;
-        }
     }
 }

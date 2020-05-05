@@ -12,10 +12,5 @@ namespace TowerGenerator
         }
 
         public CollisionCheckMode CollisionCheck;
-
-        public override bool IsValid()
-        {
-            return true;
-        }
     }
 }

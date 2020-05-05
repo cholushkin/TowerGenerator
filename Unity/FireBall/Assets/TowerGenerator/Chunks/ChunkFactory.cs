@@ -16,6 +16,7 @@ namespace TowerGenerator
         public static GameObject CreateChunk( MetaBase meta, long seed, Transform parent)
         {
             var visSegPrefab = (GameObject)Resources.Load("Chunks/" + meta.ChunkName);
+            visSegPrefab.SetActive(false);
             var visSegment = Object.Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;
 
@@ -25,8 +26,10 @@ namespace TowerGenerator
             // rotation 
             visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
 
-            var visSegController = visSegment.GetComponent<GroupsController>();
+            var visSegController = visSegment.GetComponent<RootGroupsController>();
             visSegController.Seed = seed;
+            visSegController.Init();
+            visSegment.SetActive(true);
             visSegController.SetConfiguration();
 
             // centering

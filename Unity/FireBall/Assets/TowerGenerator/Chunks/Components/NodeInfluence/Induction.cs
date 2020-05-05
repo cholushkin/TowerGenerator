@@ -8,7 +8,16 @@ namespace TowerGenerator
 
         public override bool IsValid()
         {
-            throw new System.NotImplementedException();
+            if (!base.IsValid())
+                return false;
+#if DEBUG
+            // todo: no node with InducedBy with such labels
+#endif
+            if (InductionLabels == null)
+                return false;
+            if (InductionLabels.Length < 1)
+                return false;
+            return true;
         }
 
         public void OnEnable()

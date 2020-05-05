@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -13,12 +14,12 @@ namespace TowerGenerator.ChunkImporter
 
             if (chunk is ChunkTowerBase)
             {
-                var asset = ScriptableObject.CreateInstance<MetaChunk>();
+                var metaAsset = ScriptableObject.CreateInstance<MetaChunk>();
                 string assetPathAndName = dir + "/" + name + ".m.asset";
 
-                asset.ChunkName = name;
-                asset.TopologyType = chunk.GetTopologyType();
-                var groupController = chunk.GetComponent<GroupsController>();
+                metaAsset.ChunkName = name;
+                metaAsset.TopologyType = chunk.GetTopologyType();
+                var groupController = chunk.GetComponent<RootGroupsController>();
                 Assert.IsNotNull(groupController, "chunk must have a group controller");
 
                 // todo: generation from fbx
@@ -26,16 +27,29 @@ namespace TowerGenerator.ChunkImporter
 
                 // AABBs
                 for (int i = 0; i < groupController.DimensionStack.GetItemsCount(); ++i)
-                {
-                    groupController.DimensionStack.DoChoice(i);
-                    AddAabb(asset, groupController.CalculateBB().size);
-                }
+                    AddAabb(metaAsset, ComputeAABB(groupController, i));
 
-                AssetDatabase.CreateAsset(asset, assetPathAndName);
+                AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
                 AssetDatabase.SaveAssets();
-                return asset;
+                return metaAsset;
             }
             return null;
+        }
+
+        private static Vector3 ComputeAABB(RootGroupsController controller, int i )
+        {
+            // enable all parts (maybe there are nodes beside DimensionStack
+            controller.transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(true));
+
+            // enable only this AABB item
+            controller.DimensionStack.DoChoice(i);
+
+            // disable all DimensionsIgnorant nodes on whole chunk
+            var dimIgnorant = controller.transform.GetComponentsInChildren<DimensionsIgnorant>(true);
+            foreach (var dimensionsIgnorant in dimIgnorant)
+                dimensionsIgnorant.gameObject.SetActive(false);
+
+            return controller.CalculateBB().size;
         }
 
         private static void AddAabb(MetaChunk meta, Vector3 aabb)
