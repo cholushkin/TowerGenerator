@@ -8,7 +8,7 @@ namespace TowerGenerator
 {
     // todo: pause button (for save seeds)
     // todo: dump current entity to file
-    public class ShowRoomController : MonoBehaviour
+    public class ShowRoomChunksController : MonoBehaviour
     {
         [Serializable]
         public class GUIState
@@ -204,6 +204,12 @@ namespace TowerGenerator
                         Offset.y + ButtonWideSize.y + Offset.y, 
                         BigDataLabelSize.x, BigDataLabelSize.y * 2f),
                     $"{State.CurrentMeta}");
+
+                if (GUI.Button(new Rect(
+                    Screen.width - ButtonSize.x * 2 - Offset.x,
+                    Screen.height - ButtonSize.y - Offset.y,
+                    ButtonSize.x, ButtonSize.y), State.IsPauseButtonPressed ? "[ ▶ ]" : "[ ॥ ]"))
+                    OnPressPause();
             }
 
             // ShowGUI
@@ -212,13 +218,6 @@ namespace TowerGenerator
                 Screen.height - ButtonSize.y - Offset.y,
                 ButtonSize.x, ButtonSize.y), $"[DevGUI]:\n{State.ShowGUI}"))
                 OnPressShowGUI();
-
-
-            if (GUI.Button(new Rect(
-                Screen.width - ButtonSize.x * 2 - Offset.x,
-                Screen.height - ButtonSize.y - Offset.y,
-                ButtonSize.x, ButtonSize.y), State.IsPauseButtonPressed ? "[ ▶ ]" : "[ ॥ ]"))
-                OnPressPause();
         }
 
         private void OnPressPause()

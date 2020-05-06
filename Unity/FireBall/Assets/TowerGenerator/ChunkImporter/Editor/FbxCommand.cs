@@ -447,6 +447,24 @@ namespace TowerGenerator.ChunkImporter
                 comp.InductionLabels = _inductionLabels;
             }
         }
+
+        private class Hidden : FbxCommandAddNodeAttribute
+        {
+            public override string GetPayloadCommandName()
+            {
+                return "Hidden";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
+            }
+
+            public override void Execute(GameObject gameObject)
+            {
+                gameObject.AddComponent<global::TowerGenerator.Hidden>();
+            }
+        }
         #endregion
 
         #region Miscellaneous logic
@@ -537,6 +555,7 @@ namespace TowerGenerator.ChunkImporter
             new SuppressedBy(),
             new Induction(),
             new InducedBy(),
+            new Hidden(),
 
             // Miscellaneous logic
             new Connectors(),

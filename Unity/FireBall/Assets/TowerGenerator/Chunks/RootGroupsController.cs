@@ -47,7 +47,7 @@ namespace TowerGenerator
             Debug.Log(rnd.GetCurrentSeed());
 
             // enable all parts
-            transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(true));
+            transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
 
             foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
             {
@@ -148,7 +148,7 @@ namespace TowerGenerator
             var validators = GetComponentsInChildren<BaseComponent>(true);
             foreach (var validator in validators)
             {
-                if( !validator.IsValid() )
+                if (!validator.IsValid())
                     Debug.LogError($"Node is not valid {validator.transform.GetDebugName()}");
             }
         }
@@ -167,7 +167,7 @@ namespace TowerGenerator
 
         public void Induce(string inductionLabel)
         {
-            var influencedObjects =_induction[inductionLabel];
+            var influencedObjects = _induction[inductionLabel];
             foreach (var influencedObject in influencedObjects)
                 influencedObject.gameObject.SetActive(true);
         }
