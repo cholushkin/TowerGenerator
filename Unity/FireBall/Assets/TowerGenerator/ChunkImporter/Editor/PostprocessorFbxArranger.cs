@@ -19,8 +19,8 @@ namespace TowerGenerator.ChunkImporter
         {
             foreach (string assetPath in importedAssets)
             {
-                var root = Path.GetPathRoot(assetPath);
-                var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
+                //var root = Path.GetPathRoot(assetPath);
+                //var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
 
                 if (ChunkImporterHelper.IsChunkPackFbx(assetPath))
                 {

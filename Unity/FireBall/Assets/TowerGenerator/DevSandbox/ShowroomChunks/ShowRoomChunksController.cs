@@ -78,7 +78,7 @@ namespace TowerGenerator
         static readonly Vector2 Offset = new Vector2(32, 32);
 
 
-        void Awake()
+        void Start()
         {
             UpdateData();
             StartCoroutine(ProcessShowing());
