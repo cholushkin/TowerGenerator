@@ -1,4 +1,5 @@
 ﻿using Assets.Plugins.Alg;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -11,7 +12,9 @@ namespace TowerGenerator.ChunkImporter
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
             ExecuteFbxCommands(semifinishedEnt);
-            // todo: optme: if (isAnyGroupAdded)
+
+            ApplyMaterials(semifinishedEnt);
+
             BuildGroupsController(semifinishedEnt); // tree
 
             return semifinishedEnt;
@@ -28,6 +31,19 @@ namespace TowerGenerator.ChunkImporter
                 tr.gameObject.RemoveComponent<FbxProps>();
             }
             semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);
+        }
+
+        private static void ApplyMaterials(GameObject chunk)
+        {
+            var colorAtlas = AssetDatabase.LoadAssetAtPath<Material>("Assets/!Prefabs/ColorSchemes/ColorScheme.mat");
+            Assert.IsNotNull(colorAtlas);
+
+            var renders = chunk.GetComponentsInChildren<Renderer>();
+
+            foreach (var render in renders)
+            {
+                render.material = colorAtlas;
+            }
         }
 
         private static void BuildGroupsController(GameObject chunk)

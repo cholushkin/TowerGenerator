@@ -11,6 +11,7 @@ using Random = UnityEngine.Random;
 namespace TowerGenerator
 {
     // controls all groups started from DimensionStack. Also system allows to have groups and objects beside the main group, but they should take
+    // todo: good logging
     public class RootGroupsController : MonoBehaviour
     {
         public long Seed = -1;
@@ -24,6 +25,7 @@ namespace TowerGenerator
 
         public void Init() // configure
         {
+            Debug.Log($"> Init");
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
             DimensionStack = GetComponentInChildren<GroupStack>();
@@ -43,6 +45,7 @@ namespace TowerGenerator
 
         public void SetConfiguration()
         {
+            Debug.Log($"> SetConfiguration");
             RandomHelper rnd = new RandomHelper(Seed);
             Debug.Log(rnd.GetCurrentSeed());
 
@@ -57,6 +60,7 @@ namespace TowerGenerator
                     if (!treeNode.Data.gameObject.activeInHierarchy)
                         continue;
                     group.DoRndChoice(ref rnd);
+                    Debug.Log($"do rnd choice {group.transform.GetDebugName()}");
                 }
             }
 
@@ -174,6 +178,7 @@ namespace TowerGenerator
 
         public void Suppress(string suppressionLabel)
         {
+            Debug.Log($"Supress: {suppressionLabel}");
             var influencedObjects = _suppression[suppressionLabel];
             foreach (var influencedObject in influencedObjects)
                 influencedObject.gameObject.SetActive(false);
