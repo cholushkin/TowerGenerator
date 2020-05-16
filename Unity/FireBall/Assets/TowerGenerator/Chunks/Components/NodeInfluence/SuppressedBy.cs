@@ -1,4 +1,6 @@
-﻿
+﻿using Assets.Plugins.Alg;
+using UnityEngine;
+
 namespace TowerGenerator
 {
 
@@ -10,8 +12,16 @@ namespace TowerGenerator
         {
             if (SuppressionLabels == null)
                 return false;
+
             if (SuppressionLabels.Length < 1)
                 return false;
+
+            if (transform.parent.GetComponent<Group>())
+            {
+                Debug.LogError(
+                    $"SuppressedBy component is attached to the item controlled by a Group. Use nested (proxy)object instead of direct attach to this item: {transform.GetDebugName()}");
+                return false;
+            }
 
             foreach (var suppressionLabel in SuppressionLabels)
                 if (!GroupsController.HasSuppressionLabel(suppressionLabel))

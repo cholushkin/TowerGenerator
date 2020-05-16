@@ -29,8 +29,11 @@ namespace TowerGenerator
             Assert.IsTrue(ItemStacked < GetItemsCount());
 
             DisableItems();
+
             for (int i = 0; i <= ItemStacked; ++i)
                 transform.GetChild(i).gameObject.SetActive(true);
+
+            GroupsController.EmitEventGroupChoiceDone(this);
         }
 
         public override void DoRndChoice(ref RandomHelper rnd)

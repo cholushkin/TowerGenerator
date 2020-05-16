@@ -58,6 +58,8 @@ namespace TowerGenerator.ChunkImporter
             {
                 baseComponent.Chunk = baseChunk;
                 baseComponent.GroupsController = groupController;
+                var ownerGroup = baseComponent.transform.GetComponentInParent<Group>();
+                baseComponent.OwnerGroup = ownerGroup;
             }
 
             groupController.Init();

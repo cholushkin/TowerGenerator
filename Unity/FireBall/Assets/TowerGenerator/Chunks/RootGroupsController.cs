@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Plugins.Alg;
+using Events;
 using GameLib.DataStructures;
+using GameLib.Log;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -11,9 +13,18 @@ using Random = UnityEngine.Random;
 namespace TowerGenerator
 {
     // controls all groups started from DimensionStack. Also system allows to have groups and objects beside the main group, but they should take
-    // todo: good logging
     public class RootGroupsController : MonoBehaviour
     {
+        public class EventGroupChoiceDone
+        {
+            public EventGroupChoiceDone(Group group)
+            {
+                GroupChoice = group;
+            }
+
+            public Group GroupChoice { get; }
+        }
+
         public long Seed = -1;
         public GroupStack DimensionStack { get; private set; }
         public Connectors Connectors { get; private set; }
@@ -21,17 +32,21 @@ namespace TowerGenerator
         private TreeNode<Group> _tree;
         private Dictionary<string, List<Transform>> _suppression;
         private Dictionary<string, List<Transform>> _induction;
+        private LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
+        private EventAggregator _treeEvents;
 
 
         public void Init() // configure
         {
-            Debug.Log($"> Init");
+            if(Log.Verbose())
+                Debug.Log("> Init");
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
             DimensionStack = GetComponentInChildren<GroupStack>();
             Assert.IsNotNull(DimensionStack, $"{gameObject.transform.GetDebugName()}");
             BuildImpactTree();
-            DbgPrintImpactTree();
+            if (Log.Verbose())
+                DbgPrintImpactTree();
 #if DEBUG
             Validate();
 #endif
@@ -45,7 +60,8 @@ namespace TowerGenerator
 
         public void SetConfiguration()
         {
-            Debug.Log($"> SetConfiguration");
+            if (Log.Verbose())
+                Debug.Log("> SetConfiguration");
             RandomHelper rnd = new RandomHelper(Seed);
             Debug.Log(rnd.GetCurrentSeed());
 
@@ -54,19 +70,39 @@ namespace TowerGenerator
 
             foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
             {
-                var group = treeNode.Data;
+                Group group = treeNode.Data;
+                Assert.IsNotNull(group);
                 if (group != null)
                 {
                     if (!treeNode.Data.gameObject.activeInHierarchy)
                         continue;
                     group.DoRndChoice(ref rnd);
-                    Debug.Log($"do rnd choice {group.transform.GetDebugName()}");
+                    if (Log.Verbose())
+                        DbgPrintGroupOutcomeConfiguration(group.transform);
                 }
             }
 
             // get active connectors 
             Connectors = GetActiveConnectors();
             Assert.IsNotNull(Connectors);
+        }
+
+        public void EmitEventGroupChoiceDone(Group group)
+        {
+            _treeEvents.Publish(new EventGroupChoiceDone(group));
+        }
+
+        private void DbgPrintGroupOutcomeConfiguration(Transform groupTransform)
+        {
+            var comp = groupTransform.GetComponent<Group>();
+            Assert.IsNotNull(comp);
+
+            var strOutcome = $"{comp.GetType().Name}:{groupTransform.GetDebugName(false)}:";
+            for (int i = 0; i < groupTransform.childCount; ++i)
+            {
+                strOutcome += groupTransform.GetChild(i).gameObject.activeSelf ? "V" : "X";
+            }
+            Debug.Log(strOutcome);
         }
 
         private Connectors GetActiveConnectors()
@@ -78,7 +114,9 @@ namespace TowerGenerator
 
         private void BuildImpactTree()
         {
+            _treeEvents = new EventAggregator();
             _tree = BuildStepRecursive(DimensionStack.transform, null, null);
+
 
             // fill up _induction
             {
@@ -134,6 +172,10 @@ namespace TowerGenerator
         {
             var group = iTrans.GetComponent<Group>();
 
+            var influncer = iTrans.GetComponent<IHandle<EventGroupChoiceDone>>();
+            if (influncer != null)
+                _treeEvents.Subscribe(influncer);
+
             if (group != null)
             {
                 var newGroup = new TreeNode<Group>(group);
@@ -169,7 +211,7 @@ namespace TowerGenerator
             return _induction.ContainsKey(label);
         }
 
-        public void Induce(string inductionLabel)
+        internal void Induce(string inductionLabel)
         {
             var influencedObjects = _induction[inductionLabel];
             foreach (var influencedObject in influencedObjects)
@@ -178,7 +220,6 @@ namespace TowerGenerator
 
         public void Suppress(string suppressionLabel)
         {
-            Debug.Log($"Supress: {suppressionLabel}");
             var influencedObjects = _suppression[suppressionLabel];
             foreach (var influencedObject in influencedObjects)
                 influencedObject.gameObject.SetActive(false);

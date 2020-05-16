@@ -14,9 +14,14 @@ namespace TowerGenerator
         {
             return GroupsController != null && Chunk != null;
         }
+
         [HideInInspector]
         public RootGroupsController GroupsController;
+
         [HideInInspector]
         public ChunkBase Chunk;
+
+        [HideInInspector]
+        public Group OwnerGroup;
     }
 }

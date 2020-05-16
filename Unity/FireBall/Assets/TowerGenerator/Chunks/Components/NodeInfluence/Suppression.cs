@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using Events;
+using UnityEngine;
 
 
 namespace TowerGenerator
 {
 
-    public class Suppression : BaseComponent
+    public class Suppression : BaseComponent, IHandle<RootGroupsController.EventGroupChoiceDone>
     {
         public string[] SuppressionLabels;
 
@@ -21,11 +22,14 @@ namespace TowerGenerator
                 return false;
             return true;
         }
-
-        public void OnEnable()
+ 
+        public void Handle(RootGroupsController.EventGroupChoiceDone message)
         {
-            foreach (var suppressionLabel in SuppressionLabels)
-                GroupsController.Suppress(suppressionLabel);
+            if (message.GroupChoice == OwnerGroup && gameObject.activeInHierarchy)
+            {
+                foreach (var suppressionLabel in SuppressionLabels)
+                    GroupsController.Suppress(suppressionLabel);
+            }
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using Events;
 
 namespace TowerGenerator
 {
-    public class Induction : BaseComponent
+    public class Induction : BaseComponent, IHandle<RootGroupsController.EventGroupChoiceDone>
     {
         public string[] InductionLabels;
 
@@ -20,10 +20,13 @@ namespace TowerGenerator
             return true;
         }
 
-        public void OnEnable()
+        public void Handle(RootGroupsController.EventGroupChoiceDone message)
         {
-            foreach (var inductionLabel in InductionLabels)
-                GroupsController.Induce(inductionLabel);
+            if (message.GroupChoice == OwnerGroup && gameObject.activeInHierarchy)
+            {
+                foreach (var suppressionLabel in InductionLabels)
+                    GroupsController.Induce(suppressionLabel);
+            }
         }
     }
 }
