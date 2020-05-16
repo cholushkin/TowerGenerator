@@ -60,7 +60,7 @@ namespace TowerGenerator
             public MetaInfos MetaInfosState;
             public MetaControlPanel MetaControlPanelState;
             public EntityControlPanel EntityControlPanelState;
-            public string CurrentMeta = "asdasda";
+            public string CurrentMeta = "";
             public bool IsPauseButtonPressed;
             public bool ShowGUI;
         }
@@ -80,8 +80,14 @@ namespace TowerGenerator
 
         void Start()
         {
+            LoadConfiguration();
             UpdateData();
             StartCoroutine(ProcessShowing());
+        }
+
+        void OnDestroy()
+        {
+            SaveConfiguration();
         }
 
         void Update()
@@ -299,6 +305,16 @@ namespace TowerGenerator
         {
             _pointer = (_pointer + 1) % DelayButtonValues.Length;
             State.MetaControlPanelState.Delay = DelayButtonValues[_pointer];
+        }
+
+        private void SaveConfiguration()
+        {
+            PlayerPrefs.SetString("TowerGeneratorShowRoomState", JsonUtility.ToJson(State));
+        }
+
+        private void LoadConfiguration()
+        {
+            State = JsonUtility.FromJson<GUIState>(PlayerPrefs.GetString("TowerGeneratorShowRoomState"));
         }
     }
 }
