@@ -124,8 +124,8 @@ namespace TowerGenerator
                 Assert.IsTrue(meta.AABBs.Count > 0);
                 foreach (var metaAABB in meta.AABBs)
                 {
-                    var breadthIsOK = _breadthRange.IsIn(metaAABB.x) && _breadthRange.IsIn(metaAABB.z);
-                    var heightIsOK = _heightRange.IsIn(metaAABB.y);
+                    var breadthIsOK = metaAABB.x >= _breadthRange.From && metaAABB.z <= _breadthRange.To;
+                    var heightIsOK = metaAABB.y >= _heightRange.From && metaAABB.y <= _heightRange.To;
                     if (breadthIsOK && heightIsOK)
                         return true;
                 }

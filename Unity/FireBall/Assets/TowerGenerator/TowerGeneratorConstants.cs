@@ -12,6 +12,7 @@ namespace TowerGenerator
         public static readonly Vector3 ConnectorMargin = Vector3.one;
         public const float ConnectorAspect = 3f;
 
+
         #region ---------- Paths ---------- 
 
         // allowed values for ChunkPack asset path:

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameLib.DataStructures;
+﻿using GameLib.DataStructures;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -7,15 +6,6 @@ namespace TowerGenerator
 
     public class Blueprint
     {
-        // Types of data:
-        // - Topology
-        // - VisualChunk
-        // meta, variants enabled
-        // - Content
-        // 
-
-
-
         public class Segment
         {
             public class TopologySegment
@@ -44,9 +34,9 @@ namespace TowerGenerator
 
             public class VisualSegment
             {
-                // meta
                 // decorations
                 // biome
+                // color scheme
             }
 
             public class ContentSegment
@@ -58,6 +48,7 @@ namespace TowerGenerator
             {
                 return $"{Topology}";
             }
+
             public TopologySegment Topology;
             public VisualSegment Visual;
             public ContentSegment Content;

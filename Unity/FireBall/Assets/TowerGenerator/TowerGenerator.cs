@@ -5,47 +5,54 @@ namespace TowerGenerator
 {
     public class TowerGenerator : MonoBehaviour
     {
-        public int SeedTopology;
-        public int SeedVisual;
-        public int SeedContent;
+        public GeneratorProcessor Prototype;
+        public bool DoGenerateOnStart;
 
-        public bool GenererateOnStart;
+        protected Blueprint _blueprint;
+        protected GeneratorPointer _pointers;
+        // visualizer
 
-        public TopologyGeneratorsManifoldBase TopologyGeneratorManifold;
-
-        void Reset()
+        void Awake()
         {
-            SeedTopology = -1;
-            SeedVisual = -1;
-            SeedContent = -1;
-            GenererateOnStart = true;
-            TopologyGeneratorManifold = GetComponentInChildren<TopologyGeneratorsManifoldBase>();
+            Assert.IsNotNull(Prototype);
         }
 
         void Start()
         {
-            Assert.IsNotNull(TopologyGeneratorManifold);
+            if (!Prototype)
+                return;
+            if (DoGenerateOnStart)
+                Generate();
+        }
 
-            if (SeedTopology == -1)
+        public void Generate()
+        {
+            PropagateSeeds();
+            Establish();
+            Prototype.Generate();
+        }
+
+        private void PropagateSeeds()
+        {
+        }
+
+        // todo:
+        // Gets all configs with 'establish' tag from prototype thus user can specify prototypes and configs that are fit better with establishing 
+        // if there are no such prots or cfgs than just take next one according to _generatorNodes internal chooser
+        public void Establish()
+        {
+            _pointers = new GeneratorPointer(_blueprint /*, MaxDistanceProgressToGenerator, MaxDistanceProgressToGarabageCollector*/);
+            _blueprint = new Blueprint();
+
+            // todo:
+            // get first config recursively and ask for recommended establishing 
+
+            var protoPointer = Prototype;
+            while (protoPointer.GeneratorNodes.GetNext())
             {
-                SeedTopology = Random.Range(0, int.MaxValue);
-                Debug.Log($"Using random SeedTopology: {SeedTopology}");
+                
             }
-
-            if (SeedVisual == -1)
-            {
-                SeedVisual = Random.Range(0, int.MaxValue);
-                Debug.Log($"Using random SeedVisual: {SeedVisual}");
-            }
-
-            if (SeedContent == -1)
-            {
-                SeedContent = Random.Range(0, int.MaxValue);
-                Debug.Log($"Using random SeedContent: {SeedContent}");
-            }
-
-            if (GenererateOnStart)
-                TopologyGeneratorManifold.StartGenerate((uint)SeedTopology);
+            Prototype.GeneratorNodes.GetNext();
         }
     }
 }

@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public class SegmentBuilder
+    public class SegmentBuilder // todo: rename SegmentArchitect 
     {
         public class MemorySegment
         {
@@ -82,7 +82,7 @@ namespace TowerGenerator
             int targetSegmentCount = (int)segCount.From;
             int segmentCounter = 0;
             int branchesCounter = 0;
-            _varLeafPointers = new List<TreeNode<MemorySegment>>((int) (segCount.To - segCount.From));
+            _varLeafPointers = new List<TreeNode<MemorySegment>>((int)(segCount.To - segCount.From));
             TreeNode<MemorySegment> nodePointer = from;
             while (segmentCounter != targetSegmentCount)
             {
@@ -92,8 +92,8 @@ namespace TowerGenerator
                     placementConfig = lastPlacementConfig;
 
                 // create memory segment
-                var memSeg = CreateMemorySegment(nodePointer, direction, 
-                    segmentCounter == 0 ? offsetFromTrunk : Vector3.zero, 
+                var memSeg = CreateMemorySegment(nodePointer, direction,
+                    segmentCounter == 0 ? offsetFromTrunk : Vector3.zero,
                     placementConfig);
 
                 if (memSeg.Data.HasCollision)
@@ -156,52 +156,34 @@ namespace TowerGenerator
             parentMemSegment.AddChild(curNode);
 
             // get segment size
-            if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkRndSize)
-            {
-                // get random meta of placementConfig.ChunkEntityType
-                var filter = new MetaProvider.Filter(topology: placementConfig.TopologyType,
-                    breadthRange: placementConfig.IgnoreChunkSizeRestrictions
-                        ? null
-                        : placementConfig.SegmentsSizeBreadth,
-                    heightRange: placementConfig.IgnoreChunkSizeRestrictions
-                        ? null
-                        : placementConfig.SegmentsSizeHeight);
-                var meta = _rnd.FromEnumerable(MetaProvider.Instance.GetMetas(filter));
+            //if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkRndSize)
+            // get random meta of placementConfig.ChunkEntityType
+            var filter = new MetaProvider.Filter(
+                topology: placementConfig.TopologyType,
+                breadthRange: placementConfig.SegmentsSizeBreadth,
+                heightRange: placementConfig.SegmentsSizeHeight);
+            var meta = _rnd.FromEnumerable(MetaProvider.Instance.GetMetas(filter));
 
-                // get random size
-                int sizeIndex = _rnd.Range(0, meta.AABBs.Count);
-                _rnd.FromList(meta.AABBs);
+            // get random size
+            int sizeIndex = _rnd.Range(0, meta.AABBs.Count);
+            _rnd.FromList(meta.AABBs);
 
-                var parentBounds = parentMemSegment.Data.ChunkGeometry.Bounds;
-                var childBounds = _generator.CreateBoundsForChild(parentBounds, buildDirection, meta.AABBs[sizeIndex], offsetFromParent);
+            var parentBounds = parentMemSegment.Data.ChunkGeometry.Bounds;
+            var childBounds = _generator.CreateBoundsForChild(parentBounds, buildDirection, meta.AABBs[sizeIndex], offsetFromParent);
 
-                var memoryBounds = _blueprintTree.TraverseDepthFirstPostOrder().Select(x => x.Data.ChunkGeometry.Bounds); // in addition to tree collision check we also need to check for self collision
-                var hasCollision = _generator.CheckCollisions(childBounds, memoryBounds);
+            var memoryBounds = _blueprintTree.TraverseDepthFirstPostOrder().Select(x => x.Data.ChunkGeometry.Bounds); // in addition to tree collision check we also need to check for self collision
+            var hasCollision = _generator.CheckCollisions(childBounds, memoryBounds);
 
-                memSeg.ChunkGeometry.TopologyType = placementConfig.TopologyType;
-                memSeg.ChunkGeometry.Bounds = childBounds;
-                memSeg.ChunkGeometry.BuildDirection = buildDirection;
-                memSeg.ChunkGeometry.Meta = meta.name;
-                memSeg.ChunkGeometry.SizeIndex = sizeIndex;
-                memSeg.ChunkGeometry.Seed = _rnd.ValueInt();
+            memSeg.ChunkGeometry.TopologyType = placementConfig.TopologyType;
+            memSeg.ChunkGeometry.Bounds = childBounds;
+            memSeg.ChunkGeometry.BuildDirection = buildDirection;
+            memSeg.ChunkGeometry.Meta = meta.name;
+            memSeg.ChunkGeometry.SizeIndex = sizeIndex;
+            memSeg.ChunkGeometry.Seed = _rnd.ValueInt();
 
-                memSeg.HasCollision = hasCollision;
+            memSeg.HasCollision = hasCollision;
 
-                return curNode;
-            }
-            else if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkMaxSize)
-            {
-                // take all last aabbs that is inside restrictions
-                throw new NotImplementedException();
-
-            }
-            else if (placementConfig.ChunkSizeStrategy == GeneratorConfigBase.PlacementConfig.SizeStrategy.ChunkMinSize)
-            {
-                // take all first aabbs that is inside restrictions
-                throw new NotImplementedException();
-            }
-
-            return null;
+            return curNode;
         }
 
         public IEnumerable<TreeNode<Blueprint.Segment>> Build()

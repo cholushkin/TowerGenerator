@@ -18,15 +18,15 @@ namespace TowerGenerator
         [Serializable]
         public class PlacementConfig
         {
-            public enum SizeStrategy
-            {
-                ChunkRndSize,
-                ChunkMaxSize,
-                ChunkMinSize
-            }
+            //public enum SizeStrategy
+            //{
+            //    ChunkRndSize,
+            //    ChunkMaxSize,
+            //    ChunkMinSize
+            //}
             public TopologyType TopologyType;
-            public SizeStrategy ChunkSizeStrategy;
-            public bool IgnoreChunkSizeRestrictions; // todo: use zero ranges instead
+            //public SizeStrategy ChunkSizeStrategy;
+            //public bool IgnoreChunkSizeRestrictions; // todo: use zero ranges instead
             public Range SegmentsSizeBreadth;
             public Range SegmentsSizeHeight;
             // todo: tags
