@@ -47,7 +47,7 @@
 //                [Range(0f, 1f)] public float Back;
 //            }
 
-//            public Range SegmentsBudget;
+//            public Range TrunkSegmentsCount;
 //            public PlacementConfig DefaultPlacement;
 //            public List<ChunkSpecificPlacement> ChunkSpecific;
 //            public AllowedDirectionsChances AllowedDirections = new AllowedDirectionsChances();

@@ -10,7 +10,7 @@
 //{
 //    // ----- Build sequence:
 //    // * if there is no parent build island (initial)
-//    // * build trunk up (using cfg.SegmentsBudget)
+//    // * build trunk up (using cfg.TrunkSegmentsCount)
 //    // * try to generate branches based on chance from cfg for each side
 //    //   * based on chance end it up with opened segment or not
 //    //   * by cfg.BranchLev1GrowingDownChance build branch down on 1-2 segments if possible
@@ -58,7 +58,7 @@
 //            var opened = prevState?.GetOpenedForGeneration();
 //            if (opened == null)
 //            {
-//                opened = new List<TreeNode<Blueprint.Segment>>((int)Config.SegmentsBudget.To);
+//                opened = new List<TreeNode<Blueprint.Segment>>((int)Config.TrunkSegmentsCount.To);
 //                var island = CreateOriginIsland(Config);
 //                opened.Add(island);
 //                yield return TopGenStep.DoStep(CurrentState.Created.Peek(), TopGenStep.VisualizationCmd.SegSpawn);
@@ -74,7 +74,7 @@
 //            {
 //                if (openedNode.BranchLevel == 0) // for the trunk
 //                {
-//                    var trunkSegCount = _rnd.FromRangeIntInclusive(Config.SegmentsBudget);
+//                    var trunkSegCount = _rnd.FromRangeIntInclusive(Config.TrunkSegmentsCount);
 //                    Assert.IsTrue(openedNode.Data.Topology.IsOpenedForGenerator);
 //                    var segBuilder = new SegmentBuilder(trunkSegCount, openedNode, Vector3.up, this, Vector3.zero);
 

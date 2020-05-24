@@ -9,11 +9,7 @@ namespace TowerGenerator
 {
     public abstract class GeneratorConfigBase : MonoBehaviour
     {
-        public abstract GeneratorBase CreateGenerator(
-            long seed,
-            TreeNode<Blueprint.Segment> startFrom,
-            TopologyGeneratorsManifoldBase manifold
-        );
+        public abstract GeneratorBase CreateGenerator(long seed);
 
         [Serializable]
         public class PlacementConfig
@@ -50,7 +46,7 @@ namespace TowerGenerator
             [Range(0f, 1f)] public float Back;
         }
 
-        public Range SegmentsBudget; // like a real a budget could be overused (just approximation of height size in segments)
+        public Range TrunkSegmentsCount; 
         public List<PlacementConfig> PlacementConfigs;
         public AllowedDirectionsChances AllowedDirections;
         private readonly float[] _dirChances = new float[6];

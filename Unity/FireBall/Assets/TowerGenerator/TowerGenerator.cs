@@ -10,6 +10,8 @@ namespace TowerGenerator
 
         protected Blueprint _blueprint;
         protected GeneratorPointer _pointers;
+        protected SegmentConstructor _constructor;
+
         // visualizer
 
         void Awake()
@@ -43,6 +45,7 @@ namespace TowerGenerator
         {
             _pointers = new GeneratorPointer(_blueprint /*, MaxDistanceProgressToGenerator, MaxDistanceProgressToGarabageCollector*/);
             _blueprint = new Blueprint();
+            //_constructor = new SegmentConstructor(_blueprint);
 
             // todo:
             // get first config recursively and ask for recommended establishing 
@@ -54,5 +57,28 @@ namespace TowerGenerator
             }
             Prototype.GeneratorNodes.GetNext();
         }
+
+
+        //public virtual TopGenStep EstablishTower()
+        //{
+        //    SegmentBuilder segmentBuilder = new segmen(this, _rnd.ValueInt());
+
+        //    segmentBuilder.Project(
+        //        (TreeNode<SegmentBuilder.MemorySegment>)null,
+        //        Range.One,
+        //        Vector3.up,
+        //        Vector3.zero,
+        //        Config.GetPlacementConfig(TopologyType.ChunkIsland),
+        //        null,
+        //        null
+        //    );
+
+        //    Assert.IsTrue(segmentBuilder.GetProjectVariantsNumber() == 1);
+        //    segmentBuilder.ApplyProject(0);
+
+        //    var segment = segmentBuilder.Build().First();
+        //    Assert.IsNotNull(segment);
+        //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
+        //}
     }
 }

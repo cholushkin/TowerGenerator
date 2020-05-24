@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GameLib.DataStructures;
 using GameLib.Random;
@@ -8,7 +7,7 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public class SegmentBuilder // todo: rename SegmentArchitect 
+    public class SegmentArchitect 
     {
         public class MemorySegment
         {
@@ -31,16 +30,16 @@ namespace TowerGenerator
         //private Range _segCount;
         //private MemorySegment _fromStep;
         public int CreatedCount { get; set; }
-        private GeneratorBase _generator; // for created
+        private SegmentConstructor _constructor; // for created
         private RandomHelper _rnd;
         //private TreeNode<Blueprint.Segment> _rootNode;
         private TreeNode<MemorySegment> _blueprintTree;
         private List<TreeNode<MemorySegment>> _varLeafPointers;
         private Range _segmentsCount;
 
-        public SegmentBuilder(GeneratorBase generator, int seed)
+        public SegmentArchitect(SegmentConstructor constructor, int seed)
         {
-            _generator = generator;
+            _constructor = constructor;
             _rnd = new RandomHelper(seed);
         }
 
@@ -169,10 +168,10 @@ namespace TowerGenerator
             _rnd.FromList(meta.AABBs);
 
             var parentBounds = parentMemSegment.Data.ChunkGeometry.Bounds;
-            var childBounds = _generator.CreateBoundsForChild(parentBounds, buildDirection, meta.AABBs[sizeIndex], offsetFromParent);
+            var childBounds = _constructor.CreateBoundsForChild(parentBounds, buildDirection, meta.AABBs[sizeIndex], offsetFromParent);
 
             var memoryBounds = _blueprintTree.TraverseDepthFirstPostOrder().Select(x => x.Data.ChunkGeometry.Bounds); // in addition to tree collision check we also need to check for self collision
-            var hasCollision = _generator.CheckCollisions(childBounds, memoryBounds);
+            var hasCollision = _constructor.CheckCollisions(childBounds, memoryBounds);
 
             memSeg.ChunkGeometry.TopologyType = placementConfig.TopologyType;
             memSeg.ChunkGeometry.Bounds = childBounds;
@@ -193,7 +192,7 @@ namespace TowerGenerator
             foreach (var node in _blueprintTree.TraverseDepthFirstPostOrder())
             {
                 var parent = node.Parent;
-                var created = _generator.CreateSegment(
+                var created = _constructor.CreateSegment(
                     parent.Data.CreatedNode,
                     node.Data.ChunkGeometry
                 );

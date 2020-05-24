@@ -12,6 +12,32 @@ namespace TowerGenerator
 {
     public class TopologyGeneratorsVisualizer : MonoBehaviour
     {
+        // topology generation elementary step for visualization
+        public class TopGenStep
+        {
+            public enum Cmd
+            {
+                SegSpawn,
+                SegDestroy,
+                SegChangeState,
+            }
+
+            public TreeNode<Blueprint.Segment> Segment { get; }
+            public Cmd GeneratorCmd { get; }
+
+            private TopGenStep(TreeNode<Blueprint.Segment> segment, Cmd cmd)
+            {
+                Segment = segment;
+                GeneratorCmd = cmd;
+            }
+
+            public static TopGenStep DoStep(TreeNode<Blueprint.Segment> segment, Cmd cmd)
+            {
+                Assert.IsNotNull(segment);
+                return new TopGenStep(segment, cmd);
+            }
+        }
+
         [Serializable]
         public class GeneratorStats
         {
@@ -68,9 +94,9 @@ namespace TowerGenerator
             _stats = new GeneratorStats();
         }
 
-        public void Step(GeneratorBase.TopGenStep step)
+        public void Step(TopGenStep step)
         {
-            if (step.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn)
+            if (step.GeneratorCmd == TopGenStep.Cmd.SegSpawn)
             {
                 var visSeg = BuildTopologyVis(step.Segment);
                 visSeg.Chunk.transform.DOLocalMove(visSeg.Chunk.transform.localPosition + Vector3.up * 10, StepDelay)
@@ -82,7 +108,7 @@ namespace TowerGenerator
                 if (_stats.MaxHeight < step.Segment.Data.Topology.Geometry.Bounds.center.y)
                     _stats.MaxHeight = (uint)step.Segment.Data.Topology.Geometry.Bounds.center.y;
             }
-            else if (step.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegDestroy)
+            else if (step.GeneratorCmd == TopGenStep.Cmd.SegDestroy)
             {
                 VisualizationSegment visSeg;
                 Assert.IsTrue(step.Segment.Data.Topology.IsOpenedForGenerator == false);
@@ -96,7 +122,7 @@ namespace TowerGenerator
                     _visNodes[step.Segment] = null;
                 }
             }
-            else if (step.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegChangeState)
+            else if (step.GeneratorCmd == TopGenStep.Cmd.SegChangeState)
             {
                 VisualizationSegment visSeg;
                 var gotSeg = _visNodes.TryGetValue(step.Segment, out visSeg);

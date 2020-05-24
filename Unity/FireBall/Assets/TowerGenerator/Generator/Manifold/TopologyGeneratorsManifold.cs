@@ -91,87 +91,87 @@ namespace TowerGenerator
 
         protected override IEnumerator GenerateTopology(uint seed)
         {
-            State.Status = ManifoldState.ManifoldStatus.Generating;
+            //State.Status = ManifoldState.ManifoldStatus.Generating;
             
-            Init(seed);
-            _bp = new Blueprint();
-            Pointers = new PointerProcessor(_bp, MaxDistanceProgressToGenerator, MaxDistanceProgressToGarabageCollector);
+            //Init(seed);
+            //_bp = new Blueprint();
+            //Pointers = new PointerProcessor(_bp, MaxDistanceProgressToGenerator, MaxDistanceProgressToGarabageCollector);
 
-            // get first generator and establish a tower
-            {
-                var cfg = _chooserMain.GetCurrent();
-                var firstGenerator = cfg.CreateGenerator(seed, null, this);
-                State.ActiveGenerators.Add(firstGenerator);
-                var firstStep = firstGenerator.EstablishTower();
-                Assert.IsNull(_bp.Tree);
-                Assert.IsTrue(firstStep.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn);
-                _bp.Tree = firstStep.Segment;
-            }
+            //// get first generator and establish a tower
+            //{
+            //    var cfg = _chooserMain.GetCurrent();
+            //    var firstGenerator = cfg.CreateGenerator(seed, null, this);
+            //    State.ActiveGenerators.Add(firstGenerator);
+            //    var firstStep = firstGenerator.EstablishTower();
+            //    Assert.IsNull(_bp.Tree);
+            //    Assert.IsTrue(firstStep.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn);
+            //    _bp.Tree = firstStep.Segment;
+            //}
             
-            // after first step initialization
-            if (TopologyVisualizer?.StepDelay > 0f)
-                yield return TopologyVisualizer.Wait();
-            Pointers.SetInitialPointers();
-            TopologyVisualizer?.Begin(_bp.Tree);
-            TopologyVisualizer?.ChangeGenerator(State.ActiveGenerators.First());
-            VisualBuilder?.Begin(_bp.Tree);
-            yield return null;
+            //// after first step initialization
+            //if (TopologyVisualizer?.StepDelay > 0f)
+            //    yield return TopologyVisualizer.Wait();
+            //Pointers.SetInitialPointers();
+            //TopologyVisualizer?.Begin(_bp.Tree);
+            //TopologyVisualizer?.ChangeGenerator(State.ActiveGenerators.First());
+            //VisualBuilder?.Begin(_bp.Tree);
+            //yield return null;
 
 
-            bool isWaitingForBranchFinalization = false;
-            do
-            {
-                // generate
-                foreach (var activeGenerator in State.ActiveGenerators)
-                {
-                    foreach (var step in activeGenerator.GenerateTower())
-                    {
-                        TopologyVisualizer?.Step(step);
-                    }
-                    activeGenerator.State.Iteration++;
-                }
+            //bool isWaitingForBranchFinalization = false;
+            //do
+            //{
+            //    // generate
+            //    foreach (var activeGenerator in State.ActiveGenerators)
+            //    {
+            //        foreach (var step in activeGenerator.GenerateTower())
+            //        {
+            //            TopologyVisualizer?.Step(step);
+            //        }
+            //        activeGenerator.State.Iteration++;
+            //    }
 
-                var index = 0;
-                List<GeneratorBase> newActiveGenerators = new List<GeneratorBase>();
-                foreach (var activeGenerator in State.ActiveGenerators)
-                {
-                    if (index == 0)
-                    {
-                        //if( activeGenerator.State.IsStillGeneratingTrunk )
-                        //    newActiveGenerators.Add(activeGenerator);
-                        //else
-                        //{
-                        //    _genConfigChooser.Step();
-                        //    var cfg = _genConfigChooser.GetCurrent();
-                        //    if (cfg != null)
-                        //    {
-                        //        var generator = cfg.CreateGenerator(
-                        //            activeGenerator.GetCurrentSeed(),
-                        //            activeGenerator.State.GetOpenedTrunkNode(),
-                        //            this
-                        //        );
-                        //        newActiveGenerators.Add(generator);
-                        //        TopologyVisualizer?.ChangeGenerator(generator);
-                        //    }
-                        //    else // no more generators in chain, but we still need to wait for branch generators to complete
-                        //    {
-                        //        // finalize trunk
-                        //        var step = activeGenerator.FinalizeTrunk();
-                        //        TopologyVisualizer?.Step(step);
-                        //        isWaitingForBranchFinalization = true;
-                        //    }
-                        //}
-                        continue;
-                    }
-                    //Assert.IsFalse(activeGenerator.State.IsStillGeneratingTrunk);
-                    //if(activeGenerator.State.GetOpenedForGeneration().Any())
-                    //    newActiveGenerators.Add(activeGenerator);
-                    ++index;
-                }
+            //    var index = 0;
+            //    List<GeneratorBase> newActiveGenerators = new List<GeneratorBase>();
+            //    foreach (var activeGenerator in State.ActiveGenerators)
+            //    {
+            //        if (index == 0)
+            //        {
+            //            //if( activeGenerator.State.IsStillGeneratingTrunk )
+            //            //    newActiveGenerators.Add(activeGenerator);
+            //            //else
+            //            //{
+            //            //    _genConfigChooser.Step();
+            //            //    var cfg = _genConfigChooser.GetCurrent();
+            //            //    if (cfg != null)
+            //            //    {
+            //            //        var generator = cfg.CreateGenerator(
+            //            //            activeGenerator.GetCurrentSeed(),
+            //            //            activeGenerator.State.GetOpenedTrunkNode(),
+            //            //            this
+            //            //        );
+            //            //        newActiveGenerators.Add(generator);
+            //            //        TopologyVisualizer?.ChangeGenerator(generator);
+            //            //    }
+            //            //    else // no more generators in chain, but we still need to wait for branch generators to complete
+            //            //    {
+            //            //        // finalize trunk
+            //            //        var step = activeGenerator.FinalizeTrunk();
+            //            //        TopologyVisualizer?.Step(step);
+            //            //        isWaitingForBranchFinalization = true;
+            //            //    }
+            //            //}
+            //            continue;
+            //        }
+            //        //Assert.IsFalse(activeGenerator.State.IsStillGeneratingTrunk);
+            //        //if(activeGenerator.State.GetOpenedForGeneration().Any())
+            //        //    newActiveGenerators.Add(activeGenerator);
+            //        ++index;
+            //    }
 
-                if (State.ActiveGenerators.Count == 0)
-                    State.Status = ManifoldState.ManifoldStatus.Done;
-            } while (State.Status != ManifoldState.ManifoldStatus.Done);
+            //    if (State.ActiveGenerators.Count == 0)
+            //        State.Status = ManifoldState.ManifoldStatus.Done;
+            //} while (State.Status != ManifoldState.ManifoldStatus.Done);
 
             yield return null;
         }

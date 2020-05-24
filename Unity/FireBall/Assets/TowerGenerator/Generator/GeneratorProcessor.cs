@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Assets.Plugins.Alg;
 using GameLib;
+using GameLib.DataStructures;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -17,7 +19,7 @@ namespace TowerGenerator
 
         public class GeneratorsWorkingState
         {
-            
+            public List<TreeNode<Blueprint.Segment>> OpenedSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
         }
 
 

@@ -43,7 +43,7 @@
 //            var opened = prevState?.GetOpenedForGeneration();
 //            if (opened == null)
 //            {
-//                opened = new List<TreeNode<Blueprint.Segment>>((int)Config.SegmentsBudget.To);
+//                opened = new List<TreeNode<Blueprint.Segment>>((int)Config.TrunkSegmentsCount.To);
 //                var island = CreateOriginIsland(Config);
 //                opened.Add(island);
 //                yield return TopGenStep.DoStep(CurrentState.Created.Peek(), TopGenStep.VisualizationCmd.SegSpawn);
@@ -59,7 +59,7 @@
 //            {
 //                if (openedNode.BranchLevel == 0)
 //                {
-//                    var trunkSegCount = _rnd.FromRangeIntInclusive(Config.SegmentsBudget);
+//                    var trunkSegCount = _rnd.FromRangeIntInclusive(Config.TrunkSegmentsCount);
 //                    var trunkSegCountGenerated = 0;
 
 //                    // --- build the trunk
