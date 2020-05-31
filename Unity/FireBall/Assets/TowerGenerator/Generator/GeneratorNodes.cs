@@ -12,13 +12,8 @@ namespace TowerGenerator
         [Serializable]
         public class NodeItem
         {
-            [Tooltip("Prototype or generator config")]
+            [Tooltip("Prototype or generator config (Cfg|PrototypePrefab|PrototypeNestedWithOverrides)")]
             public GameObject GeneratorNode;
-            // todo:
-            // conditional section for prototype only (via custom inspector) DoOverrideDuration : makes from infinite prototypes a limited one
-            // conditional section for prototype only DoPropagateSeeds 
-
-            // todo: feature: get all configs with 'establish' tag thus user can specify prototypes and configs that are fit better with establishing 
         }
 
         [Serializable]
@@ -26,11 +21,9 @@ namespace TowerGenerator
         {
         }
 
-        [Reorderable]
-        public GeneratorNodesList Nodes;
+        [Reorderable] public GeneratorNodesList Nodes;
 
-        [Tooltip("-1 is infinite")]
-        public int NodeCycles;
+        [Tooltip("-1 is infinite")] public int NodeCycles;
         public CyclerType NodesCyclerType;
         protected Chooser<GeneratorNodes.NodeItem> _chooser;
 
@@ -46,7 +39,7 @@ namespace TowerGenerator
 
             foreach (var cfg in configs)
             {
-                Nodes.Add(new NodeItem { GeneratorNode = cfg.gameObject });
+                Nodes.Add(new NodeItem {GeneratorNode = cfg.gameObject});
             }
         }
 

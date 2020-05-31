@@ -13,13 +13,13 @@ namespace TowerGenerator
         private TopologyGeneratorsManifoldBase _manifold;
 
 
-        //protected GeneratorBase(long seed, TreeNode<Blueprint.Segment> genFromNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold)
-        //{
+        public SegmentConstructor(Blueprint blueprint/*long seed, TreeNode<Blueprint.Segment> genFromNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold*/)
+        {
         //    _rnd = new RandomHelper(seed);
         //    State = new GeneratorState(genFromNode);
         //    Config = cfg;
         //    _manifold = manifold;
-        //}
+        }
 
         //public long GetCurrentSeed()
         //{

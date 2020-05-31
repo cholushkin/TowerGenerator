@@ -20,7 +20,7 @@ namespace TowerGenerator
             //    ChunkMaxSize,
             //    ChunkMinSize
             //}
-            public TopologyType TopologyType;
+            public TopologyType TopologyType; // todo: to dictionary key
             //public SizeStrategy ChunkSizeStrategy;
             //public bool IgnoreChunkSizeRestrictions; // todo: use zero ranges instead
             public Range SegmentsSizeBreadth;
@@ -47,7 +47,11 @@ namespace TowerGenerator
         }
 
         public Range TrunkSegmentsCount; 
-        public List<PlacementConfig> PlacementConfigs;
+        public List<PlacementConfig> PlacementConfigs; // todo: to serizalizable dictionary
+
+        [Tooltip("Placement cfg of initial chunk that current config recommend to use (accordingly to other chunks)")]
+        public PlacementConfig EstablishPlacement;
+
         public AllowedDirectionsChances AllowedDirections;
         private readonly float[] _dirChances = new float[6];
 

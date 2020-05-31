@@ -3,60 +3,46 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
+    [RequireComponent(typeof(GeneratorProcessor))]
     public class TowerGenerator : MonoBehaviour
     {
-        public GeneratorProcessor Prototype;
+        public Prototype InitialNodePrototype;
         public bool DoGenerateOnStart;
 
-        protected Blueprint _blueprint;
-        protected GeneratorPointer _pointers;
-        protected SegmentConstructor _constructor;
-
+        public Blueprint Blueprint { get; private set; }
+        public GeneratorPointer Pointers { get; private set; }
+        public SegmentConstructor Constructor { get; private set; }
+        public SegmentArchitect Architect { get; private set; }
+        public GeneratorProcessor Processor;
         // visualizer
 
-        void Awake()
-        {
-            Assert.IsNotNull(Prototype);
-        }
 
         void Start()
         {
-            if (!Prototype)
-                return;
+
             if (DoGenerateOnStart)
                 Generate();
         }
 
         public void Generate()
         {
-            PropagateSeeds();
-            Establish();
-            Prototype.Generate();
+            var proto = InstantiatePrototypes(InitialNodePrototype.gameObject );
+            Blueprint = new Blueprint();
+            Pointers = new GeneratorPointer( Blueprint );
+            Constructor = new SegmentConstructor(Blueprint);
+            Architect = new SegmentArchitect(Constructor);
+            proto.GetComponent<GeneratorProcessor>().Generate(this, null);
         }
 
-        private void PropagateSeeds()
-        {
+        private GameObject InstantiatePrototypes(GameObject prototypePrefab)
+        {                                                                                                   
+            var root = new GameObject("Prototype");
+            root.transform.SetParent(transform);
+            var proto = Instantiate(prototypePrefab, root.transform);
+            proto.name = prototypePrefab.name;
+            return proto;
         }
 
-        // todo:
-        // Gets all configs with 'establish' tag from prototype thus user can specify prototypes and configs that are fit better with establishing 
-        // if there are no such prots or cfgs than just take next one according to _generatorNodes internal chooser
-        public void Establish()
-        {
-            _pointers = new GeneratorPointer(_blueprint /*, MaxDistanceProgressToGenerator, MaxDistanceProgressToGarabageCollector*/);
-            _blueprint = new Blueprint();
-            //_constructor = new SegmentConstructor(_blueprint);
-
-            // todo:
-            // get first config recursively and ask for recommended establishing 
-
-            var protoPointer = Prototype;
-            while (protoPointer.GeneratorNodes.GetNext())
-            {
-                
-            }
-            Prototype.GeneratorNodes.GetNext();
-        }
 
 
         //public virtual TopGenStep EstablishTower()

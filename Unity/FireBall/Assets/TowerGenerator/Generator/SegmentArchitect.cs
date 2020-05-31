@@ -37,10 +37,10 @@ namespace TowerGenerator
         private List<TreeNode<MemorySegment>> _varLeafPointers;
         private Range _segmentsCount;
 
-        public SegmentArchitect(SegmentConstructor constructor, int seed)
+        public SegmentArchitect(SegmentConstructor constructor/*, int seed*/)
         {
             _constructor = constructor;
-            _rnd = new RandomHelper(seed);
+            //_rnd = new RandomHelper(seed);
         }
 
         public void Project(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Alg;
+using Assets.Plugins.Alg;
 using GameLib.Random;
 using NCalc;
 using UnityEngine;
@@ -147,7 +148,7 @@ namespace TowerGenerator
             else
             {
                 Metas = Resources.LoadAll<MetaBase>(TowerGeneratorConstants.Chunks);
-                Debug.Log($"Metas loaded: {Metas.Length}");
+                Debug.Log($"{transform.GetDebugName()}: {Metas.Length} metas loaded.");
             }
         }
 

@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class Prototype : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int SeedTopology;
+    public int SeedVisual;
+    public int SeedContent;
 
-    // Update is called once per frame
-    void Update()
+    void Reset()
     {
-        
+        SeedTopology = -1;
+        SeedVisual = -1;
+        SeedContent = -1;
     }
 }
