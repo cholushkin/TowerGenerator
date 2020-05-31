@@ -46,3 +46,5 @@ MonoBehaviour:
   SeedTopology: -1
   SeedVisual: -1
   SeedContent: -1
+  MetaProviderManager: {fileID: 0}
+  GeneratorNodes: {fileID: 0}

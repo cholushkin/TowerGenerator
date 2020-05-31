@@ -45,9 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c21763a51332b584b891d6d5f7ff290f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SeedTopology: -1
+  SeedTopology: 55
   SeedVisual: -1
   SeedContent: -1
+  MetaProviderManager: {fileID: 8416729504135193196}
+  GeneratorNodes: {fileID: 8416729503292403202}
 --- !u!1 &8416729503292403324
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,6 +102,8 @@ MonoBehaviour:
     - GeneratorNode: {fileID: 7402457836566982167, guid: fe1a1bf5ebb474348a72f94e5003612f,
         type: 3}
     - GeneratorNode: {fileID: 3967152055510908439, guid: dd74a27315d0a4945845b4f96645254b,
+        type: 3}
+    - GeneratorNode: {fileID: 3967152055510908439, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
   NodeCycles: 0
   NodesCyclerType: 0
@@ -384,17 +388,17 @@ PrefabInstance:
     - target: {fileID: 7596373740513469480, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
       propertyPath: SeedTopology
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 7596373740513469480, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
       propertyPath: SeedVisual
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 7596373740513469480, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
       propertyPath: SeedContent
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c270a142ec5537842bc1f3b14c10c8f4, type: 3}

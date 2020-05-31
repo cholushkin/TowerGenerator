@@ -54,5 +54,10 @@ namespace TowerGenerator
             _chooser.Step();
             return cur?.GeneratorNode;
         }
+
+        public int GetNodesCount()
+        {
+            return Nodes.Count;
+        }
     }
 }

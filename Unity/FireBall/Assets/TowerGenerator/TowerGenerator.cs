@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using Assets.Plugins.Alg;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace TowerGenerator
@@ -6,19 +8,22 @@ namespace TowerGenerator
     [RequireComponent(typeof(GeneratorProcessor))]
     public class TowerGenerator : MonoBehaviour
     {
-        public Prototype InitialNodePrototype;
+        public Prototype InitialPrototype;
+        public GeneratorProcessor Processor;
         public bool DoGenerateOnStart;
 
-        public Blueprint Blueprint { get; private set; }
-        public GeneratorPointer Pointers { get; private set; }
-        public SegmentConstructor Constructor { get; private set; }
-        public SegmentArchitect Architect { get; private set; }
-        public GeneratorProcessor Processor;
-        // visualizer
+        [Range(3, 16)]
+        public int PrototypesNestingDepthLevel;
+        public Transform OutcomeRoot;
+
+        private int _stackLevel;
 
 
         void Start()
         {
+            Assert.IsNotNull(InitialPrototype);
+            Assert.IsNotNull(Processor);
+            Assert.IsNotNull(OutcomeRoot);
 
             if (DoGenerateOnStart)
                 Generate();
@@ -26,45 +31,65 @@ namespace TowerGenerator
 
         public void Generate()
         {
-            var proto = InstantiatePrototypes(InitialNodePrototype.gameObject );
-            Blueprint = new Blueprint();
-            Pointers = new GeneratorPointer( Blueprint );
-            Constructor = new SegmentConstructor(Blueprint);
-            Architect = new SegmentArchitect(Constructor);
-            proto.GetComponent<GeneratorProcessor>().Generate(this, null);
+            // create transform for Prototypes
+            var prototypeTransform = new GameObject("Prototype").transform;
+            prototypeTransform.SetParent(transform);
+
+            _stackLevel = 0;
+            InstantiatePrototypes(InitialPrototype.gameObject, prototypeTransform, 0);
+            PropagateSeeds(prototypeTransform);
+
+            Processor.StartGenerate(InitialPrototype, OutcomeRoot);
         }
 
-        private GameObject InstantiatePrototypes(GameObject prototypePrefab)
-        {                                                                                                   
-            var root = new GameObject("Prototype");
-            root.transform.SetParent(transform);
-            var proto = Instantiate(prototypePrefab, root.transform);
-            proto.name = prototypePrefab.name;
-            return proto;
+        private void PropagateSeeds( Transform prototypes )
+        {
+            int seedTopologyRnd = Random.Range(0, int.MaxValue);
+            int seedContentRnd = Random.Range(0, int.MaxValue);
+            int seedVisaulRnd = Random.Range(0, int.MaxValue);
+
+
+            var protoBehs = prototypes.GetComponentsInChildren<Prototype>();
+            foreach (var prototype in protoBehs)
+            {
+                if (prototype.SeedTopology == -1)
+                    prototype.SeedTopology = seedTopologyRnd;
+                if (prototype.SeedContent == -1)
+                    prototype.SeedContent = seedContentRnd;
+                if (prototype.SeedVisual == -1)
+                    prototype.SeedVisual = seedVisaulRnd;
+            }
         }
 
+        private Transform InstantiatePrototypes(GameObject prototypeOrConfigPrefab, Transform root, int level)
+        {
+            if (level >= PrototypesNestingDepthLevel)
+            {
+                Debug.LogError($"Reached nesting level {level}");
+                return null;
+            }
+            var gObj = Instantiate(prototypeOrConfigPrefab, root.transform);
+            gObj.name = prototypeOrConfigPrefab.name;
 
+            var prototype = gObj.GetComponent<Prototype>();
+            if (prototype == null)
+                return gObj.transform;
 
-        //public virtual TopGenStep EstablishTower()
-        //{
-        //    SegmentBuilder segmentBuilder = new segmen(this, _rnd.ValueInt());
+            // instantiate prefabs (non-overriden cfgs or protos)
+            var nodesCount = prototype.GeneratorNodes.GetNodesCount();
+            var created = prototype.GeneratorNodes.transform.Children().ToArray();
 
-        //    segmentBuilder.Project(
-        //        (TreeNode<SegmentBuilder.MemorySegment>)null,
-        //        Range.One,
-        //        Vector3.up,
-        //        Vector3.zero,
-        //        Config.GetPlacementConfig(TopologyType.ChunkIsland),
-        //        null,
-        //        null
-        //    );
-
-        //    Assert.IsTrue(segmentBuilder.GetProjectVariantsNumber() == 1);
-        //    segmentBuilder.ApplyProject(0);
-
-        //    var segment = segmentBuilder.Build().First();
-        //    Assert.IsNotNull(segment);
-        //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
-        //}
+            for (int i = 0; i < nodesCount; ++i)
+            {
+                var node = prototype.GeneratorNodes.Nodes[i].GeneratorNode;
+                if (created.All(x => x != node.transform))
+                {
+                    var createdFromPrefab = InstantiatePrototypes(node, prototype.GeneratorNodes.transform, level + 1);
+                    if (createdFromPrefab)
+                        prototype.GeneratorNodes.Nodes[i].GeneratorNode = createdFromPrefab.gameObject;
+                }
+            }
+            return gObj.transform;
+        }
     }
 }

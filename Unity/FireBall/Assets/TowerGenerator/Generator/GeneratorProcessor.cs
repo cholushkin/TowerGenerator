@@ -10,114 +10,122 @@ namespace TowerGenerator
 {
     public class GeneratorProcessor : MonoBehaviour
     {
-        public enum State
+        public enum ProcessorState
         {
             Initialization,
             Generating,
             Done
         }
 
-        public class GeneratorsWorkingState
+        public class State
         {
+            public Prototype Prototype;
+            public Blueprint Blueprint;
             public List<TreeNode<Blueprint.Segment>> OpenedSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
+
+            public RandomHelper RndTopology;
+            public RandomHelper RndVisual;
+            public RandomHelper RndContent;
+
+            public SegmentArchitect Architect;
+            public SegmentConstructor Constructor;
+            public MetaProviderManager MetaProviderManager;
+            public GeneratorNodes GeneratorNodes;
+            public GeneratorPointer Pointers;
+
+            public Transform Root;
         }
 
+        public int SeedTopology;
+        public int SeedVisual;
+        public int SeedContent;
 
-        protected int SeedTopology;
-        protected int SeedVisual;
-        protected int SeedContent;
-        public GeneratorNodes GeneratorNodes { get; protected set; }
+        protected StateMachine<ProcessorState> _stateMachine;
 
-        private GeneratorsWorkingState _workingState;
-        private TowerGenerator _towerGenerator;
 
-        protected MetaProviderManager _metaProviderManager;
-        
-        protected StateMachine<State> _stateMachine;
-        
-        
-
-        void Awake()
+        public void StartGenerate(Prototype prototype, Transform root)
         {
-            Init();
+            Debug.LogFormat($">>> StartGenerate");
+
+            _stateMachine = new StateMachine<ProcessorState>(this);
+            _stateMachine.GoTo(ProcessorState.Initialization, true);
+
+            var state = Init(prototype, root);
+
+            Generate(state);
         }
 
-   
-
-        public void Generate(TowerGenerator towerGenerator, GeneratorsWorkingState workingState)
+        public void Generate(State state)
         {
-            Debug.LogFormat($">>> Generate: seeds: {SeedTopology} {SeedVisual} {SeedContent}");
-            _workingState = workingState;
-            _towerGenerator = towerGenerator;
-            StartCoroutine(GenerateStep());
+            _stateMachine.GoTo(ProcessorState.Generating, true);
+            StartCoroutine(GenerateRoutine(state));
         }
 
-        void Init()
+        State Init(Prototype prototype, Transform root)
         {
-            _stateMachine = new StateMachine<State>(this);
-            _stateMachine.GoTo(State.Initialization, true);
-            ProcessSeeds();
-            _metaProviderManager = GetComponentInChildren<MetaProviderManager>();
-            GeneratorNodes = GetComponentInChildren<GeneratorNodes>();
-            GeneratorNodes.Init(SeedTopology);
-        }
+            var blueprint = new Blueprint();
+            var constructor = new SegmentConstructor(blueprint);
+            var architect = new SegmentArchitect(constructor);
 
-        void ProcessSeeds()
-        {
-            if (SeedTopology == -1)
+            var state = new State
             {
-                SeedTopology = Random.Range(0, int.MaxValue);
-                Debug.Log($"Using random SeedTopology: {SeedTopology}");
-            }
+                Prototype = prototype,
+                Blueprint = blueprint,
+                OpenedSegments = new List<TreeNode<Blueprint.Segment>>(16),
+                Architect = architect,
+                Constructor = constructor,
+                MetaProviderManager = prototype.MetaProviderManager,
+                GeneratorNodes = prototype.GeneratorNodes,
+                Pointers = new GeneratorPointer(blueprint),
+                RndTopology = new RandomHelper(SeedTopology),
+                RndVisual = new RandomHelper(SeedVisual),
+                RndContent = new RandomHelper(SeedContent),
+                Root = root
+            };
 
-            if (SeedVisual == -1)
-            {
-                SeedVisual = Random.Range(0, int.MaxValue);
-                Debug.Log($"Using random SeedVisual: {SeedVisual}");
-            }
-
-            if (SeedContent == -1)
-            {
-                SeedContent = Random.Range(0, int.MaxValue);
-                Debug.Log($"Using random SeedContent: {SeedContent}");
-            }
+            return state;
         }
 
-        protected IEnumerator GenerateStep()
+        int ProcessSeed(int seed)
         {
-            _stateMachine.GoTo(State.Generating, true);
+            return (seed == -1) ? Random.Range(0, int.MaxValue) : seed;
+        }
 
-            
-            
+        protected IEnumerator GenerateRoutine(State state)
+        {
+            Assert.IsNotNull(state);
+
+
+
 
             // get first generator and establish a tower
-            if(_workingState == null)
+            if (state.Blueprint.Tree == null)
             {
-                var container = GeneratorNodes.GetNext();
-                Assert.IsNull(container, "first generator node is null");
-                var cfg = container.GetComponent<GeneratorConfigBase>();
-                if (cfg != null)
-                {
-                    Establish(cfg);
-                    //var cfg = _chooserMain.GetCurrent();
-                //    var firstGenerator = cfg.CreateGenerator(seed, null, this);
-                //    State.ActiveGenerators.Add(firstGenerator);
-                //    var firstStep = firstGenerator.EstablishTower();
-                //    Assert.IsNull(_bp.Tree);
-                //    Assert.IsTrue(firstStep.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn);
-                //    _bp.Tree = firstStep.Segment;
+                //var container = GeneratorNodes.GetNext();
+                //Assert.IsNull(container, "first generator node is null");
+                //var cfg = container.GetComponent<GeneratorConfigBase>();
+                //if (cfg != null)
+                //{
+                //    Establish(cfg);
+                //    //var cfg = _chooserMain.GetCurrent();
+                //    //    var firstGenerator = cfg.CreateGenerator(seed, null, this);
+                //    //    State.ActiveGenerators.Add(firstGenerator);
+                //    //    var firstStep = firstGenerator.EstablishTower();
+                //    //    Assert.IsNull(_bp.Tree);
+                //    //    Assert.IsTrue(firstStep.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn);
+                //    //    _bp.Tree = firstStep.Segment;
 
-                }
-                else  // establish from prototype
-                {
-                    var generatorProcessor = container.GetComponent<GeneratorProcessor>();
-                    Assert.IsNotNull(generatorProcessor);
-                    generatorProcessor.Generate(_towerGenerator, _workingState);
-                }
+                //}
+                //else  // establish from prototype
+                //{
+                //    var generatorProcessor = container.GetComponent<GeneratorProcessor>();
+                //    Assert.IsNotNull(generatorProcessor);
+                //    generatorProcessor.Generate(_towerGenerator, _workingState);
+                //}
 
-                
 
-                
+
+
             }
 
             // after first step initialization
@@ -190,15 +198,15 @@ namespace TowerGenerator
 
         public void Establish(GeneratorConfigBase establishConfig)
         {
-            _towerGenerator.Architect.Project(
-                (TreeNode<SegmentArchitect.MemorySegment>)null,
-                Range.One,
-                Vector3.up,
-                Vector3.zero,
-                establishConfig.EstablishPlacement,
-                null,
-                null
-            );
+            //_towerGenerator.Architect.Project(
+            //    (TreeNode<SegmentArchitect.MemorySegment>)null,
+            //    Range.One,
+            //    Vector3.up,
+            //    Vector3.zero,
+            //    establishConfig.EstablishPlacement,
+            //    null,
+            //    null
+            //);
 
             //    SegmentBuilder segmentBuilder = new segmen(this, _rnd.ValueInt());
 
@@ -218,7 +226,30 @@ namespace TowerGenerator
             //    var segment = segmentBuilder.Build().First();
             //    Assert.IsNotNull(segment);
             //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
-
         }
+
+
+
+        //public virtual TopGenStep EstablishTower()
+        //{
+        //    SegmentBuilder segmentBuilder = new segmen(this, _rnd.ValueInt());
+
+        //    segmentBuilder.Project(
+        //        (TreeNode<SegmentBuilder.MemorySegment>)null,
+        //        Range.One,
+        //        Vector3.up,
+        //        Vector3.zero,
+        //        Config.GetPlacementConfig(TopologyType.ChunkIsland),
+        //        null,
+        //        null
+        //    );
+
+        //    Assert.IsTrue(segmentBuilder.GetProjectVariantsNumber() == 1);
+        //    segmentBuilder.ApplyProject(0);
+
+        //    var segment = segmentBuilder.Build().First();
+        //    Assert.IsNotNull(segment);
+        //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
+        //}
     }
 }
