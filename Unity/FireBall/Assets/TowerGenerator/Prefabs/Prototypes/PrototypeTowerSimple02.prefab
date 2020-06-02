@@ -294,5 +294,5 @@ MonoBehaviour:
   Nodes:
     array:
     - GeneratorNode: {fileID: 3967152056789283001}
-  NodeCycles: 0
-  NodesCyclerType: 0
+  NodeCycles: 1
+  NodesCyclerType: 1

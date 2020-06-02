@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Assets.Plugins.Alg;
+using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -8,56 +9,58 @@ namespace TowerGenerator
     [RequireComponent(typeof(GeneratorProcessor))]
     public class TowerGenerator : MonoBehaviour
     {
-        public Prototype InitialPrototype;
+        public Prototype InitialPrototypePrefab;
         public GeneratorProcessor Processor;
         public bool DoGenerateOnStart;
 
         [Range(3, 16)]
         public int PrototypesNestingDepthLevel;
         public Transform OutcomeRoot;
+        public long ControlSeed;
+        private Prototype _initialPrototype;
 
-        private int _stackLevel;
-
+        void Awake()
+        {
+            Init();
+        }   
 
         void Start()
         {
-            Assert.IsNotNull(InitialPrototype);
-            Assert.IsNotNull(Processor);
-            Assert.IsNotNull(OutcomeRoot);
-
             if (DoGenerateOnStart)
                 Generate();
         }
 
-        public void Generate()
+        void Init()
         {
+            Assert.IsNotNull(InitialPrototypePrefab);
+            Assert.IsNotNull(Processor);
+            Assert.IsNotNull(OutcomeRoot);
+
             // create transform for Prototypes
             var prototypeTransform = new GameObject("Prototype").transform;
             prototypeTransform.SetParent(transform);
 
-            _stackLevel = 0;
-            InstantiatePrototypes(InitialPrototype.gameObject, prototypeTransform, 0);
-            PropagateSeeds(prototypeTransform);
-
-            Processor.StartGenerate(InitialPrototype, OutcomeRoot);
+            var proto = InstantiatePrototypes(InitialPrototypePrefab.gameObject, prototypeTransform, 0);
+            _initialPrototype = proto.GetComponent<Prototype>();
+            InitPrototypes(prototypeTransform);
         }
 
-        private void PropagateSeeds( Transform prototypes )
+        public void Generate()
         {
-            int seedTopologyRnd = Random.Range(0, int.MaxValue);
-            int seedContentRnd = Random.Range(0, int.MaxValue);
-            int seedVisaulRnd = Random.Range(0, int.MaxValue);
+            Processor.StartGenerate(_initialPrototype, OutcomeRoot);
+        }
 
+        private void InitPrototypes( Transform prototypes )
+        {
+            RandomHelper rnd = new RandomHelper(ControlSeed);
+            if (ControlSeed == -1)
+                ControlSeed = rnd.GetCurrentSeed();
 
             var protoBehs = prototypes.GetComponentsInChildren<Prototype>();
             foreach (var prototype in protoBehs)
             {
-                if (prototype.SeedTopology == -1)
-                    prototype.SeedTopology = seedTopologyRnd;
-                if (prototype.SeedContent == -1)
-                    prototype.SeedContent = seedContentRnd;
-                if (prototype.SeedVisual == -1)
-                    prototype.SeedVisual = seedVisaulRnd;
+                prototype.Init(rnd.GetCurrentSeed());
+                rnd.Next();
             }
         }
 
@@ -77,12 +80,11 @@ namespace TowerGenerator
 
             // instantiate prefabs (non-overriden cfgs or protos)
             var nodesCount = prototype.GeneratorNodes.GetNodesCount();
-            var created = prototype.GeneratorNodes.transform.Children().ToArray();
 
             for (int i = 0; i < nodesCount; ++i)
             {
                 var node = prototype.GeneratorNodes.Nodes[i].GeneratorNode;
-                if (created.All(x => x != node.transform))
+                if (node.transform.parent != prototype.GeneratorNodes.transform)
                 {
                     var createdFromPrefab = InstantiatePrototypes(node, prototype.GeneratorNodes.transform, level + 1);
                     if (createdFromPrefab)

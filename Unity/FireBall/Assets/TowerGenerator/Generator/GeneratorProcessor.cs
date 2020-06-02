@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Plugins.Alg;
 using GameLib;
 using GameLib.DataStructures;
 using GameLib.Random;
@@ -19,28 +20,24 @@ namespace TowerGenerator
 
         public class State
         {
-            public Prototype Prototype;
+            public ExecutionFrame Frame;
             public Blueprint Blueprint;
             public List<TreeNode<Blueprint.Segment>> OpenedSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
 
-            public RandomHelper RndTopology;
-            public RandomHelper RndVisual;
-            public RandomHelper RndContent;
-
             public SegmentArchitect Architect;
             public SegmentConstructor Constructor;
-            public MetaProviderManager MetaProviderManager;
-            public GeneratorNodes GeneratorNodes;
             public GeneratorPointer Pointers;
 
             public Transform Root;
         }
 
-        public int SeedTopology;
-        public int SeedVisual;
-        public int SeedContent;
+        public class ExecutionFrame
+        {
+            public Prototype Prototype;
+        }
 
         protected StateMachine<ProcessorState> _stateMachine;
+        private Stack<ExecutionFrame> _callStack;
 
 
         public void StartGenerate(Prototype prototype, Transform root)
@@ -66,22 +63,20 @@ namespace TowerGenerator
             var blueprint = new Blueprint();
             var constructor = new SegmentConstructor(blueprint);
             var architect = new SegmentArchitect(constructor);
-
+            _callStack = new Stack<ExecutionFrame>();
+            
             var state = new State
             {
-                Prototype = prototype,
+                Frame = new ExecutionFrame{Prototype = prototype},
                 Blueprint = blueprint,
                 OpenedSegments = new List<TreeNode<Blueprint.Segment>>(16),
                 Architect = architect,
                 Constructor = constructor,
-                MetaProviderManager = prototype.MetaProviderManager,
-                GeneratorNodes = prototype.GeneratorNodes,
                 Pointers = new GeneratorPointer(blueprint),
-                RndTopology = new RandomHelper(SeedTopology),
-                RndVisual = new RandomHelper(SeedVisual),
-                RndContent = new RandomHelper(SeedContent),
                 Root = root
             };
+
+            _callStack.Push(state.Frame);
 
             return state;
         }
@@ -95,18 +90,16 @@ namespace TowerGenerator
         {
             Assert.IsNotNull(state);
 
-
+            GeneratorConfigBase currentConfig = null;
 
 
             // get first generator and establish a tower
             if (state.Blueprint.Tree == null)
             {
-                //var container = GeneratorNodes.GetNext();
-                //Assert.IsNull(container, "first generator node is null");
-                //var cfg = container.GetComponent<GeneratorConfigBase>();
-                //if (cfg != null)
-                //{
-                //    Establish(cfg);
+                currentConfig = GetNextConfig(state);
+                Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
+                Assert.IsNotNull(currentConfig, "first config is null (establish fail)");
+                Establish(state, currentConfig);
                 //    //var cfg = _chooserMain.GetCurrent();
                 //    //    var firstGenerator = cfg.CreateGenerator(seed, null, this);
                 //    //    State.ActiveGenerators.Add(firstGenerator);
@@ -122,10 +115,11 @@ namespace TowerGenerator
                 //    Assert.IsNotNull(generatorProcessor);
                 //    generatorProcessor.Generate(_towerGenerator, _workingState);
                 //}
+            }
 
-
-
-
+            while ( (currentConfig = GetNextConfig(state)) != null)
+            {
+                Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
             }
 
             // after first step initialization
@@ -196,7 +190,7 @@ namespace TowerGenerator
             yield return null;
         }
 
-        public void Establish(GeneratorConfigBase establishConfig)
+        public void Establish(State state, GeneratorConfigBase establishConfig)
         {
             //_towerGenerator.Architect.Project(
             //    (TreeNode<SegmentArchitect.MemorySegment>)null,
@@ -251,5 +245,49 @@ namespace TowerGenerator
         //    Assert.IsNotNull(segment);
         //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
         //}
+
+
+        GeneratorConfigBase GetNextConfig(State state)
+        {
+            ExecutionFrame StepOut()
+            {
+                Assert.IsTrue(_callStack.Count > 0);
+                _callStack.Pop();
+                if (_callStack.Count == 0)
+                    return null;
+                return _callStack.Peek();
+            }
+
+            ExecutionFrame StepIn(Prototype prototype)
+            {
+                Assert.IsNotNull(prototype);
+                var newFrame = new ExecutionFrame { Prototype = prototype };
+                _callStack.Push(newFrame);
+                newFrame.Prototype.GeneratorNodes.OnProcessorEnter();
+                return newFrame;
+            }
+
+            var container = state.Frame.Prototype.GeneratorNodes.GetNext();
+            if (container == null) // out of genNodes on this prototype
+            {
+                state.Frame = StepOut();
+                // switch prototype (return on a level back)
+                if (state.Frame == null)
+                    return null; // no configs anymore - need to finalize construction
+                return GetNextConfig(state);
+            }
+
+            var cfg = container.GetComponent<GeneratorConfigBase>();
+            if (cfg)
+            {
+                cfg.OnProcessorEnter();
+                return cfg;
+            }
+
+            state.Frame = StepIn(container.GetComponent<Prototype>());
+            return GetNextConfig(state);
+        }
+
+       
     }
 }

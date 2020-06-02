@@ -53,6 +53,17 @@ namespace TowerGenerator
         public PlacementConfig EstablishPlacement;
 
         public AllowedDirectionsChances AllowedDirections;
+
+        public long SeedTopology;
+        public long SeedVisual;
+        public long SeedContent;
+
+        public bool ResetOnProcessorEnter;
+
+        private long _initialSeedTopology;
+        private long _initialSeedVisual;
+        private long _initialSeedContent;
+
         private readonly float[] _dirChances = new float[6];
 
         private static readonly Vector3[] _directions =
@@ -61,6 +72,39 @@ namespace TowerGenerator
             Vector3.down, Vector3.forward, Vector3.back,
         };
 
+
+        // replace all -1 in configs and save initial values
+        public void Init(long seed)
+        {   
+            var rnd = new RandomHelper(seed);
+            if (SeedContent == -1)
+                SeedContent = rnd.ValueInt();
+
+            if (SeedTopology == -1)
+                SeedTopology = rnd.ValueInt();
+
+            if (SeedVisual == -1)
+                SeedVisual = rnd.ValueInt();
+
+            _initialSeedTopology = SeedContent;
+            _initialSeedVisual = SeedVisual;
+            _initialSeedContent = SeedContent;
+        }
+
+        public void OnProcessorEnter()
+        {
+            if (ResetOnProcessorEnter)
+            {
+                ResetSeeds();
+            }
+        }
+
+        public void ResetSeeds()
+        {
+            SeedContent = _initialSeedContent;
+            SeedVisual = _initialSeedVisual;
+            SeedTopology = _initialSeedTopology;
+        }
 
         public PlacementConfig GetPlacementConfig(TopologyType topType)
         {

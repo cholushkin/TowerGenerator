@@ -105,8 +105,8 @@ MonoBehaviour:
         type: 3}
     - GeneratorNode: {fileID: 3967152055510908439, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
-  NodeCycles: 0
-  NodesCyclerType: 0
+  NodeCycles: 1
+  NodesCyclerType: 1
 --- !u!1 &8416729503416230355
 GameObject:
   m_ObjectHideFlags: 0

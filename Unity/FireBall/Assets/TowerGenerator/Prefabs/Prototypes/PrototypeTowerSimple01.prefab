@@ -296,5 +296,5 @@ MonoBehaviour:
     - GeneratorNode: {fileID: 3967152056789283001}
     - GeneratorNode: {fileID: 3967152055510908439, guid: dd74a27315d0a4945845b4f96645254b,
         type: 3}
-  NodeCycles: 0
-  NodesCyclerType: 0
+  NodeCycles: 1
+  NodesCyclerType: 1
