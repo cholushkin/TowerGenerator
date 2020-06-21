@@ -9,7 +9,7 @@ namespace TowerGenerator
         Undefined = 0,
         ChunkPeak = 1,
         ChunkStd = 2,
-        ChunkIsland = 4,
+        ChunkFoundation = 4, // islands, legs, basements, etc.
         ChunkSideEar = 8,
         ChunkBottomEar = 16,
         ChunkTopEar = 32,

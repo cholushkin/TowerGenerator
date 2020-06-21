@@ -1,11 +1,11 @@
 ﻿
 namespace TowerGenerator
 {
-    public class ChunkTowerFlyingIslandSegment : ChunkTowerBase
+    public class ChunkTowerFoundationSegment : ChunkTowerBase
     {
         public override TopologyType GetTopologyType()
         {
-            return TopologyType.ChunkIsland;
+            return TopologyType.ChunkFoundation;
         }
 
         public override bool IsValid()

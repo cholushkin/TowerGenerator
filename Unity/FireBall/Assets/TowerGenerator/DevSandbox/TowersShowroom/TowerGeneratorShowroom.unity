@@ -278,9 +278,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f17d98801703f564f877ba1e8d856b3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LogChecker:
-    CheckerLevel: 0
-    Subsystem: 
   Metas: []
 --- !u!4 &108823333
 Transform:
@@ -552,6 +549,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!114 &267285428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -571,18 +570,6 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
   AllowedDirections:
     Left: 0
     Right: 0
@@ -652,6 +639,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!114 &331861538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -671,18 +660,6 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
   AllowedDirections:
     Left: 0
     Right: 0
@@ -798,7 +775,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339294032}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15.065034, y: -10.054878, z: 0.018546343}
+  m_LocalPosition: {x: -12.41, y: 5.21, z: 0.018546343}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 595978024}
@@ -914,6 +891,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!114 &395161420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -933,18 +912,6 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
   AllowedDirections:
     Left: 0
     Right: 0
@@ -967,6 +934,36 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PropagateIslandChance: 0.382
+--- !u!1 &410647005
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 410647006}
+  m_Layer: 0
+  m_Name: Zero
+  m_TagString: Untagged
+  m_Icon: {fileID: -5938655980376293919, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &410647006
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410647005}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &416145269
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,6 +1075,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!114 &557628464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1097,18 +1096,6 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
   AllowedDirections:
     Left: 0
     Right: 0
@@ -2049,6 +2036,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!114 &1624981327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2068,18 +2057,6 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
   AllowedDirections:
     Left: 0
     Right: 0
@@ -2149,6 +2126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!114 &1728335076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2168,18 +2147,6 @@ MonoBehaviour:
     FromType: 0
     ToType: 0
   PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
   AllowedDirections:
     Left: 0
     Right: 0

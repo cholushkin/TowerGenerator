@@ -45,9 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c21763a51332b584b891d6d5f7ff290f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SeedTopology: 55
-  SeedVisual: -1
-  SeedContent: -1
   MetaProviderManager: {fileID: 8416729504135193196}
   GeneratorNodes: {fileID: 8416729503292403202}
 --- !u!1 &8416729503292403324
@@ -191,6 +188,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8416729504286589813}
+  - component: {fileID: 2061093890669532874}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -212,6 +210,19 @@ Transform:
   m_Father: {fileID: 8416729504135193199}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2061093890669532874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8416729504286589812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f17d98801703f564f877ba1e8d856b3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metas: []
 --- !u!1001 &1329945958123232875
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -369,6 +380,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PrototypeTowerSimple01
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.data[0].SpecificMetaProviders.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.data[0].TopologyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.data[0].MetaFilter.TopologyType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.data[1].MetaFilter.TopologyType
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3967152057261358154, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}

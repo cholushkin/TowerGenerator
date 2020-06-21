@@ -27,8 +27,9 @@ namespace TowerGenerator
 
         public void Init( long seed )
         {
+            MetaProviderManager.Init();
             // set seed to GeneratorNodes and to configs
-            GeneratorNodes.Init( seed );
+            GeneratorNodes.Init( seed, this );
         }
     }
 }

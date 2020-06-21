@@ -1,18 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class MetaProviderManager : MonoBehaviour
+namespace TowerGenerator
 {
-    // Start is called before the first frame update
-    void Start()
+    public class MetaProviderManager : MonoBehaviour
     {
-        
-    }
+        public MetaProvider[] MetaProviders { get; private set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void Init()
+        {
+            MetaProviders = GetComponentsInChildren<MetaProvider>();
+            foreach (var metaProvider in MetaProviders)
+            {
+                metaProvider.Init();
+            }
+        }
     }
 }

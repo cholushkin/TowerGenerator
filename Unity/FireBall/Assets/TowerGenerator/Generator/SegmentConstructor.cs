@@ -7,10 +7,16 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public class SegmentConstructor
+    public class SegmentConstructor : MonoBehaviour
     {
-        public GeneratorConfigBase Config { get; private set; }
-        private TopologyGeneratorsManifoldBase _manifold;
+        // todo: optional visualizer
+
+
+        //private Blueprint Blueprint;
+
+
+        //public GeneratorConfigBase Config { get; private set; }
+        //private TopologyGeneratorsManifoldBase _manifold;
 
 
         public SegmentConstructor(Blueprint blueprint/*long seed, TreeNode<Blueprint.Segment> genFromNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold*/)
@@ -26,7 +32,26 @@ namespace TowerGenerator
         //    return _rnd.GetCurrentSeed();
         //}
 
-      
+        public void Construct(TreeNode<SegmentArchitect.MemorySegment> project)
+        {
+
+        }
+
+        //public IEnumerable<TreeNode<Blueprint.Segment>> Build()
+        //{
+        //    Assert.IsTrue(_varLeafPointers == null || _varLeafPointers.Count == 0);
+
+        //    foreach (var node in _blueprintTree.TraverseDepthFirstPostOrder())
+        //    {
+        //        var parent = node.Parent;
+        //        var created = _constructor.CreateSegment(
+        //            parent.Data.CreatedNode,
+        //            node.Data.ChunkGeometry
+        //        );
+        //        node.Data.CreatedNode = created;
+        //        yield return created;
+        //    }
+        //}
 
 
         //public abstract IEnumerable<TopGenStep> GenerateTower();
@@ -154,7 +179,7 @@ namespace TowerGenerator
         }
 
 
-        public Bounds CreateBoundsForChild(Bounds parentBounds, Vector3 side, Vector3 childSize, Vector3 offset)
+        public static Bounds CreateBoundsForChild(Bounds parentBounds, Vector3 side, Vector3 childSize, Vector3 offset)
         {
             var newBounds = new Bounds(parentBounds.center, childSize);
             newBounds.center += new Vector3(
@@ -166,55 +191,10 @@ namespace TowerGenerator
             return newBounds;
         }
 
-        public bool CheckCollisions(Bounds checkBounds, IEnumerable<Bounds> collisionBoundsEx = null )
-        {
-            foreach (var node in _manifold.Pointers.PointerGarbageCollector.TraverseDepthFirstPreOrder())
-            {
-                var nodeBounds = node.Data.Topology.Geometry.Bounds;
-                if (nodeBounds.IntersectsEx(checkBounds))
-                    return true;
-            }
-
-            if (collisionBoundsEx != null)
-                foreach (var node in collisionBoundsEx)
-                    if (node.IntersectsEx(checkBounds))
-                        return true;
-            return false;
-        }
+        
     }
 
 
 
-    public static class BoundExtension
-    {
-        public static bool IntersectsEx(this Bounds b, Bounds bounds)
-        {
-            var hasCollision =
-                (double)b.min.x < (double)bounds.max.x &&
-                (double)b.max.x > (double)bounds.min.x &&
-                (double)b.min.y < (double)bounds.max.y &&
-                (double)b.max.y > (double)bounds.min.y &&
-                (double)b.min.z < (double)bounds.max.z &&
-                (double)b.max.z > (double)bounds.min.z;
-            if (hasCollision)
-            {
-                var delta = (b.center - bounds.center);
-                var ix = Mathf.Abs(delta.x) - (b.size.x + bounds.size.x) * 0.5f;
-                var iy = Mathf.Abs(delta.y) - (b.size.y + bounds.size.y) * 0.5f;
-                var iz = Mathf.Abs(delta.z) - (b.size.z + bounds.size.z) * 0.5f;
-
-                if (ix >= 0f) // has no intrusion by x component
-                    ix = 0f;
-                if (iy >= 0f)
-                    iy = 0f;
-                if (iz >= 0f)
-                    iz = 0f;
-
-                double TOLERANCE = 0.0001f;
-                if (Math.Abs(ix) > TOLERANCE && Math.Abs(iy) > TOLERANCE && Math.Abs(iz) > TOLERANCE)
-                    return true;
-            }
-            return false;
-        }
-    }
+    
 }

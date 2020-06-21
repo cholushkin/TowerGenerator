@@ -24,7 +24,7 @@ namespace TowerGenerator
             public Blueprint Blueprint;
             public List<TreeNode<Blueprint.Segment>> OpenedSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
 
-            public SegmentArchitect Architect;
+            // public SegmentArchitect Architect; moved to generator
             public SegmentConstructor Constructor;
             public GeneratorPointer Pointers;
 
@@ -61,8 +61,7 @@ namespace TowerGenerator
         State Init(Prototype prototype, Transform root)
         {
             var blueprint = new Blueprint();
-            var constructor = new SegmentConstructor(blueprint);
-            var architect = new SegmentArchitect(constructor);
+            var constructor = GetComponent<SegmentConstructor>();
             _callStack = new Stack<ExecutionFrame>();
             
             var state = new State
@@ -70,7 +69,6 @@ namespace TowerGenerator
                 Frame = new ExecutionFrame{Prototype = prototype},
                 Blueprint = blueprint,
                 OpenedSegments = new List<TreeNode<Blueprint.Segment>>(16),
-                Architect = architect,
                 Constructor = constructor,
                 Pointers = new GeneratorPointer(blueprint),
                 Root = root
@@ -79,11 +77,6 @@ namespace TowerGenerator
             _callStack.Push(state.Frame);
 
             return state;
-        }
-
-        int ProcessSeed(int seed)
-        {
-            return (seed == -1) ? Random.Range(0, int.MaxValue) : seed;
         }
 
         protected IEnumerator GenerateRoutine(State state)
@@ -190,62 +183,41 @@ namespace TowerGenerator
             yield return null;
         }
 
-        public void Establish(State state, GeneratorConfigBase establishConfig)
+        public void Establish(State state, GeneratorConfigBase config)
         {
-            //_towerGenerator.Architect.Project(
-            //    (TreeNode<SegmentArchitect.MemorySegment>)null,
-            //    Range.One,
-            //    Vector3.up,
-            //    Vector3.zero,
-            //    establishConfig.EstablishPlacement,
-            //    null,
-            //    null
-            //);
+            var architect = new SegmentArchitect(config.SeedTopology, null);
 
-            //    SegmentBuilder segmentBuilder = new segmen(this, _rnd.ValueInt());
+            // override default placement config picker
+            {
+                // try to get specific foundation first for this config
+                var foundationPlacementCfg = config.GetPlacementConfig(TopologyType.ChunkFoundation, SpecificsStringConstants.Establishment);
 
-            //    segmentBuilder.Project(
-            //        (TreeNode<SegmentBuilder.MemorySegment>)null,
-            //        Range.One,
-            //        Vector3.up,
-            //        Vector3.zero,
-            //        Config.GetPlacementConfig(TopologyType.ChunkIsland),
-            //        null,
-            //        null
-            //    );
+                // then get just regular foundation
+                if (foundationPlacementCfg == null)
+                {
+                    foundationPlacementCfg = config.GetPlacementConfig(TopologyType.ChunkFoundation);
+                    Assert.IsNotNull(foundationPlacementCfg);
+                }
 
-            //    Assert.IsTrue(segmentBuilder.GetProjectVariantsNumber() == 1);
-            //    segmentBuilder.ApplyProject(0);
+                architect.PlacementConfigProvider = (segRelativePos, segIndex) => foundationPlacementCfg;
+            }
 
-            //    var segment = segmentBuilder.Build().First();
-            //    Assert.IsNotNull(segment);
-            //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
+            architect.Project(
+                config,
+                null,
+                Range.One,
+                Vector3.up,
+                Vector3.zero,
+                TopologyType.ChunkFoundation,
+                TopologyType.Undefined,
+                TopologyType.Undefined
+            );
+
+            Assert.IsTrue(architect.GetProjectVariantsNumber() == 1);
+
+            state.Pointers.SetInitialPointers();
+            state.Constructor.Construct(architect.GetProject(0));
         }
-
-
-
-        //public virtual TopGenStep EstablishTower()
-        //{
-        //    SegmentBuilder segmentBuilder = new segmen(this, _rnd.ValueInt());
-
-        //    segmentBuilder.Project(
-        //        (TreeNode<SegmentBuilder.MemorySegment>)null,
-        //        Range.One,
-        //        Vector3.up,
-        //        Vector3.zero,
-        //        Config.GetPlacementConfig(TopologyType.ChunkIsland),
-        //        null,
-        //        null
-        //    );
-
-        //    Assert.IsTrue(segmentBuilder.GetProjectVariantsNumber() == 1);
-        //    segmentBuilder.ApplyProject(0);
-
-        //    var segment = segmentBuilder.Build().First();
-        //    Assert.IsNotNull(segment);
-        //    return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
-        //}
-
 
         GeneratorConfigBase GetNextConfig(State state)
         {
@@ -287,7 +259,5 @@ namespace TowerGenerator
             state.Frame = StepIn(container.GetComponent<Prototype>());
             return GetNextConfig(state);
         }
-
-       
     }
 }

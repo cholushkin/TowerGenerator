@@ -1,12 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using GameLib.DataStructures;
+using Assets.Plugins.Alg;
 using GameLib.Random;
+using NCalc;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
+    public static class SpecificsStringConstants
+    {
+        public const string Establishment = "Establishment";
+    }
+
     public abstract class GeneratorConfigBase : MonoBehaviour
     {
         public abstract GeneratorBase CreateGenerator(long seed);
@@ -14,25 +23,11 @@ namespace TowerGenerator
         [Serializable]
         public class PlacementConfig
         {
-            //public enum SizeStrategy
-            //{
-            //    ChunkRndSize,
-            //    ChunkMaxSize,
-            //    ChunkMinSize
-            //}
-            public TopologyType TopologyType; // todo: to dictionary key
-            //public SizeStrategy ChunkSizeStrategy;
-            //public bool IgnoreChunkSizeRestrictions; // todo: use zero ranges instead
-            public Range SegmentsSizeBreadth;
-            public Range SegmentsSizeHeight;
-            // todo: tags
-            // todo: purpose of segements
-        }
-
-        [Serializable]
-        public class ChunkSpecificPlacement
-        {
-            public PlacementConfig PlacementConfig;
+            public bool IsStrictSpecifics; // true means that this PlacementConfig is applicable only when it was requested with Expression that fits with Specifics.
+            public TagSet Specifics; // example: HugePeeks, VerticalIslandOnly or Establishments
+            public MetaProvider.Filter MetaFilter;
+            public MetaProvider[] MetaProviders; // if empty then use all of them
+            public TopologyType TopologyType => MetaFilter.TopologyType;
         }
 
         [Serializable]
@@ -46,11 +41,9 @@ namespace TowerGenerator
             [Range(0f, 1f)] public float Back;
         }
 
-        public Range TrunkSegmentsCount; 
-        public List<PlacementConfig> PlacementConfigs; // todo: to serizalizable dictionary
+        public Range TrunkSegmentsCount;
+        public List<PlacementConfig> PlacementConfigs;
 
-        [Tooltip("Placement cfg of initial chunk that current config recommend to use (accordingly to other chunks)")]
-        public PlacementConfig EstablishPlacement;
 
         public AllowedDirectionsChances AllowedDirections;
 
@@ -64,6 +57,8 @@ namespace TowerGenerator
         private long _initialSeedVisual;
         private long _initialSeedContent;
 
+        private RandomHelper _rnd;
+
         private readonly float[] _dirChances = new float[6];
 
         private static readonly Vector3[] _directions =
@@ -74,8 +69,8 @@ namespace TowerGenerator
 
 
         // replace all -1 in configs and save initial values
-        public void Init(long seed)
-        {   
+        public void Init(long seed, Prototype prototype)
+        {
             var rnd = new RandomHelper(seed);
             if (SeedContent == -1)
                 SeedContent = rnd.ValueInt();
@@ -89,6 +84,19 @@ namespace TowerGenerator
             _initialSeedTopology = SeedContent;
             _initialSeedVisual = SeedVisual;
             _initialSeedContent = SeedContent;
+            _rnd = new RandomHelper(_initialSeedTopology);
+
+            // init PlacementConfigs list
+            Assert.IsFalse(PlacementConfigs == null || PlacementConfigs.Count == 0, $"Generator config has no placement configs assigned {transform.GetDebugName()}");
+            foreach (var placementConfig in PlacementConfigs)
+            {
+                if (placementConfig.MetaProviders == null || placementConfig.MetaProviders.Length == 0)
+                {
+                    placementConfig.MetaProviders = prototype.MetaProviderManager.MetaProviders;
+                }
+                Assert.IsNotNull(placementConfig.MetaProviders);
+                Assert.IsTrue(placementConfig.MetaProviders!=null && placementConfig.MetaProviders.Length > 0);
+            }
         }
 
         public void OnProcessorEnter()
@@ -99,18 +107,53 @@ namespace TowerGenerator
             }
         }
 
-        public void ResetSeeds()
+        public virtual void ResetSeeds()
         {
             SeedContent = _initialSeedContent;
             SeedVisual = _initialSeedVisual;
             SeedTopology = _initialSeedTopology;
+            _rnd = new RandomHelper(_initialSeedTopology);
         }
 
-        public PlacementConfig GetPlacementConfig(TopologyType topType)
+        public PlacementConfig GetPlacementConfig(TopologyType topologyType, string specificationExpression = null)
         {
-            var cfg = PlacementConfigs.FirstOrDefault(x => x.TopologyType.HasFlag(topType)) ?? 
-                      PlacementConfigs.FirstOrDefault(x => x.TopologyType == TopologyType.Undefined); // default
-            return cfg;
+            // get all placement configs of such topologyType
+            var placementConfigs = PlacementConfigs.Where(x => x.TopologyType.HasFlag(topologyType)).ToArray();
+            if (!placementConfigs.Any())
+                return null;
+
+            // get random with specification
+            if (!string.IsNullOrEmpty(specificationExpression))
+            {
+                void ParameterDefaultValueHandler(string _, ParameterArgs args)
+                {
+                    args.Result = 0f;
+                }
+
+                bool CheckTagsPass(PlacementConfig placementConfig, Expression interpreter)
+                {
+                    if (placementConfig.Specifics == null || placementConfig.Specifics.IsEmpty())
+                    {
+                        Assert.IsFalse(placementConfig.IsStrictSpecifics);
+                        return false;
+                    }
+
+                    var specificsDictionary = placementConfig.Specifics.AsNCalcDictionary();
+                    Assert.IsNotNull(specificsDictionary);
+                    interpreter.Parameters = specificsDictionary;
+                    return (bool)interpreter.Evaluate();
+                }
+
+                var expression = new Expression(specificationExpression);
+                expression.EvaluateParameter += ParameterDefaultValueHandler;
+                var specifics = placementConfigs.Where(x => CheckTagsPass(x, expression)).ToArray();
+                if (specifics.Any())
+                    return _rnd.FromEnumerable(specifics);
+                else
+                    return null;
+            }
+
+            return _rnd.FromEnumerable(placementConfigs.Where(x => x.IsStrictSpecifics == false || x.Specifics.IsEmpty()));
         }
 
         public Vector3 GetRndPropagationDir(ref RandomHelper rnd)

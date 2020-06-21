@@ -51,7 +51,7 @@ namespace TowerGenerator
             }
         }
 
-        public void Init(long seed)
+        public void Init(long seed, Prototype prototype)
         {
             _chooser = new Chooser<NodeItem>(Nodes.ToArray(), NodesCyclerType, seed, NodeCycles);
             var rnd = new RandomHelper(seed);
@@ -60,7 +60,7 @@ namespace TowerGenerator
             {
                 var cfg = node.GeneratorNode.GetComponent<GeneratorConfigBase>();
                 if (cfg != null)
-                    cfg.Init(rnd.ValueInt());
+                    cfg.Init(rnd.ValueInt(), prototype);
             }
         }
 

@@ -133,6 +133,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a62c7572ac429e4d80b4585d4f4a094, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1003456782 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2363361773598143490, guid: ee25dbe6afe4ddf4399388a76e9fa30a,
+    type: 3}
+  m_PrefabInstance: {fileID: 2363361772295146235}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f17d98801703f564f877ba1e8d856b3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1108316939
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,6 +306,11 @@ PrefabInstance:
       propertyPath: State.MetaControlPanelState.ChunkConnectorVertical
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 151939626403982761, guid: 9320f212596a79d46a1891961f5e49d6,
+        type: 3}
+      propertyPath: MetaProvider
+      value: 
+      objectReference: {fileID: 1003456782}
     - target: {fileID: 151939626403982762, guid: 9320f212596a79d46a1891961f5e49d6,
         type: 3}
       propertyPath: m_Name

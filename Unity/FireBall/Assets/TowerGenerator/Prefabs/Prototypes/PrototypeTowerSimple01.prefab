@@ -45,9 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c21763a51332b584b891d6d5f7ff290f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SeedTopology: -1
-  SeedVisual: -1
-  SeedContent: -1
   MetaProviderManager: {fileID: 3967152055868322984}
   GeneratorNodes: {fileID: 3967152057261358154}
 --- !u!1 &3967152055848844025
@@ -59,6 +56,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3967152055848844024}
+  - component: {fileID: 111504530187509675}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -80,6 +78,19 @@ Transform:
   m_Father: {fileID: 3967152055868322985}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &111504530187509675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3967152055848844025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f17d98801703f564f877ba1e8d856b3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Metas: []
 --- !u!1 &3967152055868322986
 GameObject:
   m_ObjectHideFlags: 0
@@ -204,19 +215,30 @@ MonoBehaviour:
     To: 0
     FromType: 0
     ToType: 0
-  PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
+  PlacementConfigs:
+  - IsStrictSpecifics: 0
+    Specifics:
+      Tags: []
+    MetaFilter:
+      Generation:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      TopologyType: 2
+      BreadthRange:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      HeightRange:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      Wildcard: 
+      Expression: 
+    MetaProviders: []
   AllowedDirections:
     Left: 0
     Right: 0
@@ -224,6 +246,10 @@ MonoBehaviour:
     Down: 0
     Forward: 0
     Back: 0
+  SeedTopology: 0
+  SeedVisual: 0
+  SeedContent: 0
+  ResetOnProcessorEnter: 0
   IslandHeight:
     From: 0
     To: 0
@@ -247,6 +273,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
 --- !u!1 &3967152057261358156
 GameObject:
   m_ObjectHideFlags: 0

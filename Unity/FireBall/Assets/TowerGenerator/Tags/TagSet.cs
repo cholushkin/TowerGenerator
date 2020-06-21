@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -23,11 +24,13 @@ namespace TowerGenerator
                 Value = value;
             }
 
-            public string Name { get; private set; }
-            public float Value { get; set; }
+            public string Name;
+            [Range(0,1)]
+            public float Value;
         }
 
-        public Dictionary<string, Tag> Tags;
+        public List<Tag> Tags;
+        
 
         public void SetTag(Tag tag)
         {
@@ -37,25 +40,24 @@ namespace TowerGenerator
 
         public void SetTag(string tagName, float value)
         {
-            if (Tags == null)
-                Tags = new Dictionary<string, Tag>();
+            Tag existing = Tags.FirstOrDefault(x => x.Name == tagName);
 
-            Tag existed;
-            if (Tags.TryGetValue(tagName, out existed))
+            if (existing != null)
             {
-                existed.Value = value;
+                existing.Value = value;
             }
             else
             {
-                Tags.Add(tagName, new Tag(tagName, value));
+                Tags.Add(new Tag(tagName, value));
+                UpdateFastAccessDictionaries();
             }
         }
 
         public bool HasTag(string tag, float threshold = 0.0f)
         {
-            if (Tags.TryGetValue(tag, out var existed))
+            if (_dictionary.TryGetValue(tag, out var existed))
             {
-                if (existed.Value == 0.0f)
+                if (Math.Abs(existed.Value) < 0.0001f)
                     return false;
                 if (existed.Value >= threshold)
                     return true;
@@ -76,26 +78,44 @@ namespace TowerGenerator
             }
             var result = "";
             foreach (var tag in Tags)
-                result += $"[{tag.Value.Name}:{tag.Value.Value}]";
+                result += $"[{tag.Name}:{tag.Value}]";
             return result;
         }
 
-
         private Dictionary<string, object> _nCalcDictionary;
+        private Dictionary<string, Tag> _dictionary;
+
+        void UpdateFastAccessDictionaries()
+        {
+            UpdateNCalcDictionary();
+        }
+
+        public void UpdateNCalcDictionary()
+        {
+            _nCalcDictionary = new Dictionary<string, object>();
+            foreach (var tag in Tags)
+                _nCalcDictionary.Add(tag.Name, tag.Value);
+        }
+
         public Dictionary<string, object> AsNCalcDictionary()
         {
-            if (IsEmpty())
-                return null;
-
-            // lazy resource initialization
-            if (_nCalcDictionary != null)
-                return _nCalcDictionary;
-
-            _nCalcDictionary = new Dictionary<string, object>();
-            foreach (var kv in Tags)
-                _nCalcDictionary.Add(kv.Value.Name, kv.Value.Value);
-
+            if (_nCalcDictionary == null)
+                UpdateNCalcDictionary();
             return _nCalcDictionary;
+        }
+
+        public void UpdateDictionary()
+        {
+            _dictionary = new Dictionary<string, Tag>();
+            foreach (var tag in Tags)
+                _dictionary.Add(tag.Name, new Tag(tag.Name, tag.Value));
+        }
+        
+        public Dictionary<string, Tag> AsDictionary()
+        {
+            if(_dictionary == null)
+                UpdateDictionary();
+            return _dictionary;
         }
     }
 }

@@ -168,11 +168,11 @@ namespace TowerGenerator.ChunkImporter
         #endregion
 
         #region Chunk types
-        private class ChunkTowerRoofPeekSegment : FbxCommandAddComponent
+        private class ChunkTowerPeekSegment : FbxCommandAddComponent
         {
             public override string GetPayloadCommandName()
             {
-                return "ChunkTowerRoofPeekSegment";
+                return "ChunkTowerPeekSegment";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
@@ -182,7 +182,7 @@ namespace TowerGenerator.ChunkImporter
 
             public override void Execute(GameObject gameObject)
             {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerRoofPeekSegment>();
+                gameObject.AddComponent<global::TowerGenerator.ChunkTowerPeekSegment>();
             }
         }
 
@@ -204,11 +204,11 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        private class ChunkTowerIslandAndBasementSegment : FbxCommandAddComponent
+        private class ChunkTowerFoundationAndStandardSegment : FbxCommandAddComponent
         {
             public override string GetPayloadCommandName()
             {
-                return "ChunkTowerIslandAndBasementSegment";
+                return "ChunkTowerFoundationAndStandardSegment";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
@@ -218,15 +218,15 @@ namespace TowerGenerator.ChunkImporter
 
             public override void Execute(GameObject gameObject)
             {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerIslandAndBasementSegment>();
+                gameObject.AddComponent<global::TowerGenerator.ChunkTowerFoundationAndStandardSegment>();
             }
         }
 
-        private class ChunkTowerFlyingIslandSegment : FbxCommandAddComponent
+        private class ChunkTowerFoundationSegment : FbxCommandAddComponent
         {
             public override string GetPayloadCommandName()
             {
-                return "ChunkFlyingIslandSegment";
+                return "ChunkFoundationSegment";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
@@ -236,7 +236,7 @@ namespace TowerGenerator.ChunkImporter
 
             public override void Execute(GameObject gameObject)
             {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerFlyingIslandSegment>();
+                gameObject.AddComponent<global::TowerGenerator.ChunkTowerFoundationSegment>();
             }
         }
 
@@ -539,10 +539,10 @@ namespace TowerGenerator.ChunkImporter
             new GroupSwitch(),
 
             // Chunk types
-            new ChunkTowerRoofPeekSegment(),
+            new ChunkTowerPeekSegment(),
             new ChunkTowerStandardSegment(),
-            new ChunkTowerIslandAndBasementSegment(),
-            new ChunkTowerFlyingIslandSegment(),
+            new ChunkTowerFoundationAndStandardSegment(),
+            new ChunkTowerFoundationSegment(),
             new ChunkTowerSideEarSegment(),
             new ChunkTowerBottomEarSegment(),
             new ChunkTowerConnectorVertical(),

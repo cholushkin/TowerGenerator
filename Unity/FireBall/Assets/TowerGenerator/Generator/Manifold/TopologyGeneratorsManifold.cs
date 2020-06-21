@@ -40,7 +40,7 @@ namespace TowerGenerator
 
         [Space(12)]
         public TopologyGeneratorsVisualizer TopologyVisualizer;
-        public VisualBuilder VisualBuilder;
+        //public VisualBuilder VisualBuilder;
 
 #if UNITY_EDITOR
         public bool IsGizmoDrawPointers;

@@ -176,7 +176,7 @@ namespace TowerGenerator
                 segment = Instantiate(prefabSegChunkRoofPeak);
             else if (segTopology.Geometry.TopologyType == TopologyType.ChunkStd)
                 segment = Instantiate(prefabSegChunkStd);
-            else if (segTopology.Geometry.TopologyType.HasFlag(TopologyType.ChunkIsland))
+            else if (segTopology.Geometry.TopologyType.HasFlag(TopologyType.ChunkFoundation))
                 segment = Instantiate(prefabSegChunkIslandAndBasement);
             else if (segTopology.Geometry.TopologyType == TopologyType.ChunkSideEar)
                 segment = Instantiate(prefabSegChunkSideEar);

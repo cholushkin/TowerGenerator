@@ -1,7 +1,7 @@
 ﻿
 namespace TowerGenerator
 {
-    public class ChunkTowerRoofPeekSegment : ChunkTowerBase
+    public class ChunkTowerPeekSegment : ChunkTowerBase
     {
         public override TopologyType GetTopologyType()
         {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Alg;
 using Assets.Plugins.Alg;
 using GameLib.Random;
 using NCalc;
@@ -11,78 +10,64 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public class MetaProvider : Singleton<MetaProvider>
+    public class MetaProvider : MonoBehaviour
     {
         [Serializable]
         public class Filter
         {
-            private readonly Range _generation;
-            private readonly TopologyType _topologyType;
-            private readonly Range _breadthRange;
-            private readonly Range _heightRange;
-            private readonly string _wildcard;
-            private Expression _expression;
+            public Range Generation;
+            public TopologyType TopologyType;
+            public Range BreadthRange;
+            public Range HeightRange;
+            public string Wildcard;
+            public string Expression;
 
-            private string ExpressionPass
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        _expression = null;
-                        return;
-                    }
-                    _expression = new Expression(value);
-                    _expression.EvaluateParameter += _parameterDefaultValueHandler;
-                    _expression.EvaluateFunction += _tagFunctionsHandler;
-                }
-            }
-
-            public Filter( Range generationRange = null,
-                TopologyType topology = (TopologyType) 0b1111111111111111,
-                string wildCard = null, string tagExpression = null, Range breadthRange = null,
-                Range heightRange = null )
-            {
-                _generation = generationRange;
-                _topologyType = topology;
-                _wildcard = wildCard;
-                _breadthRange = breadthRange;
-                _heightRange = heightRange;
-                ExpressionPass = tagExpression;
-            }
 
             public IEnumerable<MetaBase> FilterGeneration(IEnumerable<MetaBase> metas)
             {
-                if (_generation == null)
+                if (Generation == null)
                     return metas;
-                return metas.Where(m => _generation.IsIn(m.Generation));
+                return metas.Where(m => Generation.IsIn(m.Generation));
             }
 
             public IEnumerable<MetaBase> FilterEntType(IEnumerable<MetaBase> metas)
             {
-                return metas.Where(m => (_topologyType & m.TopologyType) != 0);
+                return metas.Where(m => (TopologyType & m.TopologyType) != 0);
             }
 
             public IEnumerable<MetaBase> FilterNameWildcard(IEnumerable<MetaBase> metas)
             {
-                if (string.IsNullOrEmpty(_wildcard))
+                if (string.IsNullOrEmpty(Wildcard))
                     return metas;
-                var wildcard = _wildCardToRegular(_wildcard);
+                var wildcard = _wildCardToRegular(Wildcard);
                 return metas.Where(m => Regex.IsMatch(m.ChunkName, wildcard));
             }
 
             public IEnumerable<MetaBase> FilterTagExpression(IEnumerable<MetaBase> metas)
             {
-                if (_expression == null)
-                    return metas;
-                return metas.Where(x => _checkTagsPass(x, _expression));
+                if (string.IsNullOrEmpty(Expression))
+                    return metas;                         
+
+                // todo: cache expression
+                var expression = new Expression(Expression);
+                expression.EvaluateParameter += _parameterDefaultValueHandler;
+                expression.EvaluateFunction += _tagFunctionsHandler;
+                return metas.Where(x => _checkTagsPass(x, expression));
             }
 
             public IEnumerable<MetaBase> FilterSize(IEnumerable<MetaBase> metas)
             {
-                if (_breadthRange == null || _heightRange == null)
+                var breadth = BreadthRange;
+                if (breadth == null || breadth.IsZero())
+                    breadth = Range.InfiniteRange;
+                var height = HeightRange;
+                if (height == null || height.IsZero())
+                    height = Range.InfiniteRange;
+
+                if (breadth == Range.Infinite && height == Range.Infinite)
                     return metas;
-                return metas.Where(_checkSizes);
+
+                return metas.Where(x=>_checkSizes(x, breadth, height));
             }
 
             public override string ToString()
@@ -120,26 +105,48 @@ namespace TowerGenerator
                 }
             }
 
-            private bool _checkSizes(MetaBase meta)
+            public static bool IsAABBInside(Vector3 AABB, Range breadthRange, Range heightRange)
+            {
+                if (breadthRange == null || breadthRange.IsZero())
+                    breadthRange = Range.InfiniteRange;
+                if (heightRange == null || heightRange.IsZero())
+                    heightRange = Range.InfiniteRange;
+
+                var xIsOK = AABB.x >= breadthRange.From && AABB.x <= breadthRange.To;
+                var zIsOK = AABB.z >= breadthRange.From && AABB.z <= breadthRange.To;
+                var heightIsOK = AABB.y >= heightRange.From && AABB.y <= heightRange.To;
+                if (xIsOK && zIsOK && heightIsOK)
+                    return true;
+
+                return false;
+            }
+
+            static bool _checkSizes(MetaBase meta, Range breadthRange, Range heightRange)
             {
                 Assert.IsTrue(meta.AABBs.Count > 0);
                 foreach (var metaAABB in meta.AABBs)
                 {
-                    var breadthIsOK = metaAABB.x >= _breadthRange.From && metaAABB.z <= _breadthRange.To;
-                    var heightIsOK = metaAABB.y >= _heightRange.From && metaAABB.y <= _heightRange.To;
-                    if (breadthIsOK && heightIsOK)
+                    var xIsOK = metaAABB.x >= breadthRange.From && metaAABB.x <= breadthRange.To;
+                    var zIsOK = metaAABB.z >= breadthRange.From && metaAABB.z <= breadthRange.To;
+                    var heightIsOK = metaAABB.y >= heightRange.From && metaAABB.y <= heightRange.To;
+                    if (xIsOK && zIsOK && heightIsOK)
                         return true;
                 }
-
                 return false;
             }
         }
 
         public MetaBase[] Metas;
+        private bool _isInited;
 
-        protected override void Awake()
+        void Awake()
         {
-            base.Awake();
+            if(!_isInited)
+                Init();
+        }
+
+        public void Init()
+        {
             if (Metas.Length != 0)
             {
                 Debug.LogWarning("Using defined metas set instead of loading");
@@ -150,17 +157,21 @@ namespace TowerGenerator
                 Metas = Resources.LoadAll<MetaBase>(TowerGeneratorConstants.Chunks);
                 Debug.Log($"{transform.GetDebugName()}: {Metas.Length} metas loaded.");
             }
+            _isInited = true;
         }
 
 
         public IEnumerable<MetaBase> GetMetas(Filter filter = null)
         {
-            Assert.IsNotNull(Metas);
+            return GetMetas(Metas, filter);
+        }
 
+        public static IEnumerable<MetaBase> GetMetas(IEnumerable<MetaBase> metas, Filter filter = null)
+        {
             if (filter == null) // no filter? just return original sequence
-                return Metas;
+                return metas;
 
-            IEnumerable<MetaBase> filteredResult = Metas;
+            IEnumerable<MetaBase> filteredResult = metas;
 
             filteredResult = filter.FilterEntType(filteredResult);
             filteredResult = filter.FilterGeneration(filteredResult);
@@ -186,7 +197,7 @@ namespace TowerGenerator
         void DbgTestNoFilter()
         {
             var metas = GetMetas();
-            Debug.Log($"NO FILTER: count = {metas.Count()} of {MetaProvider.Instance.Metas.Length}");
+            Debug.Log($"NO FILTER: count = {metas.Count()} of {Metas.Length}");
             DbgPrintMetas(metas);
         }
 
@@ -233,5 +244,6 @@ namespace TowerGenerator
         //}
 
 #endif
+       
     }
 }

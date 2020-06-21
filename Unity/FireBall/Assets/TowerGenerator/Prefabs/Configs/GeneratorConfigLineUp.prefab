@@ -49,19 +49,53 @@ MonoBehaviour:
     To: 0
     FromType: 0
     ToType: 0
-  PlacementConfigs: []
-  EstablishPlacement:
-    TopologyType: 0
-    SegmentsSizeBreadth:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
-    SegmentsSizeHeight:
-      From: 0
-      To: 0
-      FromType: 0
-      ToType: 0
+  PlacementConfigs:
+  - IsStrictSpecifics: 0
+    Specifics:
+      Tags: []
+    MetaFilter:
+      Generation:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      TopologyType: 1
+      BreadthRange:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      HeightRange:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      Wildcard: 
+      Expression: 
+    MetaProviders: []
+  - IsStrictSpecifics: 0
+    Specifics:
+      Tags: []
+    MetaFilter:
+      Generation:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      TopologyType: 2
+      BreadthRange:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      HeightRange:
+        From: 0
+        To: 0
+        FromType: 0
+        ToType: 0
+      Wildcard: 
+      Expression: 
+    MetaProviders: []
   AllowedDirections:
     Left: 0
     Right: 0
@@ -69,6 +103,10 @@ MonoBehaviour:
     Down: 0
     Forward: 0
     Back: 0
+  SeedTopology: 0
+  SeedVisual: 0
+  SeedContent: 0
+  ResetOnProcessorEnter: 0
   IslandHeight:
     From: 0
     To: 0
@@ -92,3 +130,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []
