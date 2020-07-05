@@ -265,7 +265,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &108823332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -567,8 +567,6 @@ MonoBehaviour:
   TrunkSegmentsCount:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PlacementConfigs: []
   AllowedDirections:
     Left: 0
@@ -584,13 +582,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0
 --- !u!1 &331861535
 GameObject:
@@ -657,8 +651,6 @@ MonoBehaviour:
   TrunkSegmentsCount:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PlacementConfigs: []
   AllowedDirections:
     Left: 0
@@ -674,13 +666,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0
 --- !u!1 &335862718
 GameObject:
@@ -775,7 +763,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339294032}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.41, y: 5.21, z: 0.018546343}
+  m_LocalPosition: {x: -10.04, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 903159236}
@@ -911,8 +899,6 @@ MonoBehaviour:
   TrunkSegmentsCount:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PlacementConfigs: []
   AllowedDirections:
     Left: 0
@@ -928,13 +914,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0.382
 --- !u!1 &410647005
 GameObject:
@@ -1095,8 +1077,6 @@ MonoBehaviour:
   TrunkSegmentsCount:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PlacementConfigs: []
   AllowedDirections:
     Left: 0
@@ -1112,13 +1092,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0
 --- !u!1 &560803577
 GameObject:
@@ -1182,7 +1158,7 @@ GameObject:
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5938655980376293919, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -2106,8 +2082,6 @@ MonoBehaviour:
   TrunkSegmentsCount:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PlacementConfigs: []
   AllowedDirections:
     Left: 0
@@ -2123,13 +2097,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0
 --- !u!1 &1728335073
 GameObject:
@@ -2196,8 +2166,6 @@ MonoBehaviour:
   TrunkSegmentsCount:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PlacementConfigs: []
   AllowedDirections:
     Left: 0
@@ -2213,13 +2181,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0
 --- !u!1 &1880026664
 GameObject:

@@ -73,6 +73,7 @@ namespace TowerGenerator
             {
                 Blueprint = blueprint,
                 OpenedSegments = new List<TreeNode<Blueprint.Segment>>(16),
+                DeadlockSegments = new List<TreeNode<Blueprint.Segment>>(16),
                 Pointers = pointers
             };
 

@@ -416,6 +416,16 @@ PrefabInstance:
       propertyPath: PlacementConfigs.Array.data[1].MetaFilter.TopologyType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: TrunkSegmentsCount.From
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: TrunkSegmentsCount.To
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3967152057261358154, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
       propertyPath: Nodes.array.Array.size

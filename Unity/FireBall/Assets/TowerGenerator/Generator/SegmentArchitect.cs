@@ -125,7 +125,7 @@ namespace TowerGenerator
             var choosen = _varLeafPointers[index];
             TreeNode<Blueprint.Segment> prevMemSegment = null;
             lastNode = null;
-            foreach (var node in TreeNode<Blueprint.Segment>.TraverseToParent(_fromNode, choosen))
+            foreach (var node in TreeNode<Blueprint.Segment>.TraverseToParent(null, choosen))
             {
                 TreeNode<Blueprint.Segment> memSeg = new TreeNode<Blueprint.Segment>(node.Data);
 

@@ -71,6 +71,9 @@ namespace TowerGenerator
         // replace all -1 in configs and save initial values
         public virtual void Init(long seed, Prototype prototype)
         {
+#if DEBUG
+            DbgValidate();
+#endif
             var rnd = new RandomHelper(seed);
             if (SeedContent == -1)
                 SeedContent = rnd.ValueInt();
@@ -176,6 +179,11 @@ namespace TowerGenerator
         //    var height = rnd.FromRange(placementCfg.SegmentsSizeHeight);
         //    return new Vector3(breadth, height, breadth);
         //}
+
+        private void DbgValidate()
+        {
+            Assert.IsFalse(TrunkSegmentsCount.IsZero(),$"{transform.GetDebugName()} has invalid TrunkSegmentsCount {TrunkSegmentsCount}");
+        }
 
         public override string ToString()
         {

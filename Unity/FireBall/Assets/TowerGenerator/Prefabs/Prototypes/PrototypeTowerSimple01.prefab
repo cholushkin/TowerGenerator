@@ -211,10 +211,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TrunkSegmentsCount:
-    From: 0
-    To: 0
-    FromType: 0
-    ToType: 0
+    From: 2
+    To: 2
   PlacementConfigs:
   - IsStrictSpecifics: 0
     Specifics:
@@ -223,19 +221,13 @@ MonoBehaviour:
       Generation:
         From: 0
         To: 0
-        FromType: 0
-        ToType: 0
       TopologyType: 2
       BreadthRange:
         From: 0
         To: 0
-        FromType: 0
-        ToType: 0
       HeightRange:
         From: 0
         To: 0
-        FromType: 0
-        ToType: 0
       Wildcard: 
       Expression: 
     MetaProviders: []
@@ -253,13 +245,9 @@ MonoBehaviour:
   IslandHeight:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   IslandDistanceFromTrunk:
     From: 0
     To: 0
-    FromType: 0
-    ToType: 0
   PropagateIslandChance: 0
 --- !u!114 &3967152056789282999
 MonoBehaviour:
