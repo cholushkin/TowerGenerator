@@ -139,17 +139,12 @@ namespace TowerGenerator
         public MetaBase[] Metas;
         private bool _isInited;
 
-        void Awake()
-        {
-            if(!_isInited)
-                Init();
-        }
-
         public void Init()
         {
+            Assert.IsFalse(_isInited);
             if (Metas.Length != 0)
             {
-                Debug.LogWarning("Using defined metas set instead of loading");
+                Debug.Log("Using defined metas set instead of loading");
                 Debug.Log($"Metas using: {Metas.Length}");
             }
             else

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Assets.Plugins.Alg;
 using GameLib.Random;
 using NCalc;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -23,7 +21,8 @@ namespace TowerGenerator
         [Serializable]
         public class PlacementConfig
         {
-            public bool IsStrictSpecifics; // true means that this PlacementConfig is applicable only when it was requested with Expression that fits with Specifics.
+            [Tooltip("TRUE means that this PlacementConfig is applicable only when it was requested by GetPlacementConfig with Expression that fits with Specifics.\nFALSE - this PlacementConfig is applicable even if there is no request for specifics")]
+            public bool IsStrictSpecifics; // 
             public TagSet Specifics; // example: HugePeeks, VerticalIslandOnly or Establishments
             public MetaProvider.Filter MetaFilter;
             public MetaProvider[] MetaProviders; // if empty then use all of them
@@ -70,7 +69,7 @@ namespace TowerGenerator
 
 
         // replace all -1 in configs and save initial values
-        public void Init(long seed, Prototype prototype)
+        public virtual void Init(long seed, Prototype prototype)
         {
             var rnd = new RandomHelper(seed);
             if (SeedContent == -1)

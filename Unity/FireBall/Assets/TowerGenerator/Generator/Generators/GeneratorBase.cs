@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
-    public abstract class GeneratorBase : MonoBehaviour
+    public abstract class GeneratorBase
     {
         public GeneratorConfigBase Config { get; private set; }
         protected RandomHelper _rnd;

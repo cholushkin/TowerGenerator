@@ -68,7 +68,6 @@ namespace TowerGenerator
             _towerRoot = root;
 
             var pointers = new GeneratorPointer(blueprint);
-            pointers.SetInitialPointers();
 
             var state = new State
             {
@@ -230,6 +229,8 @@ namespace TowerGenerator
 
             state.Blueprint.AddSubtree(null, Vector3.up, project);
             state.OpenedSegments.Add(openedSeg);
+
+            state.Pointers.SetInitialPointers();
         }
 
         GeneratorConfigBase GetNextConfig()
@@ -271,6 +272,78 @@ namespace TowerGenerator
 
             _frame = StepIn(container.GetComponent<Prototype>());
             return GetNextConfig();
+        }
+
+
+
+        void OnDrawGizmos()
+        {
+            
+            //foreach (var treeNode in _bp.Tree.TraverseBreadthFirst())
+            //{
+            //    // node center
+            //    Gizmos.color = Color.red;
+            //    Gizmos.DrawSphere(
+            //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
+            //        0.5f);
+
+            //    Gizmos.DrawWireCube(
+            //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position), 
+            //        treeNode.Data.Topology.Geometry.AspectRatio);
+
+            //    Gizmos.color = Color.gray;
+            //    Gizmos.DrawWireCube(
+            //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
+            //        treeNode.Data.Topology.Geometry.AspectRatio - TowerGeneratorConstants.ConnectorMargin);
+
+
+            //    // all nodes children lines
+            //    foreach (var child in treeNode.Children)
+            //    {
+            //        Gizmos.color = (child.BranchLevel == 0) ? Color.white : Color.grey;
+
+            //        var childPos = transform.TransformPoint(child.Data.Topology.Geometry.Position);
+            //        Gizmos.DrawLine(childPos, transform.TransformPoint(treeNode.Data.Topology.Geometry.Position));
+            //    }
+            //}
+
+            //if (IsGizmoDrawPointers)
+            //{
+            //    // _pointerGenerator
+            //    var pointerGeneratorPos = transform.TransformPoint(Pointers.PointerGenerator.Data.Topology.Geometry.Position);
+            //    Gizmos.color = Color.black;
+            //    Gizmos.DrawWireSphere(
+            //        pointerGeneratorPos,
+            //        1.0f);
+            //    Handles.Label(pointerGeneratorPos, "PointerGenerator");
+
+
+            //    // _pointerStable
+            //    var pointerStablePos = transform.TransformPoint(Pointers.PointerStable.Data.Topology.Geometry.Position);
+            //    Gizmos.color = Color.black;
+            //    Gizmos.DrawWireSphere(
+            //        pointerStablePos,
+            //        1.0f);
+            //    Handles.Label(pointerStablePos, "PointerStable");
+
+            //    // _progressPointer
+            //    var pointerProgress = transform.TransformPoint(Pointers.PointerProgress.Data.Topology.Geometry.Position);
+            //    Gizmos.color = Color.white;
+            //    Gizmos.DrawWireSphere(
+            //        pointerProgress,
+            //        1.0f);
+            //    Handles.Label(pointerProgress, "PointerProgress");
+            //    //Gizmos.DrawLine(pointerGeneratorPos, pointerProgress);
+
+            //    // _pointerGarbageCollector
+            //    var pointerGarbageCollectorPos =
+            //        transform.TransformPoint(Pointers.PointerGarbageCollector.Data.Topology.Geometry.Position);
+            //    Gizmos.color = Color.yellow;
+            //    Gizmos.DrawWireSphere(
+            //        pointerGarbageCollectorPos,
+            //        1.0f);
+            //    Handles.Label(pointerGarbageCollectorPos, "PointerGarbageCollector");
+            //}
         }
     }
 }

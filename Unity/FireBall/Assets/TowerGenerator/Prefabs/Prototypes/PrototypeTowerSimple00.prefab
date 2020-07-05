@@ -295,6 +295,16 @@ PrefabInstance:
       propertyPath: PropagateIslandChance
       value: 0.382
       objectReference: {fileID: 0}
+    - target: {fileID: 7402457836566982248, guid: fe1a1bf5ebb474348a72f94e5003612f,
+        type: 3}
+      propertyPath: TrunkSegmentsCount.From
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7402457836566982248, guid: fe1a1bf5ebb474348a72f94e5003612f,
+        type: 3}
+      propertyPath: TrunkSegmentsCount.To
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe1a1bf5ebb474348a72f94e5003612f, type: 3}
 --- !u!1 &8416729503472513148 stripped

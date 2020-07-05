@@ -31,11 +31,10 @@ namespace TowerGenerator
         private TopologyType _beginningTopology;
         private TopologyType _middleTopology;
         private TopologyType _endingTopology;
-        private bool _makeLastSegmentOpened;
 
 
         public SegmentArchitect(
-            long seed, 
+            long seed,
             TreeNode<Blueprint.Segment> treeCheck, // from which part of the tree Architect should check collisions
             GeneratorConfigBase baseCfg,
             TopologyType beginningType, TopologyType middleType, TopologyType endingType,
@@ -59,10 +58,10 @@ namespace TowerGenerator
 
         public bool MakeProjects(
             TreeNode<Blueprint.Segment> from, Range segCount,
-            Vector3 offset, Vector3 direction, bool makeLastOpened = true
+            Vector3 offset, Vector3 direction
         )
         {
-            if (_varLeafPointers != null )
+            if (_varLeafPointers != null)
             {
                 Debug.Log("Reusing SegmentArchitect");
             }
@@ -71,7 +70,6 @@ namespace TowerGenerator
             _varLeafPointers = new List<TreeNode<Blueprint.Segment>>((int)(segCount.To - segCount.From));
             _fromNode = from;
             TreeNode<Blueprint.Segment> nodePointer = from;
-            _makeLastSegmentOpened = makeLastOpened;
 
             _rnd = new RandomHelper(_initialSeed);
 
@@ -94,7 +92,7 @@ namespace TowerGenerator
                     placementConfig);
                 Assert.IsNotNull(memSeg);
 
-                if(_startingNode == null)
+                if (_startingNode == null)
                     _startingNode = memSeg;
 
                 if (memSeg.Data.Topology.HasCollision)
@@ -128,7 +126,7 @@ namespace TowerGenerator
             TreeNode<Blueprint.Segment> prevMemSegment = null;
             lastNode = null;
             foreach (var node in TreeNode<Blueprint.Segment>.TraverseToParent(_fromNode, choosen))
-            {   
+            {
                 TreeNode<Blueprint.Segment> memSeg = new TreeNode<Blueprint.Segment>(node.Data);
 
                 if (lastNode == null)
@@ -150,21 +148,21 @@ namespace TowerGenerator
         {
             var memSeg = new Blueprint.Segment();
             var curNode = new TreeNode<Blueprint.Segment>(memSeg);
-            if(parentNode != _fromNode)
+            if (parentNode != _fromNode)
                 parentNode.AddChild(curNode);
 
             // get random meta from available meta providers of current placementConfig
             IEnumerable<MetaBase> allMetas = placementConfig.MetaProviders[0].GetMetas(); // available for current placement config
-            for(int i=1; i< placementConfig.MetaProviders.Length;++i)
+            for (int i = 1; i < placementConfig.MetaProviders.Length; ++i)
                 allMetas = Enumerable.Concat(allMetas, placementConfig.MetaProviders[i].GetMetas());
 
-            var meta = _rnd.FromEnumerable( 
+            var meta = _rnd.FromEnumerable(
                 MetaProvider.GetMetas(allMetas, placementConfig.MetaFilter));
 
             // exclude aabbs bigger than placementConfig.MetaFilter.BreadthRange and placementConfig.MetaFilter.HeightRange
             var aabbs = meta.AABBs.Where(a => MetaProvider.Filter.IsAABBInside(a,
                 placementConfig.MetaFilter.BreadthRange, placementConfig.MetaFilter.HeightRange)).ToArray();
-            
+
             Assert.IsTrue(aabbs.Length > 0);
 
             // get random aabb
@@ -188,7 +186,7 @@ namespace TowerGenerator
 
             memSeg.Topology = new Blueprint.Segment.TopologySegment
             {
-                Geometry = {Bounds = bounds, BuildDirection = buildDirection,Meta = meta.name,Seed = _rnd.ValueInt(),SizeIndex = sizeIndex,TopologyType = meta.TopologyType},
+                Geometry = new Blueprint.Segment.TopologySegment.ChunkGeometry { Bounds = bounds, BuildDirection = buildDirection, Meta = meta.name, Seed = _rnd.ValueInt(), SizeIndex = sizeIndex, TopologyType = meta.TopologyType },
                 HasCollision = hasCollision,
                 Connection = -buildDirection,
             };
