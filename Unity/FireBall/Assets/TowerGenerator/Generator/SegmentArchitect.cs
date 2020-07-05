@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameLib;
 using GameLib.DataStructures;
 using GameLib.Random;
 using UnityEngine;
@@ -13,67 +14,90 @@ namespace TowerGenerator
         public delegate Vector3 ChangeDirectionCallback(int index);
 
         // if we want:
-        //  * dynamically created PlacementConfig (decreasing size every segment for example)
+        //  * dynamically created PlacementConfig (for example decreasing size every segment )
         //  * get some specifications ("very_big_peak,hat_like")
         public delegate GeneratorConfigBase.PlacementConfig GetPlacementConfigCallback(TopologyType topologyType, int segmentIndex);
-
-        public class MemorySegment
-        {
-            public Blueprint.Segment.TopologySegment.ChunkGeometry ChunkGeometry;
-            public bool HasCollision { get; set; }
-        }
 
         public ChangeDirectionCallback DirectionChanger { get; set; }
         public GetPlacementConfigCallback PlacementConfigProvider { get; set; }
 
-
         private RandomHelper _rnd;
-        private TreeNode<Blueprint.Segment> _blueprintTree;
-        private List<TreeNode<MemorySegment>> _varLeafPointers;
-        private TreeNode<MemorySegment> _startingNode;
+        private long _initialSeed;
+        private TreeNode<Blueprint.Segment> _treeCheck;
+        private List<TreeNode<Blueprint.Segment>> _varLeafPointers;
+        private TreeNode<Blueprint.Segment> _fromNode;
+        private TreeNode<Blueprint.Segment> _startingNode;
         private GeneratorConfigBase _baseConfig;
+        private TopologyType _beginningTopology;
+        private TopologyType _middleTopology;
+        private TopologyType _endingTopology;
+        private bool _makeLastSegmentOpened;
 
 
-        public SegmentArchitect(long seed, TreeNode<Blueprint.Segment> tree) 
-        {
-            _rnd = new RandomHelper(seed);
-            _blueprintTree = tree;
-        }
-
-        public bool Project(
-            GeneratorConfigBase baseCfg, Blueprint.Segment.TopologySegment.ChunkGeometry from, Range segCount,
-            Vector3 direction, Vector3 offset,
-            TopologyType beginningType, TopologyType middleType, TopologyType lastType
+        public SegmentArchitect(
+            long seed, 
+            TreeNode<Blueprint.Segment> treeCheck, // from which part of the tree Architect should check collisions
+            GeneratorConfigBase baseCfg,
+            TopologyType beginningType, TopologyType middleType, TopologyType endingType,
+            ChangeDirectionCallback directionChanger = null,
+            GetPlacementConfigCallback placementConfigProvider = null
         )
         {
-            Assert.IsTrue(_varLeafPointers == null || _varLeafPointers.Count == 0);
+            _initialSeed = seed;
+            _treeCheck = treeCheck;
+
             Assert.IsNotNull(baseCfg);
             _baseConfig = baseCfg;
+
+            _beginningTopology = beginningType;
+            _middleTopology = middleType;
+            _endingTopology = endingType;
+
+            DirectionChanger = directionChanger;
+            PlacementConfigProvider = placementConfigProvider;
+        }
+
+        public bool MakeProjects(
+            TreeNode<Blueprint.Segment> from, Range segCount,
+            Vector3 offset, Vector3 direction, bool makeLastOpened = true
+        )
+        {
+            if (_varLeafPointers != null )
+            {
+                Debug.Log("Reusing SegmentArchitect");
+            }
             int targetSegmentCount = (int)segCount.From;
             int segmentCounter = 0;
-            _varLeafPointers = new List<TreeNode<MemorySegment>>((int)(segCount.To - segCount.From));
-            TreeNode<MemorySegment> nodePointer = new TreeNode<MemorySegment>(new MemorySegment{ChunkGeometry = from});
-            _startingNode = nodePointer;
+            _varLeafPointers = new List<TreeNode<Blueprint.Segment>>((int)(segCount.To - segCount.From));
+            _fromNode = from;
+            TreeNode<Blueprint.Segment> nodePointer = from;
+            _makeLastSegmentOpened = makeLastOpened;
+
+            _rnd = new RandomHelper(_initialSeed);
 
             while (segmentCounter != targetSegmentCount)
             {
                 // get actual placement config
-                var topologyType = (segmentCounter == 0) ? beginningType : middleType;
+                var topologyType = (segmentCounter == 0) ? _beginningTopology : _middleTopology;
                 if (segmentCounter == targetSegmentCount - 1 && (segmentCounter != 0))
-                    topologyType = lastType;
+                    topologyType = _endingTopology;
                 GeneratorConfigBase.PlacementConfig placementConfig = null;
                 if (PlacementConfigProvider != null)
                     placementConfig = PlacementConfigProvider(topologyType, segmentCounter);
                 else
-                    placementConfig = baseCfg.GetPlacementConfig(topologyType);
+                    placementConfig = _baseConfig.GetPlacementConfig(topologyType);
                 Assert.IsNotNull(placementConfig, "Can't find placement config");
 
                 // create memory segment
                 var memSeg = CreateMemorySegment(nodePointer, direction,
                     segmentCounter == 0 ? offset : Vector3.zero,
                     placementConfig);
+                Assert.IsNotNull(memSeg);
 
-                if (memSeg.Data.HasCollision)
+                if(_startingNode == null)
+                    _startingNode = memSeg;
+
+                if (memSeg.Data.Topology.HasCollision)
                     break;
 
                 if (segmentCounter == targetSegmentCount - 1)
@@ -98,14 +122,19 @@ namespace TowerGenerator
             return _varLeafPointers.Count;
         }
 
-        public TreeNode<MemorySegment> GetProject(int index)
+        public TreeNode<Blueprint.Segment> GetProject(int index, out TreeNode<Blueprint.Segment> lastNode)
         {
             var choosen = _varLeafPointers[index];
-            TreeNode<MemorySegment> prevMemSegment = null;
-            foreach (var node in TreeNode<MemorySegment>.TraverseToParent(_startingNode, choosen))
-            {
-                TreeNode<MemorySegment> memSeg = new TreeNode<MemorySegment>(node.Data);
-                if(prevMemSegment != null)
+            TreeNode<Blueprint.Segment> prevMemSegment = null;
+            lastNode = null;
+            foreach (var node in TreeNode<Blueprint.Segment>.TraverseToParent(_fromNode, choosen))
+            {   
+                TreeNode<Blueprint.Segment> memSeg = new TreeNode<Blueprint.Segment>(node.Data);
+
+                if (lastNode == null)
+                    lastNode = memSeg;
+
+                if (prevMemSegment != null)
                     memSeg.AddChild(prevMemSegment);
 
                 prevMemSegment = memSeg;
@@ -113,15 +142,16 @@ namespace TowerGenerator
             return prevMemSegment;
         }
 
-        private TreeNode<MemorySegment> CreateMemorySegment(
-            TreeNode<MemorySegment> parentNode,
+        private TreeNode<Blueprint.Segment> CreateMemorySegment(
+            TreeNode<Blueprint.Segment> parentNode,
             Vector3 buildDirection,
             Vector3 offsetFromParent,
             GeneratorConfigBase.PlacementConfig placementConfig)
         {
-            var memSeg = new MemorySegment();
-            var curNode = new TreeNode<MemorySegment>(memSeg);
-            parentNode.AddChild(curNode);
+            var memSeg = new Blueprint.Segment();
+            var curNode = new TreeNode<Blueprint.Segment>(memSeg);
+            if(parentNode != _fromNode)
+                parentNode.AddChild(curNode);
 
             // get random meta from available meta providers of current placementConfig
             IEnumerable<MetaBase> allMetas = placementConfig.MetaProviders[0].GetMetas(); // available for current placement config
@@ -143,9 +173,9 @@ namespace TowerGenerator
             _rnd.FromList(meta.AABBs);
 
             Bounds bounds;
-            if (parentNode.Data.ChunkGeometry != null)
+            if (parentNode != null)
             {
-                var parentBounds = parentNode.Data.ChunkGeometry.Bounds;
+                var parentBounds = parentNode.Data.Topology.Geometry.Bounds;
                 bounds = CreateBoundsForChild(parentBounds, buildDirection, meta.AABBs[sizeIndex], offsetFromParent);
             }
             else // parentNode is a proxy empty (establishment) node
@@ -153,16 +183,15 @@ namespace TowerGenerator
                 bounds = CreateBounds(meta.AABBs[sizeIndex], offsetFromParent);
             }
 
-            var hasCollision = CheckTreeCollisions(bounds, _blueprintTree);
+            var hasCollision = CheckTreeCollisions(bounds, _treeCheck);
             hasCollision = hasCollision && CheckProjectCollisions(bounds, parentNode);
 
-            memSeg.ChunkGeometry.TopologyType = meta.TopologyType;
-            memSeg.ChunkGeometry.Bounds = bounds;
-            memSeg.ChunkGeometry.BuildDirection = buildDirection;
-            memSeg.ChunkGeometry.Meta = meta.name;
-            memSeg.ChunkGeometry.SizeIndex = sizeIndex;
-            memSeg.ChunkGeometry.Seed = _rnd.ValueInt();
-            memSeg.HasCollision = hasCollision;
+            memSeg.Topology = new Blueprint.Segment.TopologySegment
+            {
+                Geometry = {Bounds = bounds, BuildDirection = buildDirection,Meta = meta.name,Seed = _rnd.ValueInt(),SizeIndex = sizeIndex,TopologyType = meta.TopologyType},
+                HasCollision = hasCollision,
+                Connection = -buildDirection,
+            };
 
             return curNode;
         }
@@ -200,22 +229,24 @@ namespace TowerGenerator
             return false;
         }
 
-        private bool CheckProjectCollisions(Bounds checkBounds, TreeNode<MemorySegment> lastParent)
+        // todo: from the start node of the project for each node check with checkBounds
+        private bool CheckProjectCollisions(Bounds checkBounds, TreeNode<Blueprint.Segment> lastParent)
         {
-            if (lastParent == null)
-                return false;
+            //if (lastParent == null)
+            //    return false;
 
-            var pointer = lastParent;
-            while (pointer != _startingNode) 
-            {
-                var pointerBounds = pointer.Data.ChunkGeometry.Bounds;
-                if (pointerBounds.IntersectsEx(checkBounds))
-                    return true;
-            }
+            //var pointer = lastParent;
+            //while (pointer != _startingNode) 
+            //{
+            //    var pointerBounds = pointer.Data.ChunkGeometry.Bounds;
+            //    if (pointerBounds.IntersectsEx(checkBounds))
+            //        return true;
+            //}
             return false;
         }
 
     }
+
 
 
 

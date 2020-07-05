@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting;
 using GameLib.DataStructures;
 using GameLib.Random;
 using UnityEngine;
@@ -12,19 +14,21 @@ namespace TowerGenerator
         // todo: optional visualizer
 
 
-        //private Blueprint Blueprint;
+        private Blueprint _blueprint;
+        private GeneratorPointer _pointers;
+
 
 
         //public GeneratorConfigBase Config { get; private set; }
         //private TopologyGeneratorsManifoldBase _manifold;
 
-
-        public SegmentConstructor(Blueprint blueprint/*long seed, TreeNode<Blueprint.Segment> genFromNode, GeneratorConfigBase cfg, TopologyGeneratorsManifoldBase manifold*/)
+        public void Init(Blueprint blueprint, GeneratorPointer pointers)
         {
-        //    _rnd = new RandomHelper(seed);
-        //    State = new GeneratorState(genFromNode);
-        //    Config = cfg;
-        //    _manifold = manifold;
+            Assert.IsNotNull(blueprint);
+            Assert.IsNotNull(pointers);
+            _pointers = pointers;
+            _blueprint = blueprint;
+            StartCoroutine(VisualizationCycle());
         }
 
         //public long GetCurrentSeed()
@@ -32,9 +36,22 @@ namespace TowerGenerator
         //    return _rnd.GetCurrentSeed();
         //}
 
-        public void Construct(TreeNode<SegmentArchitect.MemorySegment> project)
-        {
+        //public void Construct(TreeNode<SegmentArchitect.MemorySegment> project)
+        //{
+        //    foreach (var planSegment in project.TraverseDepthFirstPostOrder())
+        //    {
+        //        var chunkGeometry = planSegment.Data.ChunkGeometry;
+        //        Assert.IsNotNull(chunkGeometry);
+        //    }
+        //}
 
+        IEnumerator VisualizationCycle()
+        {
+            while (true)
+            {
+
+                yield return null;
+            }
         }
 
         //public IEnumerable<TreeNode<Blueprint.Segment>> Build()

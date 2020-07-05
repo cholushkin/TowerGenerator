@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 namespace TowerGenerator
 {
-    // controls all groups started from DimensionStack. Also system allows to have groups and objects beside the main group, but they should take
+    // controls all groups started from DimensionStack. 
     public class RootGroupsController : MonoBehaviour
     {
         public class EventGroupChoiceDone

@@ -20,15 +20,13 @@ namespace TowerGenerator
 
         public class State
         {
-            public ExecutionFrame Frame;
             public Blueprint Blueprint;
             public List<TreeNode<Blueprint.Segment>> OpenedSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
+            public List<TreeNode<Blueprint.Segment>> DeadlockSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
 
             // public SegmentArchitect Architect; moved to generator
-            public SegmentConstructor Constructor;
+            //public SegmentConstructor Constructor;
             public GeneratorPointer Pointers;
-
-            public Transform Root;
         }
 
         public class ExecutionFrame
@@ -36,8 +34,12 @@ namespace TowerGenerator
             public Prototype Prototype;
         }
 
+        public SegmentConstructor Constructor;
+
         protected StateMachine<ProcessorState> _stateMachine;
+        private ExecutionFrame _frame;
         private Stack<ExecutionFrame> _callStack;
+        private Transform _towerRoot;
 
 
         public void StartGenerate(Prototype prototype, Transform root)
@@ -61,20 +63,23 @@ namespace TowerGenerator
         State Init(Prototype prototype, Transform root)
         {
             var blueprint = new Blueprint();
-            var constructor = GetComponent<SegmentConstructor>();
             _callStack = new Stack<ExecutionFrame>();
-            
+            _frame = new ExecutionFrame { Prototype = prototype };
+            _towerRoot = root;
+
+            var pointers = new GeneratorPointer(blueprint);
+            pointers.SetInitialPointers();
+
             var state = new State
             {
-                Frame = new ExecutionFrame{Prototype = prototype},
                 Blueprint = blueprint,
                 OpenedSegments = new List<TreeNode<Blueprint.Segment>>(16),
-                Constructor = constructor,
-                Pointers = new GeneratorPointer(blueprint),
-                Root = root
+                Pointers = pointers
             };
 
-            _callStack.Push(state.Frame);
+            Constructor.Init(blueprint, pointers);
+
+            _callStack.Push(_frame);
 
             return state;
         }
@@ -89,30 +94,40 @@ namespace TowerGenerator
             // get first generator and establish a tower
             if (state.Blueprint.Tree == null)
             {
-                currentConfig = GetNextConfig(state);
+                currentConfig = GetNextConfig();
                 Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
                 Assert.IsNotNull(currentConfig, "first config is null (establish fail)");
                 Establish(state, currentConfig);
-                //    //var cfg = _chooserMain.GetCurrent();
-                //    //    var firstGenerator = cfg.CreateGenerator(seed, null, this);
-                //    //    State.ActiveGenerators.Add(firstGenerator);
-                //    //    var firstStep = firstGenerator.EstablishTower();
-                //    //    Assert.IsNull(_bp.Tree);
-                //    //    Assert.IsTrue(firstStep.GeneratorCmd == GeneratorBase.TopGenStep.Cmd.SegSpawn);
-                //    //    _bp.Tree = firstStep.Segment;
-
-                //}
-                //else  // establish from prototype
-                //{
-                //    var generatorProcessor = container.GetComponent<GeneratorProcessor>();
-                //    Assert.IsNotNull(generatorProcessor);
-                //    generatorProcessor.Generate(_towerGenerator, _workingState);
-                //}
+                yield return null;
             }
 
-            while ( (currentConfig = GetNextConfig(state)) != null)
+            while ((currentConfig = GetNextConfig()) != null)
             {
                 Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
+                var currentGenerator = currentConfig.CreateGenerator(currentConfig.SeedTopology);
+                yield return null;
+
+                const int MaxIterationForGenerator = 16;
+                for (int i = 0; i < MaxIterationForGenerator; ++i)
+                {
+                    currentGenerator.Generate(state, i);
+                    yield return null;
+
+                    if (state.DeadlockSegments.Count != 0)
+                    {
+                        //ResolveDeadlocks
+                        yield return null;
+                    }
+
+                    yield return null;
+                    if (currentGenerator.Done())
+                        break;
+                }
+
+
+
+                //currentGenerator.
+
             }
 
             // after first step initialization
@@ -185,7 +200,9 @@ namespace TowerGenerator
 
         public void Establish(State state, GeneratorConfigBase config)
         {
-            var architect = new SegmentArchitect(config.SeedTopology, null);
+            var architect = new SegmentArchitect(config.SeedTopology, state.Pointers.PointerStable, config,
+                TopologyType.ChunkFoundation, TopologyType.Undefined, TopologyType.Undefined
+                );
 
             // override default placement config picker
             {
@@ -202,24 +219,20 @@ namespace TowerGenerator
                 architect.PlacementConfigProvider = (segRelativePos, segIndex) => foundationPlacementCfg;
             }
 
-            architect.Project(
-                config,
+            architect.MakeProjects(
                 null,
                 Range.One,
-                Vector3.up,
-                Vector3.zero,
-                TopologyType.ChunkFoundation,
-                TopologyType.Undefined,
-                TopologyType.Undefined
+                Vector3.zero, Vector3.up
             );
 
             Assert.IsTrue(architect.GetProjectVariantsNumber() == 1);
+            var project = architect.GetProject(0, out var openedSeg);
 
-            state.Pointers.SetInitialPointers();
-            state.Constructor.Construct(architect.GetProject(0));
+            state.Blueprint.AddSubtree(null, Vector3.up, project);
+            state.OpenedSegments.Add(openedSeg);
         }
 
-        GeneratorConfigBase GetNextConfig(State state)
+        GeneratorConfigBase GetNextConfig()
         {
             ExecutionFrame StepOut()
             {
@@ -239,14 +252,14 @@ namespace TowerGenerator
                 return newFrame;
             }
 
-            var container = state.Frame.Prototype.GeneratorNodes.GetNext();
+            var container = _frame.Prototype.GeneratorNodes.GetNext();
             if (container == null) // out of genNodes on this prototype
             {
-                state.Frame = StepOut();
+                _frame = StepOut();
                 // switch prototype (return on a level back)
-                if (state.Frame == null)
+                if (_frame == null)
                     return null; // no configs anymore - need to finalize construction
-                return GetNextConfig(state);
+                return GetNextConfig();
             }
 
             var cfg = container.GetComponent<GeneratorConfigBase>();
@@ -256,8 +269,8 @@ namespace TowerGenerator
                 return cfg;
             }
 
-            state.Frame = StepIn(container.GetComponent<Prototype>());
-            return GetNextConfig(state);
+            _frame = StepIn(container.GetComponent<Prototype>());
+            return GetNextConfig();
         }
     }
 }

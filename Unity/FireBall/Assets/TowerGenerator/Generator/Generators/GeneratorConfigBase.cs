@@ -41,6 +41,7 @@ namespace TowerGenerator
             [Range(0f, 1f)] public float Back;
         }
 
+        [Tooltip("Segments amount for one iteration of generator for the trunk")]
         public Range TrunkSegmentsCount;
         public List<PlacementConfig> PlacementConfigs;
 

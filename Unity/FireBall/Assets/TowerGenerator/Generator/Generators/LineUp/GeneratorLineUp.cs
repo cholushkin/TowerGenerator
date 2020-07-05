@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameLib.DataStructures;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
@@ -26,6 +28,30 @@ namespace TowerGenerator
         public GeneratorLineUp(long seed, ConfigLineUp cfg)
             : base(seed, cfg)
         {
+        }
+
+        public override void Generate(GeneratorProcessor.State state, int iteration)
+        {
+            var opened = state.OpenedSegments.OrderBy(x => x.BranchLevel).ToList();
+            var lineUpCfg = (ConfigLineUp) Config;
+
+            Assert.IsTrue(opened[0].BranchLevel == 0);
+            foreach (var openedNode in opened)
+            {
+                var architect = new SegmentArchitect(_rnd.GetCurrentSeed(), state.Pointers.PointerStable, lineUpCfg,
+                    TopologyType.ChunkStd, TopologyType.ChunkStd, TopologyType.ChunkStd
+                );
+
+                var success = architect.MakeProjects(  openedNode, lineUpCfg.TrunkSegmentsCount,
+                    Vector3.zero, Vector3.up);
+                Assert.IsTrue(success);
+
+                var project = architect.GetProject(_rnd.Range(0, architect.GetProjectVariantsNumber()), out var lastSeg);
+
+                state.Blueprint.AddSubtree(openedNode, Vector3.up, project);
+                state.OpenedSegments.Remove(openedNode);
+                state.OpenedSegments.Add(lastSeg);
+            }
         }
 
         //public override IEnumerable<TopGenStep> GenerateTower()
@@ -72,5 +98,9 @@ namespace TowerGenerator
         //    //    yield return TopGenStep.DoStep(segment, TopGenStep.Cmd.SegSpawn);
         //    ////State.IsStillGeneratingTrunk = false;
         //}
+        public override bool Done()
+        {
+            return true;
+        }
     }
 }

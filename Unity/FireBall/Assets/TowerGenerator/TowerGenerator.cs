@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Assets.Plugins.Alg;
-using GameLib.Random;
+﻿using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -16,7 +14,9 @@ namespace TowerGenerator
         [Range(3, 16)]
         public int PrototypesNestingDepthLevel;
         public Transform OutcomeRoot;
+        [Tooltip("Seed used for initialize configs with -1 seeds")]
         public long ControlSeed;
+
         private Prototype _initialPrototype;
 
         void Awake()

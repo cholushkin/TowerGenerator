@@ -64,7 +64,7 @@ namespace TowerGenerator
                 if (height == null || height.IsZero())
                     height = Range.InfiniteRange;
 
-                if (breadth == Range.Infinite && height == Range.Infinite)
+                if (breadth == Range.InfiniteRange && height == Range.InfiniteRange)
                     return metas;
 
                 return metas.Where(x=>_checkSizes(x, breadth, height));

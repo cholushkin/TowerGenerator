@@ -39,7 +39,7 @@ namespace TowerGenerator
         public Transform BranchConfigs;
 
         [Space(12)]
-        public TopologyGeneratorsVisualizer TopologyVisualizer;
+        //public TopologyGeneratorsVisualizer TopologyVisualizer;
         //public VisualBuilder VisualBuilder;
 
 #if UNITY_EDITOR
@@ -311,8 +311,8 @@ namespace TowerGenerator
                 var p = node;
                 while (p != null)
                 {
-                    if (p.Data.Topology.IsOpenedForGenerator == false && p.BranchLevel == 0)
-                        return p;
+                    //if (p.Data.Topology.IsOpenedForGenerator == false && p.BranchLevel == 0)
+                    //    return p;
                     p = p.Parent;
                 }
                 return null;
