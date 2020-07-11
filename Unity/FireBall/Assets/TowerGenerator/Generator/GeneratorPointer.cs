@@ -3,66 +3,119 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    public class GeneratorPointer 
+    public class GeneratorPointer
     {
-        public TreeNode<Blueprint.Segment> PointerGarbageCollector { get; private set; }
-        public TreeNode<Blueprint.Segment> PointerProgress { get; private set; }
-        public TreeNode<Blueprint.Segment> PointerGenerator { get; private set; }
-        public TreeNode<Blueprint.Segment> PointerStable { get; set; }
-        public float MaxDistanceProgressToGenerator;
-        public float MaxDistanceProgressToGarbageCollector;
+        public TreeNode<Blueprint.Segment> PointerGeneratorTopTrunk { get; private set; } // everything below PointerGarbageCollector could be collected
+        public TreeNode<Blueprint.Segment> PointerGeneratorStable { get; private set; } // last stable node (also last collision check pivot). Constructor never goes above the stable node because a tree there could be regenerated
+        public TreeNode<Blueprint.Segment> PointerGarbageCollectorAbove { get; private set; } // everything above PointerGarbageCollectorAbove could be collected (excluding PointerGarbageCollectorAbove pointer itself)
+        public TreeNode<Blueprint.Segment> PointerGarbageCollectorBelow { get; private set; } // everything below PointerGarbageCollectorBelow could be collected (excluding PointerGarbageCollectorBelow pointer itself)
+
+        public TreeNode<Blueprint.Segment> PointerConstructFrom { get; private set; } // constructor builds from this pointer (including)
+        public TreeNode<Blueprint.Segment> PointerConstructTo { get; private set; } // constructor builds to this pointer (including)
+        public TreeNode<Blueprint.Segment> PointerViewport { get; private set; }
+
+        public bool IsNeededToGenerateMore => DistanceDown(PointerGeneratorTopTrunk, PointerViewport) < ViewportToTopTrunkDistance;
+
+        private const int ViewportToTopTrunkDistance = 32; // how many segments from PointerViewport up to PointerGeneratorTopTrunk needs to be to pause generation
+        private int GarbageCollectorDistance = 64; // how many segments from PointerViewport down&up to GarbageCollector pointers
+
         private Blueprint _bp;
 
-        public GeneratorPointer(
-            Blueprint bp
-            //float maxDistanceProgressToGenerator,
-            //float maxDistanceProgressToGarbageCollector
-            )
+        public GeneratorPointer(Blueprint bp)
         {
             _bp = bp;
-            //MaxDistanceProgressToGenerator = maxDistanceProgressToGenerator;
-            //MaxDistanceProgressToGarbageCollector = maxDistanceProgressToGarbageCollector;
+            Assert.IsTrue(GarbageCollectorDistance > ViewportToTopTrunkDistance);
         }
 
         public void SetInitialPointers()
         {
             Assert.IsNotNull(_bp);
             Assert.IsNotNull(_bp.Tree);
-            PointerGarbageCollector = _bp.Tree;
-            PointerProgress = _bp.Tree;
-            PointerGenerator = _bp.Tree;
-            PointerStable = _bp.Tree;
+            PointerGarbageCollectorAbove = PointerGarbageCollectorBelow = PointerGeneratorTopTrunk = PointerGeneratorStable
+            = PointerConstructFrom = PointerConstructTo = PointerViewport = _bp.Tree;
         }
 
-        //public float DistanceYFactorProgress2Generator()
-        //{
-        //    return Mathf.Abs(PointerProgress.Data.Topology.Geometry.Position.y -
-        //                     PointerGenerator.Data.Topology.Geometry.Position.y);
-        //}
+        public void SetPointerGeneratorTopTrunk(TreeNode<Blueprint.Segment> pointerGeneratorTopTrunk, TreeNode<Blueprint.Segment> pointerGeneratorStable)
+        {
+            Assert.IsNotNull(pointerGeneratorTopTrunk);
+            Assert.IsNotNull(pointerGeneratorStable);
+            PointerGeneratorTopTrunk = pointerGeneratorTopTrunk;
+            PointerGeneratorStable = pointerGeneratorStable;
 
-        //public void MoveProgress()
-        //{
-        //    var nextTrunkNode = PointerProgress.Children.FirstOrDefault();
-        //    if (nextTrunkNode == null)
-        //        return;
+            // refresh pointer viewport
+            SetPointerViewport(PointerViewport);
+        }
 
-        //    // Update progress pointer
-        //    PointerProgress = nextTrunkNode;
+        public void SetPointerViewport(TreeNode<Blueprint.Segment> pointerViewport)
+        {
+            Assert.IsNotNull(pointerViewport);
+            PointerViewport = pointerViewport;
 
-        //    // Decrease distance between PointerProgress and PointerGarbageCollector
-        //    while (Mathf.Abs(PointerProgress.Data.Topology.Geometry.Position.y - PointerGarbageCollector.Data.Topology.Geometry.Position.y)
-        //           > MaxDistanceProgressToGarbageCollector) // y distance from PointerProgress to PointerGarbageCollector
-        //    {
-        //        MoveGarbageCollectorPointer();
-        //    }
-        //}
+            // refresh construct pointers
+            PointerConstructFrom = GetBelow(PointerViewport, ViewportToTopTrunkDistance);
+            PointerConstructTo = GetAbove(PointerViewport, ViewportToTopTrunkDistance);
 
-        //private void MoveGarbageCollectorPointer()
-        //{
-        //    PointerGarbageCollector = PointerGarbageCollector.Children.First();
-        //}
+            // refresh garbage collector pointers
+            PointerGarbageCollectorBelow = GetBelow(pointerViewport, GarbageCollectorDistance);
+            PointerGarbageCollectorAbove = GetAbove(pointerViewport, GarbageCollectorDistance);
+        }
+
+        private TreeNode<Blueprint.Segment> GetBelow(TreeNode<Blueprint.Segment> from, int distance)
+        {
+            int counter = 0;
+            var pointer = from;
+            while (pointer != null)
+            {
+                if (counter == distance)
+                    return pointer;
+                counter++;
+                pointer = pointer.Parent;
+            }
+            return _bp.Tree;
+        }
+
+        private TreeNode<Blueprint.Segment> GetAbove(TreeNode<Blueprint.Segment> from, int distance)
+        {
+            int counter = 0;
+            var pointer = from;
+            while (pointer != null)
+            {
+                if (counter == distance)
+                    return pointer;
+
+                counter++;
+
+                if (pointer.Children.Count == 0)
+                    return pointer;
+
+                pointer = pointer.Children[0];
+            }
+            return null;
+        }
+
+        public int DistanceUp(TreeNode<Blueprint.Segment> from, TreeNode<Blueprint.Segment> to)
+        {
+            int counter = 0;
+            var pointer = from;
+            while (pointer != to && pointer.Children.Count != 0)
+            {
+                counter++;
+                pointer = pointer.Children[0];
+            }
+            return counter;
+        }
+
+
+        public int DistanceDown(TreeNode<Blueprint.Segment> from, TreeNode<Blueprint.Segment> to)
+        {
+            int counter = 0;
+            var pointer = from;
+            while (pointer != to && pointer != null)
+            {
+                counter++;
+                pointer = pointer.Parent;
+            }
+            return counter;
+        }
     }
-
-
-
 }

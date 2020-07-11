@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Assets.Plugins.Alg;
 using GameLib;
 using GameLib.DataStructures;
 using GameLib.Random;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -26,6 +28,7 @@ namespace TowerGenerator
 
             // public SegmentArchitect Architect; moved to generator
             //public SegmentConstructor Constructor;
+            public int ConfigCounter;
             public GeneratorPointer Pointers;
         }
 
@@ -34,13 +37,19 @@ namespace TowerGenerator
             public Prototype Prototype;
         }
 
-        public SegmentConstructor Constructor;
+        public ChunkVisualConstructor Constructor;
 
         protected StateMachine<ProcessorState> _stateMachine;
+        private GeneratorConfigBase _currentConfig;
+        private Queue<TreeNode<Blueprint.Segment>> _lastSegments;
         private ExecutionFrame _frame;
         private Stack<ExecutionFrame> _callStack;
         private Transform _towerRoot;
+#if DEBUG
+        private State _state;
+#endif
 
+        private const int LastSegmentsQueueSize = 4;
 
         public void StartGenerate(Prototype prototype, Transform root)
         {
@@ -66,6 +75,7 @@ namespace TowerGenerator
             _callStack = new Stack<ExecutionFrame>();
             _frame = new ExecutionFrame { Prototype = prototype };
             _towerRoot = root;
+            _lastSegments = new Queue<TreeNode<Blueprint.Segment>>();
 
             var pointers = new GeneratorPointer(blueprint);
 
@@ -77,10 +87,12 @@ namespace TowerGenerator
                 Pointers = pointers
             };
 
-            Constructor.Init(blueprint, pointers);
+            Constructor.Init(blueprint, _towerRoot, pointers);
 
             _callStack.Push(_frame);
-
+#if DEBUG
+            _state = state;
+#endif
             return state;
         }
 
@@ -98,20 +110,33 @@ namespace TowerGenerator
                 Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
                 Assert.IsNotNull(currentConfig, "first config is null (establish fail)");
                 Establish(state, currentConfig);
+                _lastSegments.Enqueue(state.OpenedSegments.First());
                 yield return null;
             }
 
             while ((currentConfig = GetNextConfig()) != null)
             {
                 Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
-                var currentGenerator = currentConfig.CreateGenerator(currentConfig.SeedTopology);
+                var currentGenerator = currentConfig.CreateGenerator();
                 yield return null;
 
                 const int MaxIterationForGenerator = 16;
                 for (int i = 0; i < MaxIterationForGenerator; ++i)
                 {
                     currentGenerator.Generate(state, i);
-                    yield return null;
+
+                    // update last segments
+                    var trunkLastSegment = state.OpenedSegments.OrderBy(x => x.BranchLevel).First();
+                    _lastSegments.Enqueue(trunkLastSegment);
+                    while (_lastSegments.Count > LastSegmentsQueueSize)
+                        _lastSegments.Dequeue();
+                    Assert.IsNotNull(trunkLastSegment);
+                    Assert.IsTrue(trunkLastSegment.BranchLevel == 0);
+
+                    // update pointers
+                    state.Pointers.SetPointerGeneratorTopTrunk( trunkLastSegment, _lastSegments.Peek());
+
+                    yield return new WaitUntil(()=>state.Pointers.IsNeededToGenerateMore);
 
                     if (state.DeadlockSegments.Count != 0)
                     {
@@ -198,11 +223,18 @@ namespace TowerGenerator
             yield return null;
         }
 
+        private void OnNewConfigEnter(State state, GeneratorConfigBase newConfig, GeneratorConfigBase prevConfig)
+        {
+            _currentConfig = newConfig;
+            state.ConfigCounter++;
+        }
+
         public void Establish(State state, GeneratorConfigBase config)
         {
-            var architect = new SegmentArchitect(config.SeedTopology, state.Pointers.PointerStable, config,
-                TopologyType.ChunkFoundation, TopologyType.Undefined, TopologyType.Undefined
-                );
+            var architect = new SegmentArchitect(
+                config.SeedTopology,  config.SeedContent, config.SeedVisual,
+                state.Pointers.PointerGeneratorStable, config,
+                TopologyType.ChunkFoundation, TopologyType.Undefined, TopologyType.Undefined);
 
             // override default placement config picker
             {
@@ -268,6 +300,7 @@ namespace TowerGenerator
             if (cfg)
             {
                 cfg.OnProcessorEnter();
+                OnNewConfigEnter(_state, cfg, _currentConfig);
                 return cfg;
             }
 
@@ -276,75 +309,84 @@ namespace TowerGenerator
         }
 
 
-
+#if DEBUG
         void OnDrawGizmos()
         {
-            
-            //foreach (var treeNode in _bp.Tree.TraverseBreadthFirst())
-            //{
-            //    // node center
-            //    Gizmos.color = Color.red;
-            //    Gizmos.DrawSphere(
-            //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
-            //        0.5f);
+            if (_state == null)
+                return;
 
-            //    Gizmos.DrawWireCube(
-            //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position), 
-            //        treeNode.Data.Topology.Geometry.AspectRatio);
+            foreach (var treeNode in _state.Blueprint.Tree.TraverseBreadthFirst())
+            {
+                //    // node center
+                //    Gizmos.color = Color.red;
+                //    Gizmos.DrawSphere(
+                //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
+                //        0.5f);
 
-            //    Gizmos.color = Color.gray;
-            //    Gizmos.DrawWireCube(
-            //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
-            //        treeNode.Data.Topology.Geometry.AspectRatio - TowerGeneratorConstants.ConnectorMargin);
+                Gizmos.DrawWireCube(
+                    transform.TransformPoint(treeNode.Data.Topology.Geometry.Bounds.center + _towerRoot.localPosition),
+                    treeNode.Data.Topology.Geometry.Bounds.size);
+                var labelPos = transform.TransformPoint(treeNode.Data.Topology.Geometry.Bounds.center + _towerRoot.localPosition);
+                //    Gizmos.color = Color.black;
+                //    Gizmos.DrawWireSphere(
+                //        pointerGeneratorPos,
+                //        1.0f);
+                Handles.Label(labelPos, treeNode.Data.ToString(), new GUIStyle { fontSize = 10 });
 
-
-            //    // all nodes children lines
-            //    foreach (var child in treeNode.Children)
-            //    {
-            //        Gizmos.color = (child.BranchLevel == 0) ? Color.white : Color.grey;
-
-            //        var childPos = transform.TransformPoint(child.Data.Topology.Geometry.Position);
-            //        Gizmos.DrawLine(childPos, transform.TransformPoint(treeNode.Data.Topology.Geometry.Position));
-            //    }
-            //}
-
-            //if (IsGizmoDrawPointers)
-            //{
-            //    // _pointerGenerator
-            //    var pointerGeneratorPos = transform.TransformPoint(Pointers.PointerGenerator.Data.Topology.Geometry.Position);
-            //    Gizmos.color = Color.black;
-            //    Gizmos.DrawWireSphere(
-            //        pointerGeneratorPos,
-            //        1.0f);
-            //    Handles.Label(pointerGeneratorPos, "PointerGenerator");
+                //    Gizmos.color = Color.gray;
+                //    Gizmos.DrawWireCube(
+                //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
+                //        treeNode.Data.Topology.Geometry.AspectRatio - TowerGeneratorConstants.ConnectorMargin);
 
 
-            //    // _pointerStable
-            //    var pointerStablePos = transform.TransformPoint(Pointers.PointerStable.Data.Topology.Geometry.Position);
-            //    Gizmos.color = Color.black;
-            //    Gizmos.DrawWireSphere(
-            //        pointerStablePos,
-            //        1.0f);
-            //    Handles.Label(pointerStablePos, "PointerStable");
+                //    // all nodes children lines
+                //    foreach (var child in treeNode.Children)
+                //    {
+                //        Gizmos.color = (child.BranchLevel == 0) ? Color.white : Color.grey;
 
-            //    // _progressPointer
-            //    var pointerProgress = transform.TransformPoint(Pointers.PointerProgress.Data.Topology.Geometry.Position);
-            //    Gizmos.color = Color.white;
-            //    Gizmos.DrawWireSphere(
-            //        pointerProgress,
-            //        1.0f);
-            //    Handles.Label(pointerProgress, "PointerProgress");
-            //    //Gizmos.DrawLine(pointerGeneratorPos, pointerProgress);
+                //        var childPos = transform.TransformPoint(child.Data.Topology.Geometry.Position);
+                //        Gizmos.DrawLine(childPos, transform.TransformPoint(treeNode.Data.Topology.Geometry.Position));
+                //    }
+                //}
 
-            //    // _pointerGarbageCollector
-            //    var pointerGarbageCollectorPos =
-            //        transform.TransformPoint(Pointers.PointerGarbageCollector.Data.Topology.Geometry.Position);
-            //    Gizmos.color = Color.yellow;
-            //    Gizmos.DrawWireSphere(
-            //        pointerGarbageCollectorPos,
-            //        1.0f);
-            //    Handles.Label(pointerGarbageCollectorPos, "PointerGarbageCollector");
-            //}
+                //if (IsGizmoDrawPointers)
+                //{
+                //    // _pointerGenerator
+                //    var pointerGeneratorPos = transform.TransformPoint(Pointers.PointerGenerator.Data.Topology.Geometry.Position);
+                //    Gizmos.color = Color.black;
+                //    Gizmos.DrawWireSphere(
+                //        pointerGeneratorPos,
+                //        1.0f);
+                //    Handles.Label(pointerGeneratorPos, "PointerGenerator");
+
+
+                //    // _pointerStable
+                //    var pointerStablePos = transform.TransformPoint(Pointers.PointerStable.Data.Topology.Geometry.Position);
+                //    Gizmos.color = Color.black;
+                //    Gizmos.DrawWireSphere(
+                //        pointerStablePos,
+                //        1.0f);
+                //    Handles.Label(pointerStablePos, "PointerStable");
+
+                //    // _progressPointer
+                //    var pointerProgress = transform.TransformPoint(Pointers.PointerProgress.Data.Topology.Geometry.Position);
+                //    Gizmos.color = Color.white;
+                //    Gizmos.DrawWireSphere(
+                //        pointerProgress,
+                //        1.0f);
+                //    Handles.Label(pointerProgress, "PointerProgress");
+                //    //Gizmos.DrawLine(pointerGeneratorPos, pointerProgress);
+
+                //    // _pointerGarbageCollector
+                //    var pointerGarbageCollectorPos =
+                //        transform.TransformPoint(Pointers.PointerGarbageCollector.Data.Topology.Geometry.Position);
+                //    Gizmos.color = Color.yellow;
+                //    Gizmos.DrawWireSphere(
+                //        pointerGarbageCollectorPos,
+                //        1.0f);
+                //    Handles.Label(pointerGarbageCollectorPos, "PointerGarbageCollector");
+            }
         }
+#endif
     }
 }

@@ -16,7 +16,7 @@ namespace TowerGenerator
 
     public abstract class GeneratorConfigBase : MonoBehaviour
     {
-        public abstract GeneratorBase CreateGenerator(long seed);
+        public abstract GeneratorBase CreateGenerator();
 
         [Serializable]
         public class PlacementConfig

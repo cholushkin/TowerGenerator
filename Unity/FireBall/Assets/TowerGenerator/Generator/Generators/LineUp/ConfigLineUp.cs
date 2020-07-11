@@ -14,9 +14,9 @@ namespace TowerGenerator
         [Range(0f, 1f)]
         public float PropagateIslandChance; // used for creating openings on branches(use case 1) and for continue openings from prev generator (2)
 
-        public override GeneratorBase CreateGenerator( long seed )
+        public override GeneratorBase CreateGenerator()
         {
-            return new GeneratorLineUp(seed, this);
+            return new GeneratorLineUp(this);
         }
     }
 

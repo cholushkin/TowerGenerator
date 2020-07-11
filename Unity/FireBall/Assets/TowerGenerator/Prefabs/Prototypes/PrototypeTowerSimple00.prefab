@@ -305,6 +305,11 @@ PrefabInstance:
       propertyPath: TrunkSegmentsCount.To
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 7402457836566982248, guid: fe1a1bf5ebb474348a72f94e5003612f,
+        type: 3}
+      propertyPath: SeedTopology
+      value: -1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe1a1bf5ebb474348a72f94e5003612f, type: 3}
 --- !u!1 &8416729503472513148 stripped
@@ -425,6 +430,11 @@ PrefabInstance:
         type: 3}
       propertyPath: TrunkSegmentsCount.To
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: SeedTopology
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 3967152057261358154, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}

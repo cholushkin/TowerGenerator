@@ -9,11 +9,16 @@ namespace TowerGenerator
     public abstract class GeneratorBase
     {
         public GeneratorConfigBase Config { get; private set; }
-        protected RandomHelper _rnd;
+        protected RandomHelper _rndTopology;
+        protected RandomHelper _rndVisual;
+        protected RandomHelper _rndContent;
 
-        public GeneratorBase(long seed, GeneratorConfigBase cfg)
+        public GeneratorBase(GeneratorConfigBase cfg)
         {
-            _rnd = new RandomHelper(seed);
+            _rndTopology = new RandomHelper(cfg.SeedTopology);
+            _rndVisual = new RandomHelper(cfg.SeedVisual);
+            _rndContent = new RandomHelper(cfg.SeedContent);
+
             Config = cfg;
         }
 

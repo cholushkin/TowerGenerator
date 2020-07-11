@@ -21,8 +21,15 @@ namespace TowerGenerator
         public ChangeDirectionCallback DirectionChanger { get; set; }
         public GetPlacementConfigCallback PlacementConfigProvider { get; set; }
 
-        private RandomHelper _rnd;
-        private long _initialSeed;
+        private RandomHelper _rndTopology;
+        private RandomHelper _rndVisual;
+        private RandomHelper _rndContent;
+
+        private long _seedTopology;
+        private long _seedVisual;
+        private long _seedContent;
+
+
         private TreeNode<Blueprint.Segment> _treeCheck;
         private List<TreeNode<Blueprint.Segment>> _varLeafPointers;
         private TreeNode<Blueprint.Segment> _fromNode;
@@ -34,7 +41,7 @@ namespace TowerGenerator
 
 
         public SegmentArchitect(
-            long seed,
+            long seedTopology, long seedContent, long seedVisual,
             TreeNode<Blueprint.Segment> treeCheck, // from which part of the tree Architect should check collisions
             GeneratorConfigBase baseCfg,
             TopologyType beginningType, TopologyType middleType, TopologyType endingType,
@@ -42,7 +49,10 @@ namespace TowerGenerator
             GetPlacementConfigCallback placementConfigProvider = null
         )
         {
-            _initialSeed = seed;
+            _seedTopology = seedTopology;
+            _seedVisual = seedVisual;
+            _seedContent = seedContent;
+
             _treeCheck = treeCheck;
 
             Assert.IsNotNull(baseCfg);
@@ -71,7 +81,9 @@ namespace TowerGenerator
             _fromNode = from;
             TreeNode<Blueprint.Segment> nodePointer = from;
 
-            _rnd = new RandomHelper(_initialSeed);
+            _rndTopology = new RandomHelper(_seedTopology);
+            _rndVisual = new RandomHelper(_seedVisual);
+            _rndContent = new RandomHelper(_seedContent);
 
             while (segmentCounter != targetSegmentCount)
             {
@@ -156,7 +168,7 @@ namespace TowerGenerator
             for (int i = 1; i < placementConfig.MetaProviders.Length; ++i)
                 allMetas = Enumerable.Concat(allMetas, placementConfig.MetaProviders[i].GetMetas());
 
-            var meta = _rnd.FromEnumerable(
+            var meta = _rndTopology.FromEnumerable(
                 MetaProvider.GetMetas(allMetas, placementConfig.MetaFilter));
 
             // exclude aabbs bigger than placementConfig.MetaFilter.BreadthRange and placementConfig.MetaFilter.HeightRange
@@ -166,9 +178,9 @@ namespace TowerGenerator
             Assert.IsTrue(aabbs.Length > 0);
 
             // get random aabb
-            var aabb = _rnd.FromArray(aabbs);
+            var aabb = _rndTopology.FromArray(aabbs);
             int sizeIndex = meta.AABBs.FindIndex(x => x == aabb);
-            _rnd.FromList(meta.AABBs);
+            _rndTopology.FromList(meta.AABBs);
 
             Bounds bounds;
             if (parentNode != null)
@@ -186,9 +198,20 @@ namespace TowerGenerator
 
             memSeg.Topology = new Blueprint.Segment.TopologySegment
             {
-                Geometry = new Blueprint.Segment.TopologySegment.ChunkGeometry { Bounds = bounds, BuildDirection = buildDirection, Meta = meta.name, Seed = _rnd.ValueInt(), SizeIndex = sizeIndex, TopologyType = meta.TopologyType },
+                Geometry = new Blueprint.Segment.TopologySegment.ChunkGeometry { Bounds = bounds, BuildDirection = buildDirection, Meta = meta, /*Seed = _rnd.ValueInt(),*/ SizeIndex = sizeIndex, TopologyType = meta.TopologyType },
                 HasCollision = hasCollision,
                 Connection = -buildDirection,
+            };
+
+            memSeg.Visual = new Blueprint.Segment.VisualSegment
+            {
+                ChunkTransform = null,
+                Seed = _rndVisual.ValueInt()
+            };
+
+            memSeg.Content = new Blueprint.Segment.ContentSegment
+            {
+                // todo: seed
             };
 
             return curNode;

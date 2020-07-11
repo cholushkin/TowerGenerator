@@ -58,7 +58,7 @@ namespace TowerGenerator
             return _tree.Data.gameObject.BoundBox();
         }
 
-        public void SetConfiguration()
+        public void SetConfiguration( int sizeIndex = -1)
         {
             if (Log.Verbose())
                 Debug.Log("> SetConfiguration");
@@ -72,6 +72,13 @@ namespace TowerGenerator
             {
                 Group group = treeNode.Data;
                 Assert.IsNotNull(group);
+
+                if (group == DimensionStack && sizeIndex != -1)
+                {
+                    DimensionStack.DoChoice(sizeIndex);
+                    continue;
+                }
+                
                 if (group != null)
                 {
                     if (!treeNode.Data.gameObject.activeInHierarchy)

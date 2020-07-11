@@ -13,14 +13,15 @@ namespace TowerGenerator
             return Vector3.zero;
         }
 
-        public static GameObject CreateChunk( MetaBase meta, long seed, Transform parent)
+
+        public static GameObject CreateChunkRnd(MetaBase meta, long seed, Transform parent, Vector3 position)
         {
             var visSegPrefab = (GameObject)Resources.Load("Chunks/" + meta.ChunkName);
             visSegPrefab.SetActive(false);
             var visSegment = Object.Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;
 
-            visSegment.transform.position = parent.position;
+            visSegment.transform.position = position;
             visSegment.transform.SetParent(parent);
 
             // rotation 
@@ -34,11 +35,38 @@ namespace TowerGenerator
 
             // centering
             var segBB = visSegController.CalculateBB();
-            Debug.Log($"sebBB:{segBB}");
             var offset = visSegController.transform.position - segBB.center;
-            Debug.Log($"offset:{offset}");
             visSegment.transform.position += offset;
-            segBB.center = visSegment.transform.position;
+            //segBB.center = visSegment.transform.position;
+            return visSegment;
+        }
+
+        public static GameObject CreateChunk( Blueprint.Segment bpSegment, Transform parent)
+        {
+            var topology = bpSegment.Topology;
+
+            var visSegPrefab = (GameObject)Resources.Load("Chunks/" + topology.Geometry.Meta.ChunkName);
+            visSegPrefab.SetActive(false);
+            var visSegment = Object.Instantiate(visSegPrefab);
+            visSegment.name = visSegPrefab.name;
+
+            visSegment.transform.position = parent.position + topology.Geometry.Bounds.center;
+            visSegment.transform.SetParent(parent);
+
+            // rotation 
+            visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
+
+            var visSegController = visSegment.GetComponent<RootGroupsController>();
+            visSegController.Seed = bpSegment.Visual.Seed;
+            visSegController.Init();
+            visSegment.SetActive(true);
+            visSegController.SetConfiguration(topology.Geometry.SizeIndex);
+
+            // centering
+            var segBB = visSegController.CalculateBB();
+            var offset = visSegController.transform.position - segBB.center;
+            visSegment.transform.position += offset;
+            //segBB.center = visSegment.transform.position;
             return visSegment;
         }
     }

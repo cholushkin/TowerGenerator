@@ -238,7 +238,7 @@ MonoBehaviour:
     Down: 0
     Forward: 0
     Back: 0
-  SeedTopology: 0
+  SeedTopology: -1
   SeedVisual: 0
   SeedContent: 0
   ResetOnProcessorEnter: 0

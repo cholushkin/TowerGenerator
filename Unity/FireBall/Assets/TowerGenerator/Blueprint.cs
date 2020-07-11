@@ -16,9 +16,9 @@ namespace TowerGenerator
                     public TopologyType TopologyType;
                     public Bounds Bounds; // position and aspects
                     public Vector3 BuildDirection;
-                    public string Meta;
+                    public MetaBase Meta;
                     public int SizeIndex;
-                    public long Seed;
+                    //public long Seed;
                 }
 
                 public ChunkGeometry Geometry;
@@ -28,12 +28,14 @@ namespace TowerGenerator
 
                 public override string ToString()
                 {
-                    return $"{Geometry.TopologyType}";
+                    return $"{Geometry.TopologyType},{Geometry.Meta}";
                 }
             }
 
             public class VisualSegment
             {
+                public Transform ChunkTransform;
+                public long Seed;
                 // transform of created chunk
                 // decorations
                 // biome

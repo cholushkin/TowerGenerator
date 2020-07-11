@@ -15,7 +15,7 @@ namespace TowerGenerator
             Destroy(_current);
 
             // spawn new
-            _current = ChunkFactory.CreateChunk(metaToPlace, seed, transform);
+            _current = ChunkFactory.CreateChunkRnd(metaToPlace, seed, transform, transform.position);
             CameraEntShowroomController.FitView(_current);
             _current.transform.localScale = Vector3.zero;
             _current.transform.DOScale(100f, 1f).SetEase(Ease.OutElastic);

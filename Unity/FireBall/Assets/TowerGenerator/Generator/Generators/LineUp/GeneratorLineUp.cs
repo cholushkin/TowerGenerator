@@ -25,8 +25,8 @@ namespace TowerGenerator
 
     public class GeneratorLineUp : GeneratorBase
     {
-        public GeneratorLineUp(long seed, ConfigLineUp cfg)
-            : base(seed, cfg)
+        public GeneratorLineUp(ConfigLineUp cfg)
+            : base(cfg)
         {
         }
 
@@ -38,15 +38,16 @@ namespace TowerGenerator
             Assert.IsTrue(opened[0].BranchLevel == 0);
             foreach (var openedNode in opened)
             {
-                var architect = new SegmentArchitect(_rnd.GetCurrentSeed(), state.Pointers.PointerStable, lineUpCfg,
+                var architect = new SegmentArchitect(
+                    _rndTopology.ValueInt(), _rndVisual.ValueInt(), _rndContent.ValueInt(),
+                    state.Pointers.PointerGeneratorStable, lineUpCfg,
                     TopologyType.ChunkStd, TopologyType.ChunkStd, TopologyType.ChunkStd
                 );
 
-                var success = architect.MakeProjects(  openedNode, lineUpCfg.TrunkSegmentsCount,
-                    Vector3.zero, Vector3.up);
+                var success = architect.MakeProjects( openedNode, lineUpCfg.TrunkSegmentsCount, Vector3.zero, Vector3.up);
                 Assert.IsTrue(success);
 
-                var project = architect.GetProject(_rnd.Range(0, architect.GetProjectVariantsNumber()), out var lastSeg);
+                var project = architect.GetProject(_rndTopology.Range(0, architect.GetProjectVariantsNumber()), out var lastSeg);
 
                 state.Blueprint.AddSubtree(openedNode, Vector3.up, project);
                 state.OpenedSegments.Remove(openedNode);
