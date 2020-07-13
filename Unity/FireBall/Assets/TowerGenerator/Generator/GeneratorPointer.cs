@@ -74,7 +74,7 @@ namespace TowerGenerator
             return _bp.Tree;
         }
 
-        private TreeNode<Blueprint.Segment> GetAbove(TreeNode<Blueprint.Segment> from, int distance)
+        public static TreeNode<Blueprint.Segment> GetAbove(TreeNode<Blueprint.Segment> from, int distance)
         {
             int counter = 0;
             var pointer = from;

@@ -292,6 +292,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7402457836566982248, guid: fe1a1bf5ebb474348a72f94e5003612f,
         type: 3}
+      propertyPath: PlacementConfigs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7402457836566982248, guid: fe1a1bf5ebb474348a72f94e5003612f,
+        type: 3}
       propertyPath: PropagateIslandChance
       value: 0.382
       objectReference: {fileID: 0}
@@ -309,6 +314,11 @@ PrefabInstance:
         type: 3}
       propertyPath: SeedTopology
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7402457836566982248, guid: fe1a1bf5ebb474348a72f94e5003612f,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.data[2].MetaFilter.TopologyType
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe1a1bf5ebb474348a72f94e5003612f, type: 3}
@@ -399,7 +409,7 @@ PrefabInstance:
     - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
       propertyPath: PlacementConfigs.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}
@@ -435,6 +445,11 @@ PrefabInstance:
         type: 3}
       propertyPath: SeedTopology
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3967152056789282998, guid: c270a142ec5537842bc1f3b14c10c8f4,
+        type: 3}
+      propertyPath: PlacementConfigs.Array.data[2].MetaFilter.TopologyType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3967152057261358154, guid: c270a142ec5537842bc1f3b14c10c8f4,
         type: 3}

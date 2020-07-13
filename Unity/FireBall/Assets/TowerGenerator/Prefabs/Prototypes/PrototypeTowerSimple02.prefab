@@ -221,7 +221,7 @@ MonoBehaviour:
       Generation:
         From: 0
         To: 0
-      TopologyType: 2
+      TopologyType: 3
       BreadthRange:
         From: 0
         To: 0

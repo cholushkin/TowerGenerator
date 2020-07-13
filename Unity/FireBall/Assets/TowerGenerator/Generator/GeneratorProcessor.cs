@@ -25,9 +25,6 @@ namespace TowerGenerator
             public Blueprint Blueprint;
             public List<TreeNode<Blueprint.Segment>> OpenedSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
             public List<TreeNode<Blueprint.Segment>> DeadlockSegments; // = new List<TreeNode<Blueprint.Segment>>(16);
-
-            // public SegmentArchitect Architect; moved to generator
-            //public SegmentConstructor Constructor;
             public int ConfigCounter;
             public GeneratorPointer Pointers;
         }
@@ -101,6 +98,7 @@ namespace TowerGenerator
             Assert.IsNotNull(state);
 
             GeneratorConfigBase currentConfig = null;
+            GeneratorConfigBase prevConfig = null;
 
 
             // get first generator and establish a tower
@@ -114,16 +112,22 @@ namespace TowerGenerator
                 yield return null;
             }
 
+            GeneratorBase currentGenerator = null;
             while ((currentConfig = GetNextConfig()) != null)
             {
                 Debug.Log($"CONFIG:{currentConfig.transform.GetDebugName()}");
-                var currentGenerator = currentConfig.CreateGenerator();
+                currentGenerator = currentConfig.CreateGenerator();
                 yield return null;
 
                 const int MaxIterationForGenerator = 16;
                 for (int i = 0; i < MaxIterationForGenerator; ++i)
                 {
                     currentGenerator.Generate(state, i);
+                    if (state.DeadlockSegments.Count != 0)
+                    {
+                        ResolveDeadlocks(state);
+                        yield return null;
+                    }
 
                     // update last segments
                     var trunkLastSegment = state.OpenedSegments.OrderBy(x => x.BranchLevel).First();
@@ -135,92 +139,16 @@ namespace TowerGenerator
 
                     // update pointers
                     state.Pointers.SetPointerGeneratorTopTrunk( trunkLastSegment, _lastSegments.Peek());
-
                     yield return new WaitUntil(()=>state.Pointers.IsNeededToGenerateMore);
-
-                    if (state.DeadlockSegments.Count != 0)
-                    {
-                        //ResolveDeadlocks
-                        yield return null;
-                    }
-
-                    yield return null;
                     if (currentGenerator.Done())
                         break;
                 }
-
-
-
-                //currentGenerator.
-
             }
 
-            // after first step initialization
-            //if (TopologyVisualizer?.StepDelay > 0f)
-            //    yield return TopologyVisualizer.Wait();
-            //Pointers.SetInitialPointers();
-            //TopologyVisualizer?.Begin(_bp.Tree);
-            //TopologyVisualizer?.ChangeGenerator(State.ActiveGenerators.First());
-            //VisualBuilder?.Begin(_bp.Tree);
-            //yield return null;
-
-
-            //bool isWaitingForBranchFinalization = false;
-            //do
-            //{
-            //    // generate
-            //    foreach (var activeGenerator in State.ActiveGenerators)
-            //    {
-            //        foreach (var step in activeGenerator.GenerateTower())
-            //        {
-            //            TopologyVisualizer?.Step(step);
-            //        }
-            //        activeGenerator.State.Iteration++;
-            //    }
-
-            //    var index = 0;
-            //    List<GeneratorBase> newActiveGenerators = new List<GeneratorBase>();
-            //    foreach (var activeGenerator in State.ActiveGenerators)
-            //    {
-            //        if (index == 0)
-            //        {
-            //            //if( activeGenerator.State.IsStillGeneratingTrunk )
-            //            //    newActiveGenerators.Add(activeGenerator);
-            //            //else
-            //            //{
-            //            //    _genConfigChooser.Step();
-            //            //    var cfg = _genConfigChooser.GetCurrent();
-            //            //    if (cfg != null)
-            //            //    {
-            //            //        var generator = cfg.CreateGenerator(
-            //            //            activeGenerator.GetCurrentSeed(),
-            //            //            activeGenerator.State.GetOpenedTrunkNode(),
-            //            //            this
-            //            //        );
-            //            //        newActiveGenerators.Add(generator);
-            //            //        TopologyVisualizer?.ChangeGenerator(generator);
-            //            //    }
-            //            //    else // no more generators in chain, but we still need to wait for branch generators to complete
-            //            //    {
-            //            //        // finalize trunk
-            //            //        var step = activeGenerator.FinalizeTrunk();
-            //            //        TopologyVisualizer?.Step(step);
-            //            //        isWaitingForBranchFinalization = true;
-            //            //    }
-            //            //}
-            //            continue;
-            //        }
-            //        //Assert.IsFalse(activeGenerator.State.IsStillGeneratingTrunk);
-            //        //if(activeGenerator.State.GetOpenedForGeneration().Any())
-            //        //    newActiveGenerators.Add(activeGenerator);
-            //        ++index;
-            //    }
-
-            //    if (State.ActiveGenerators.Count == 0)
-            //        State.Status = TopologyGeneratorsManifold.ManifoldState.ManifoldStatus.Done;
-            //} while (State.Status != TopologyGeneratorsManifold.ManifoldState.ManifoldStatus.Done);
-
-            yield return null;
+            currentGenerator.Finalize(state);
+            if (state.DeadlockSegments.Count != 0)
+                ResolveDeadlocks(state);
+            state.Pointers.SetPointerGeneratorTopTrunk(GeneratorPointer.GetAbove(state.Pointers.PointerGeneratorTopTrunk,16), _lastSegments.Peek());
         }
 
         private void OnNewConfigEnter(State state, GeneratorConfigBase newConfig, GeneratorConfigBase prevConfig)
@@ -264,6 +192,15 @@ namespace TowerGenerator
             state.OpenedSegments.Add(openedSeg);
 
             state.Pointers.SetInitialPointers();
+        }
+
+
+        // todo: deadlock resolver
+        public void ResolveDeadlocks(State state)
+        {
+            // todo: deadlock resolver
+            // todo: choose meta to fit
+            // todo: replace stateOpenedSegment with a peak
         }
 
         GeneratorConfigBase GetNextConfig()

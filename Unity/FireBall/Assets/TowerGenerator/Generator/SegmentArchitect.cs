@@ -101,7 +101,7 @@ namespace TowerGenerator
                 // create memory segment
                 var memSeg = CreateMemorySegment(nodePointer, direction,
                     segmentCounter == 0 ? offset : Vector3.zero,
-                    placementConfig);
+                    placementConfig, topologyType);
                 Assert.IsNotNull(memSeg);
 
                 if (_startingNode == null)
@@ -156,17 +156,20 @@ namespace TowerGenerator
             TreeNode<Blueprint.Segment> parentNode,
             Vector3 buildDirection,
             Vector3 offsetFromParent,
-            GeneratorConfigBase.PlacementConfig placementConfig)
+            GeneratorConfigBase.PlacementConfig placementConfig,
+            TopologyType topologyType)
         {
+            Assert.IsTrue(Numbers.IsPowerOfTwo((ulong)topologyType));
             var memSeg = new Blueprint.Segment();
             var curNode = new TreeNode<Blueprint.Segment>(memSeg);
             if (parentNode != _fromNode)
                 parentNode.AddChild(curNode);
 
             // get random meta from available meta providers of current placementConfig
-            IEnumerable<MetaBase> allMetas = placementConfig.MetaProviders[0].GetMetas(); // available for current placement config
+            MetaProvider.Filter filter = new MetaProvider.Filter {TopologyType = topologyType};
+            IEnumerable<MetaBase> allMetas = placementConfig.MetaProviders[0].GetMetas(filter); // available for current placement config
             for (int i = 1; i < placementConfig.MetaProviders.Length; ++i)
-                allMetas = Enumerable.Concat(allMetas, placementConfig.MetaProviders[i].GetMetas());
+                allMetas = Enumerable.Concat(allMetas, placementConfig.MetaProviders[i].GetMetas(filter));
 
             var meta = _rndTopology.FromEnumerable(
                 MetaProvider.GetMetas(allMetas, placementConfig.MetaFilter));

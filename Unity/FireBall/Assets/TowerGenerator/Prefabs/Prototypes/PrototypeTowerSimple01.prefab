@@ -231,6 +231,23 @@ MonoBehaviour:
       Wildcard: 
       Expression: 
     MetaProviders: []
+  - IsStrictSpecifics: 0
+    Specifics:
+      Tags: []
+    MetaFilter:
+      Generation:
+        From: 0
+        To: 0
+      TopologyType: 1
+      BreadthRange:
+        From: 0
+        To: 0
+      HeightRange:
+        From: 0
+        To: 0
+      Wildcard: 
+      Expression: 
+    MetaProviders: []
   AllowedDirections:
     Left: 0
     Right: 0

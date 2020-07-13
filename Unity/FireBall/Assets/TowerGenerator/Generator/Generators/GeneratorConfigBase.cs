@@ -12,6 +12,7 @@ namespace TowerGenerator
     public static class SpecificsStringConstants
     {
         public const string Establishment = "Establishment";
+        public const string Finalization = "Finalization";
     }
 
     public abstract class GeneratorConfigBase : MonoBehaviour
@@ -183,6 +184,13 @@ namespace TowerGenerator
         private void DbgValidate()
         {
             Assert.IsFalse(TrunkSegmentsCount.IsZero(),$"{transform.GetDebugName()} has invalid TrunkSegmentsCount {TrunkSegmentsCount}");
+
+            //foreach (var placementConfig in PlacementConfigs)
+            //{
+            //    Assert.IsTrue(GameLib.Numbers.CountBits((uint)placementConfig.TopologyType) == 1, "TopologyType inside placement config must be only single type");
+                
+            //}
+
         }
 
         public override string ToString()
