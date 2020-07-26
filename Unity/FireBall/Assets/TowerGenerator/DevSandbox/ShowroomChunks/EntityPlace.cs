@@ -6,7 +6,7 @@ namespace TowerGenerator
     public class EntityPlace : MonoBehaviour
     {
         private GameObject _current;
-        private RootGroupsController _groupController;
+        private ChunkControllerBase _chunkController;
         public CameraEntShowroomController CameraEntShowroomController;
 
         public void Place(MetaBase metaToPlace, long seed)
@@ -19,7 +19,7 @@ namespace TowerGenerator
             CameraEntShowroomController.FitView(_current);
             _current.transform.localScale = Vector3.zero;
             _current.transform.DOScale(100f, 1f).SetEase(Ease.OutElastic);
-            _groupController = _current.GetComponent<RootGroupsController>();
+            _chunkController = _current.GetComponent<ChunkControllerBase>();
 
         }
 
@@ -28,7 +28,7 @@ namespace TowerGenerator
             if (_current != null)
             {
                 //Gizmos.DrawLine(Vector3.zero, Vector3.zero+Vector3.right*100f);
-                var bounds = _groupController.CalculateBB();
+                var bounds = _chunkController.CalculateCurrentAABB();
                 Gizmos.DrawWireCube(
                     bounds.center,
                     bounds.size);

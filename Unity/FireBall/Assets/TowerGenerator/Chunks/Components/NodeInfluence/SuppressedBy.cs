@@ -24,7 +24,7 @@ namespace TowerGenerator
             }
 
             foreach (var suppressionLabel in SuppressionLabels)
-                if (!GroupsController.HasSuppressionLabel(suppressionLabel))
+                if (!ChunkController.HasSuppressionLabel(suppressionLabel))
                     return false;
 
             return true;

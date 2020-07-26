@@ -30,7 +30,7 @@ namespace TowerGenerator
 
             DisableItems();
             transform.GetChild(ItemSelected).gameObject.SetActive(true);
-            GroupsController.EmitEventGroupChoiceDone(this);
+            ChunkController.EmitEventGroupChoiceDone(this);
         }
 
         public override void DoRndChoice(ref RandomHelper rnd)

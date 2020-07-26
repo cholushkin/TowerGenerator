@@ -1,4 +1,5 @@
-﻿using Assets.Plugins.Alg;
+﻿using System;
+using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -7,27 +8,54 @@ namespace TowerGenerator.ChunkImporter
 {
     public static class ChunkCooker
     {
-        public static GameObject Cook(GameObject semifinishedEnt)
+        [Serializable]
+        public class ChunkImportInformation
+        {
+            public string ChunkName;
+            public string[] ChunkClass;
+            public uint Generation;
+
+            public int CommandsProcessedAmount;
+
+            public int GroupStackAmount;
+            public int GroupSetAmount;
+            public int GroupSwitchAmount;
+            public int ChunkControllerAmount;
+            public int CollisionDependentAmount;
+            public int DimensionsIgnorantAmount;
+            public int DimensionsStackAmount;
+            public int SuppressionAmount;
+            public int SuppressedByAmount;
+            public int InductionAmount;
+            public int InducedByAmount;
+            public int HiddenAmount;
+            public int ClassNameAmount;
+            public int ConnectorAmount;
+            public int TagAmount;
+            public int GenerationAttributeAmount;
+        }
+
+        public static GameObject Cook(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
-            ExecuteFbxCommands(semifinishedEnt);
+            ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
             ApplyMaterials(semifinishedEnt);
 
-            BuildGroupsController(semifinishedEnt); // tree
+            ConfigureChunkController(semifinishedEnt); // tree
 
             return semifinishedEnt;
         }
 
-        private static void ExecuteFbxCommands(GameObject semifinishedEnt)
+        private static void ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
         {
             void ProcessCommand(Transform tr)
             {
                 var fbxProp = tr.GetComponent<FbxProps>();
                 if (fbxProp == null)
                     return;
-                FbxCommand.Execute(fbxProp, tr.gameObject);
+                FbxCommand.Execute(fbxProp, tr.gameObject, chunkImportInformation);
                 tr.gameObject.RemoveComponent<FbxProps>();
             }
             semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);
@@ -46,23 +74,19 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        private static void BuildGroupsController(GameObject chunk)
+        private static void ConfigureChunkController(GameObject chunk)
         {
-            var groupController = chunk.AddComponent<RootGroupsController>();
-            var baseChunk = chunk.GetComponent<ChunkBase>();
-            Assert.IsNotNull(groupController);
-            Assert.IsNotNull(baseChunk);
+            var chunkController = chunk.GetComponent<ChunkControllerBase>();
+            Assert.IsNotNull(chunkController);
 
             var baseComponents = chunk.GetComponentsInChildren<BaseComponent>(true);
             foreach (var baseComponent in baseComponents)
             {
-                baseComponent.Chunk = baseChunk;
-                baseComponent.GroupsController = groupController;
-                var ownerGroup = baseComponent.transform.GetComponentInParent<Group>();
-                baseComponent.OwnerGroup = ownerGroup;
+                baseComponent.ChunkController = chunkController;
+                baseComponent.InfluenceGroup = baseComponent.transform.GetComponentInParent<Group>(); 
             }
 
-            groupController.Init();
+            chunkController.Validate();
         }
     }
 }

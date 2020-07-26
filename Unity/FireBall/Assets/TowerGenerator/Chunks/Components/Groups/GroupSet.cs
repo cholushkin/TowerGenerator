@@ -61,7 +61,7 @@ namespace TowerGenerator
             ItemsSelectedAmount = indexes.Length;
             foreach (var t in indexes)
                 transform.GetChild(t).gameObject.SetActive(true);
-            GroupsController.EmitEventGroupChoiceDone(this);
+            ChunkController.EmitEventGroupChoiceDone(this);
         }
 
         public override void DoRndChoice(ref RandomHelper rnd)

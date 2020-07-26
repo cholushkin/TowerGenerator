@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
+using Boo.Lang;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -24,7 +25,7 @@ namespace TowerGenerator.ChunkImporter
             public abstract string GetFbxCommandName();
             public abstract string GetPayloadCommandName();
             public abstract void ParseParameters(string parameters, GameObject gameObject);
-            public abstract void Execute(GameObject gameObject);
+            public abstract void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation);
 
             protected static float ConvertFloat01(string float01String)
             {
@@ -48,10 +49,16 @@ namespace TowerGenerator.ChunkImporter
                 return value;
             }
 
+            public virtual int GetExecutionPriority()
+            {
+                return int.MaxValue;
+            }
+
             protected T ConvertEnum<T>(string enumString) where T : struct
             {
                 try
                 {
+                    enumString = enumString.Replace('|', ',');
                     T res = (T)Enum.Parse(typeof(T), enumString);
                     if (!Enum.IsDefined(typeof(T), res))
                         return default(T);
@@ -70,21 +77,23 @@ namespace TowerGenerator.ChunkImporter
             {
                 return "AddComponent";
             }
-        }
 
-        private abstract class FbxCommandAddTag : FbxCommandBase
-        {
-            public override string GetFbxCommandName()
+            public override int GetExecutionPriority()
             {
-                return "AddTag";
+                return 0;
             }
         }
 
-        private abstract class FbxCommandAddNodeAttribute : FbxCommandBase
+        private abstract class FbxCommandAddAttribute : FbxCommandBase
         {
             public override string GetFbxCommandName()
             {
-                return "AddNodeAttribute";
+                return "AddAttribute";
+            }
+
+            public override int GetExecutionPriority()
+            {
+                return 1;
             }
         }
         #endregion
@@ -92,7 +101,6 @@ namespace TowerGenerator.ChunkImporter
         #region Groups
         private class GroupStack : FbxCommandAddComponent
         {
-
             public override string GetPayloadCommandName()
             {
                 return "GroupStack";
@@ -103,9 +111,10 @@ namespace TowerGenerator.ChunkImporter
                 Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 gameObject.AddComponent<global::TowerGenerator.GroupStack>();
+                importInformation.GroupStackAmount++;
             }
         }
 
@@ -140,11 +149,12 @@ namespace TowerGenerator.ChunkImporter
                 }
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var groupSetComp = gameObject.AddComponent<global::TowerGenerator.GroupSet>();
                 groupSetComp.MaxObjectsSelected = _maxObjectsSelected.Value;
                 groupSetComp.MinObjectsSelected = _minObjectsSelected.Value;
+                importInformation.GroupSetAmount++;
             }
         }
 
@@ -160,166 +170,67 @@ namespace TowerGenerator.ChunkImporter
                 Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 gameObject.AddComponent<global::TowerGenerator.GroupSwitch>();
+                importInformation.GroupSwitchAmount++;
             }
         }
         #endregion
 
-        #region Chunk types
-        private class ChunkTowerPeekSegment : FbxCommandAddComponent
+        private class ChunkController : FbxCommandAddComponent
         {
+            private Parameter<TopologyType> _chunkTopologyType;
+            private Parameter<ChunkConformationType> _chunkConformationType;
+
             public override string GetPayloadCommandName()
             {
-                return "ChunkTowerPeekSegment";
+                return "ChunkController";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
             {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
+                // set defaults parameters first
+                _chunkTopologyType = new Parameter<TopologyType> { Name = "ChunkTopologyType", Value = TopologyType.ChunkStd };
+                _chunkConformationType = new Parameter<ChunkConformationType> { Name = "ChunkConformationTypes", Value = ChunkConformationType.DimensionsBased };
+
+                var actualParams = parameters.Split(',');
+                Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2);
+                if (actualParams.Length >= 1)
+                {
+                    _chunkTopologyType.Value = ConvertEnum<TopologyType>(actualParams[0]);
+                }
+                if (actualParams.Length >= 2)
+                {
+                    _chunkConformationType.Value = ConvertEnum<ChunkConformationType>(actualParams[1]);
+                }
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerPeekSegment>();
+                ChunkControllerBase chunkController = null;
+
+                if (_chunkConformationType.Value == ChunkConformationType.Combinatorial)
+                    chunkController = gameObject.AddComponent<ChunkControllerCombinatorial>();
+                else if (_chunkConformationType.Value == ChunkConformationType.DimensionsBased)
+                    chunkController = gameObject.AddComponent<ChunkControllerDimensionsBased>();
+                else if (_chunkConformationType.Value == ChunkConformationType.Stretchable)
+                    chunkController = gameObject.AddComponent<ChunkControllerStretchable>();
+
+                Assert.IsNotNull(chunkController);
+                chunkController.TopologyType = _chunkTopologyType.Value;
+                chunkController.ConformationType = _chunkConformationType.Value;
+                importInformation.ChunkControllerAmount++;
             }
         }
-
-        private class ChunkTowerStandardSegment : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkTowerStandardSegment";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerStandardSegment>();
-            }
-        }
-
-        private class ChunkTowerFoundationAndStandardSegment : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkTowerFoundationAndStandardSegment";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerFoundationAndStandardSegment>();
-            }
-        }
-
-        private class ChunkTowerFoundationSegment : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkFoundationSegment";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerFoundationSegment>();
-            }
-        }
-
-        private class ChunkTowerSideEarSegment : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkTowerSideEarSegment";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerSideEarSegment>();
-            }
-        }
-
-        private class ChunkTowerBottomEarSegment : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkTowerBottomEarSegment";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerBottomEarSegment>();
-            }
-        }
-
-        private class ChunkTowerConnectorVertical : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkTowerConnectorVertical";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerConnectorVertical>();
-            }
-        }
-
-        private class ChunkTowerConnectorHorizontal : FbxCommandAddComponent
-        {
-            public override string GetPayloadCommandName()
-            {
-                return "ChunkTowerConnectorHorizontal";
-            }
-
-            public override void ParseParameters(string parameters, GameObject gameObject)
-            {
-                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
-            }
-
-            public override void Execute(GameObject gameObject)
-            {
-                gameObject.AddComponent<global::TowerGenerator.ChunkTowerConnectorHorizontal>();
-            }
-        }
-        #endregion
 
         #region Node attributes
-        private class CollisionDependant : FbxCommandAddNodeAttribute
+        private class CollisionDependent : FbxCommandAddAttribute
         {
             private Parameter<global::TowerGenerator.CollisionDependant.CollisionCheckMode> _collisionMode;
             public override string GetPayloadCommandName()
             {
-                return "CollisionDependant";
+                return "CollisionDependent";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
@@ -337,14 +248,15 @@ namespace TowerGenerator.ChunkImporter
                 _collisionMode.Value = ConvertEnum<global::TowerGenerator.CollisionDependant.CollisionCheckMode>(parameters);
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var comp = gameObject.AddComponent<global::TowerGenerator.CollisionDependant>();
                 comp.CollisionCheck = _collisionMode.Value;
+                importInformation.CollisionDependentAmount++;
             }
         }
 
-        private class DimensionsIgnorant : FbxCommandAddNodeAttribute
+        private class DimensionsIgnorant : FbxCommandAddAttribute
         {
             public override string GetPayloadCommandName()
             {
@@ -356,14 +268,39 @@ namespace TowerGenerator.ChunkImporter
                 Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
-                gameObject.AddComponent<global::TowerGenerator.GroupStack>();
+                gameObject.AddComponent<global::TowerGenerator.DimensionsIgnorant>();
+                importInformation.DimensionsIgnorantAmount++;
             }
-
         }
 
-        private class Suppression : FbxCommandAddNodeAttribute
+        private class DimensionsStack : FbxCommandAddAttribute
+        {
+            public override string GetPayloadCommandName()
+            {
+                return "DimensionsStack";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
+            }
+
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+            {
+                var dimBasedController = gameObject.GetComponentInParent<ChunkControllerDimensionsBased>();
+                Assert.IsNotNull(dimBasedController, "DimensionsStack attribute refers to GroupStack group that controls dim based logic, so  ChunkControllerDimensionsBased must be presented");
+
+                var groupStack = gameObject.GetComponent<global::TowerGenerator.GroupStack>();
+                Assert.IsNotNull(groupStack, "Have to be attached because of higher priority of AddComponent");
+
+                dimBasedController.DimensionStack = groupStack;
+                importInformation.DimensionsStackAmount++;
+            }
+        }
+
+        private class Suppression : FbxCommandAddAttribute
         {
             private string[] _suppressionLabels;
 
@@ -378,14 +315,15 @@ namespace TowerGenerator.ChunkImporter
                 _suppressionLabels = parameters.Split(',');
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var comp = gameObject.AddComponent<global::TowerGenerator.Suppression>();
                 comp.SuppressionLabels = _suppressionLabels;
+                importInformation.SuppressionAmount++;
             }
         }
 
-        private class SuppressedBy : FbxCommandAddNodeAttribute
+        private class SuppressedBy : FbxCommandAddAttribute
         {
             private string[] _suppressionLabels;
             public override string GetPayloadCommandName()
@@ -399,14 +337,15 @@ namespace TowerGenerator.ChunkImporter
                 _suppressionLabels = parameters.Split(',');
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var comp = gameObject.AddComponent<global::TowerGenerator.SuppressedBy>();
                 comp.SuppressionLabels = _suppressionLabels;
+                importInformation.SuppressedByAmount++;
             }
         }
 
-        private class Induction : FbxCommandAddNodeAttribute
+        private class Induction : FbxCommandAddAttribute
         {
             private string[] _inductionLabels;
             public override string GetPayloadCommandName()
@@ -420,14 +359,15 @@ namespace TowerGenerator.ChunkImporter
                 _inductionLabels = parameters.Split(',');
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var comp = gameObject.AddComponent<global::TowerGenerator.Induction>();
                 comp.InductionLabels = _inductionLabels;
+                importInformation.InductionAmount++;
             }
         }
 
-        private class InducedBy : FbxCommandAddNodeAttribute
+        private class InducedBy : FbxCommandAddAttribute
         {
             private string[] _inductionLabels;
             public override string GetPayloadCommandName()
@@ -441,14 +381,15 @@ namespace TowerGenerator.ChunkImporter
                 _inductionLabels = parameters.Split(',');
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var comp = gameObject.AddComponent<global::TowerGenerator.InducedBy>();
                 comp.InductionLabels = _inductionLabels;
+                importInformation.InducedByAmount++;
             }
         }
 
-        private class Hidden : FbxCommandAddNodeAttribute
+        private class Hidden : FbxCommandAddAttribute
         {
             public override string GetPayloadCommandName()
             {
@@ -460,19 +401,69 @@ namespace TowerGenerator.ChunkImporter
                 Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 gameObject.AddComponent<global::TowerGenerator.Hidden>();
+                importInformation.HiddenAmount++;
+            }
+        }
+
+        private class ClassName : FbxCommandAddAttribute
+        {
+            private string[] _classNames;
+            public override string GetPayloadCommandName()
+            {
+                return "ClassName";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
+                _classNames = parameters.Split('|');
+                _classNames = _classNames.Select(RemoveSpaces).ToArray();
+            }
+
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+            {
+                importInformation.ClassNameAmount++;
+                importInformation.ChunkClass = _classNames;
+            }
+        }
+
+        private class Generation : FbxCommandAddAttribute
+        {
+            private Parameter<uint> _generation;
+            public override string GetPayloadCommandName()
+            {
+                return "Generation";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                // set defaults parameters first
+                _generation = new Parameter<uint> { Name = "GenerationValue", Value = 0 };
+
+                if (string.IsNullOrWhiteSpace(parameters))
+                    return;
+
+                _generation.Value = (uint)ConvertInt(parameters);
+            }
+
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+            {
+                importInformation.GenerationAttributeAmount++;
+                importInformation.Generation = _generation.Value;
             }
         }
         #endregion
 
         #region Miscellaneous logic
-        private class Connectors : FbxCommandAddComponent
+
+        private class Connector : FbxCommandAddComponent
         {
             public override string GetPayloadCommandName()
             {
-                return "Connectors";
+                return "Connector";
             }
 
             public override void ParseParameters(string parameters, GameObject gameObject)
@@ -480,13 +471,14 @@ namespace TowerGenerator.ChunkImporter
                 Assert.IsTrue(string.IsNullOrWhiteSpace(parameters));
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
-                gameObject.AddComponent<global::TowerGenerator.Connectors>();
+                gameObject.AddComponent<global::TowerGenerator.Connector>();
+                importInformation.ConnectorAmount++;
             }
         }
 
-        private class AddTag : FbxCommandAddTag
+        private class Tag : FbxCommandAddComponent
         {
             private Parameter<string> _tagName;
             private Parameter<float> _tagValue;
@@ -518,13 +510,14 @@ namespace TowerGenerator.ChunkImporter
                 }
             }
 
-            public override void Execute(GameObject gameObject)
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
             {
                 var tagHolder = gameObject.GetComponent<TagHolder>();
                 if (tagHolder == null)
                     tagHolder = gameObject.AddComponent<TagHolder>();
 
                 tagHolder.TagSet.SetTag(_tagName.Value, _tagValue.Value);
+                importInformation.TagAmount++;
             }
         }
         #endregion
@@ -535,39 +528,35 @@ namespace TowerGenerator.ChunkImporter
         {
             // Groups
             new GroupStack(),
-            new GroupSet(), 
+            new GroupSet(),
             new GroupSwitch(),
 
-            // Chunk types
-            new ChunkTowerPeekSegment(),
-            new ChunkTowerStandardSegment(),
-            new ChunkTowerFoundationAndStandardSegment(),
-            new ChunkTowerFoundationSegment(),
-            new ChunkTowerSideEarSegment(),
-            new ChunkTowerBottomEarSegment(),
-            new ChunkTowerConnectorVertical(),
-            new ChunkTowerConnectorHorizontal(),
+            new ChunkController(),
+            new Connector(),
+            new Tag(),
 
             // Node attributes
-            new CollisionDependant(),
+            new CollisionDependent(),
             new DimensionsIgnorant(),
+            new DimensionsStack(),
             new Suppression(),
             new SuppressedBy(),
             new Induction(),
             new InducedBy(),
             new Hidden(),
-
-            // Miscellaneous logic
-            new Connectors(),
-            new AddTag()
+            new ClassName(), 
+            new Generation(),
         };
 
-        public static void Execute(FbxProps fromFbxProps, GameObject gameObject)
+        public static void Execute(FbxProps fromFbxProps, GameObject gameObject, ChunkCooker.ChunkImportInformation chunkImportInformation)
         {
             Assert.IsNotNull(fromFbxProps);
             Assert.IsNotNull(gameObject);
             Assert.IsNotNull(fromFbxProps.Properties, $"empty props on {gameObject}");
 
+            var commands = new List<FbxCommandBase>(fromFbxProps.Properties.Count);
+
+            // parse commands
             foreach (var property in fromFbxProps.Properties)
             {
                 string fbxCmdName = ParseFbxCommand(property);
@@ -578,8 +567,18 @@ namespace TowerGenerator.ChunkImporter
                 if (cmd == null)
                     Debug.LogError($"Unable to find cmd '{fbxCmdName}', payloadCmd = '{payloadCmd}', payloadParameters = '{payloadParameters}', object = '{gameObject.transform.GetDebugName()}' ");
                 cmd.ParseParameters(payloadParameters, gameObject);
-                cmd.Execute(gameObject);
+                commands.Add(cmd);
+                chunkImportInformation.CommandsProcessedAmount++;
             }
+
+            // execute commands by their priorities
+            foreach (var cmd in commands.OrderBy(c => c.GetExecutionPriority()))
+                cmd.Execute(gameObject, chunkImportInformation);
+        }
+
+        private static string RemoveSpaces( string str)
+        {
+            return Regex.Replace(str, @"\s+", "");
         }
 
         private static string ParsePayloadCommand(FbxProps.Property property)
@@ -588,7 +587,7 @@ namespace TowerGenerator.ChunkImporter
             return match.Groups[0].Value;
         }
 
-        // info: fbx command could end with digit due to fbx props naming
+        // info: fbx command could end with digit due to fbx props naming traits
         private static string ParseFbxCommand(FbxProps.Property property)
         {
             return Regex.Replace(property.Name, @"\d*$", "");

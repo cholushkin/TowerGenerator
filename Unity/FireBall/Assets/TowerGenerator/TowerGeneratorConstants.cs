@@ -12,6 +12,10 @@ namespace TowerGenerator
         public static readonly Vector3 ConnectorMargin = Vector3.one;
         public const float ConnectorAspect = 3f;
 
+        public const string ChunkClassNameTower = "Tower";
+        public const string ChunkClassNameTotem = "Totem";
+        public const string ChunkClassNameCreature = "Creature";
+
 
         #region ---------- Paths ---------- 
 

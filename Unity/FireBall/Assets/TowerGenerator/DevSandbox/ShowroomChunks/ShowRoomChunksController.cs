@@ -242,49 +242,49 @@ namespace TowerGenerator
 
                 // ChunkPeak
                 State.MetaInfosState.ChunkRoofPeakNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkPeak);
+                    x => x.TopologyType == TopologyType.ChunkPeak);
                 State.MetaInfosState.ChunkRoofPeakNumberPercent =
                     (int) ((float) State.MetaInfosState.ChunkRoofPeakNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // ChunkStd
                 State.MetaInfosState.ChunkStdNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkStd);
+                    x => x.TopologyType == TopologyType.ChunkStd);
                 State.MetaInfosState.ChunkStdNumberPercent =
                     (int)((float)State.MetaInfosState.ChunkStdNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // ChunkIsland
                 State.MetaInfosState.ChunkIslandAndBasementNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkFoundation);
+                    x => x.TopologyType == TopologyType.ChunkFoundation);
                 State.MetaInfosState.ChunkIslandAndBasementNumberPercent =
                     (int)((float)State.MetaInfosState.ChunkIslandAndBasementNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // ChunkSideEar
                 State.MetaInfosState.ChunkSideEarNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkSideEar);
+                    x => x.TopologyType == TopologyType.ChunkSideEar);
                 State.MetaInfosState.ChunkSideEarNumberPercent =
                     (int)((float)State.MetaInfosState.ChunkSideEarNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // ChunkBottomEar
                 State.MetaInfosState.ChunkBottomEarNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkBottomEar);
+                    x => x.TopologyType == TopologyType.ChunkBottomEar);
                 State.MetaInfosState.ChunkBottomEarNumberPercent =
                     (int)((float)State.MetaInfosState.ChunkBottomEarNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // TopEar
                 State.MetaInfosState.ChunkBottomEarNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkTopEar);
+                    x => x.TopologyType == TopologyType.ChunkTopEar);
                 State.MetaInfosState.ChunkBottomEarNumberPercent =
                     (int)((float)State.MetaInfosState.ChunkBottomEarNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // ChunkConnectorVerticalNumber
                 State.MetaInfosState.ChunkConnectorVerticalNumber = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkConnectorVertical);
+                    x => x.TopologyType == TopologyType.ChunkConnectorVertical);
                 State.MetaInfosState.ChunkConnectorVerticalNumberPercent =
                     (int)((float)State.MetaInfosState.ChunkConnectorVerticalNumber / State.MetaInfosState.MetasNumber * 100f);
 
                 // ChunkConnectorHorizontal
                 State.MetaInfosState.ChunkConnectorHorizontal = MetaProvider.Metas.Count(
-                    x => x is MetaChunk chunk && chunk.TopologyType == TopologyType.ChunkConnectorHorizontal);
+                    x => x.TopologyType == TopologyType.ChunkConnectorHorizontal);
                 State.MetaInfosState.ChunkConnectorHorizontalPercent =
                     (int)((float)State.MetaInfosState.ChunkConnectorHorizontal / State.MetaInfosState.MetasNumber * 100f);
             }

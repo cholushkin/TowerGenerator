@@ -13,12 +13,10 @@ namespace TowerGenerator
             {
                 public class ChunkGeometry
                 {
-                    public TopologyType TopologyType;
                     public Bounds Bounds; // position and aspects
                     public Vector3 BuildDirection;
                     public MetaBase Meta;
                     public int SizeIndex;
-                    //public long Seed;
                 }
 
                 public ChunkGeometry Geometry;
@@ -28,7 +26,7 @@ namespace TowerGenerator
 
                 public override string ToString()
                 {
-                    return $"{Geometry.TopologyType},{Geometry.Meta}";
+                    return $"{Geometry.Meta.name}";
                 }
             }
 

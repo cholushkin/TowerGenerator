@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TowerGenerator
 {
 
-    public class Suppression : BaseComponent, IHandle<RootGroupsController.EventGroupChoiceDone>
+    public class Suppression : BaseComponent, IHandle<ChunkControllerBase.EventGroupChoiceDone>
     {
         public string[] SuppressionLabels;
 
@@ -23,12 +23,12 @@ namespace TowerGenerator
             return true;
         }
  
-        public void Handle(RootGroupsController.EventGroupChoiceDone message)
+        public void Handle(ChunkControllerBase.EventGroupChoiceDone message)
         {
-            if (message.GroupChoice == OwnerGroup && gameObject.activeInHierarchy)
+            if (message.GroupChoice == InfluenceGroup && gameObject.activeInHierarchy)
             {
                 foreach (var suppressionLabel in SuppressionLabels)
-                    GroupsController.Suppress(suppressionLabel);
+                    ChunkController.Suppress(suppressionLabel);
             }
         }
     }

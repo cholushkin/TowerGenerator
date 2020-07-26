@@ -9,6 +9,7 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
+    // works only with MetaCombChunk 
     public class SegmentArchitect
     {
         public delegate Vector3 ChangeDirectionCallback(int index);
@@ -201,7 +202,7 @@ namespace TowerGenerator
 
             memSeg.Topology = new Blueprint.Segment.TopologySegment
             {
-                Geometry = new Blueprint.Segment.TopologySegment.ChunkGeometry { Bounds = bounds, BuildDirection = buildDirection, Meta = meta, /*Seed = _rnd.ValueInt(),*/ SizeIndex = sizeIndex, TopologyType = meta.TopologyType },
+                Geometry = new Blueprint.Segment.TopologySegment.ChunkGeometry { Bounds = bounds, BuildDirection = buildDirection, Meta = meta, /*Seed = _rnd.ValueInt(),*/ SizeIndex = sizeIndex},
                 HasCollision = hasCollision,
                 Connection = -buildDirection,
             };

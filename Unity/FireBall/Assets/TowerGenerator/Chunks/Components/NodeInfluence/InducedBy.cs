@@ -1,6 +1,4 @@
-﻿
-using Assets.Plugins.Alg;
-using Events;
+﻿using Assets.Plugins.Alg;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -29,7 +27,7 @@ namespace TowerGenerator
             }
 
             foreach (var inductionLabel in InductionLabels)
-                if (!GroupsController.HasInductionLabel(inductionLabel))
+                if (!ChunkController.HasInductionLabel(inductionLabel))
                     return false;
 
             return true;

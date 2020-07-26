@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEngine;
 
 namespace TowerGenerator
 {
+    // note: one chunk must belong to only one TopologyType, but you can request multiple chunks by combined flags
     [Flags]
     public enum TopologyType
     {
@@ -15,5 +15,15 @@ namespace TowerGenerator
         ChunkTopEar = 32,
         ChunkConnectorVertical = 64,
         ChunkConnectorHorizontal = 128,
+    }
+
+
+    // note: one chunk must belong to only one ChunkConformationType, but you can request multiple chunks by combined flags
+    [Flags]
+    public enum ChunkConformationType 
+    {
+        DimensionsBased = 1,
+        Combinatorial = 2,
+        Stretchable = 4
     }
 }

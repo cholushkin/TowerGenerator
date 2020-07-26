@@ -27,17 +27,16 @@ namespace TowerGenerator
             // rotation 
             visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
 
-            var visSegController = visSegment.GetComponent<RootGroupsController>();
-            visSegController.Seed = seed;
-            visSegController.Init();
+            var baseChunkController = visSegment.GetComponent<ChunkControllerBase>();
+            baseChunkController.Seed = seed;
+            baseChunkController.Init();
             visSegment.SetActive(true);
-            visSegController.SetConfiguration();
+            baseChunkController.SetConfiguration();
 
             // centering
-            var segBB = visSegController.CalculateBB();
-            var offset = visSegController.transform.position - segBB.center;
+            var segBB = baseChunkController.CalculateCurrentAABB();
+            var offset = baseChunkController.transform.position - segBB.center;
             visSegment.transform.position += offset;
-            //segBB.center = visSegment.transform.position;
             return visSegment;
         }
 
@@ -56,17 +55,19 @@ namespace TowerGenerator
             // rotation 
             visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
 
-            var visSegController = visSegment.GetComponent<RootGroupsController>();
+            var visSegController = visSegment.GetComponent<ChunkControllerBase>();
             visSegController.Seed = bpSegment.Visual.Seed;
             visSegController.Init();
             visSegment.SetActive(true);
-            visSegController.SetConfiguration(topology.Geometry.SizeIndex);
+            if(visSegController is ChunkControllerDimensionsBased dimBasedController)
+                dimBasedController.SetDimensionIndex(topology.Geometry.SizeIndex);
+
+            visSegController.SetConfiguration();
 
             // centering
-            var segBB = visSegController.CalculateBB();
+            var segBB = visSegController.CalculateCurrentAABB();
             var offset = visSegController.transform.position - segBB.center;
             visSegment.transform.position += offset;
-            //segBB.center = visSegment.transform.position;
             return visSegment;
         }
     }

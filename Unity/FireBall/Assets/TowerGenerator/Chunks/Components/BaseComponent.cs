@@ -12,16 +12,14 @@ namespace TowerGenerator
     {
         public virtual bool IsValid()
         {
-            return GroupsController != null && Chunk != null;
+            return ChunkController != null;
         }
 
         [HideInInspector]
-        public RootGroupsController GroupsController;
+        public ChunkControllerBase ChunkController;
+
 
         [HideInInspector]
-        public ChunkBase Chunk;
-
-        [HideInInspector]
-        public Group OwnerGroup;
+        public Group InfluenceGroup;
     }
 }

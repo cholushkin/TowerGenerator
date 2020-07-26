@@ -12,8 +12,7 @@ using Random = UnityEngine.Random;
 
 namespace TowerGenerator
 {
-    // controls all groups started from DimensionStack. 
-    public class RootGroupsController : MonoBehaviour
+    public abstract class ChunkControllerBase : MonoBehaviour
     {
         public class EventGroupChoiceDone
         {
@@ -26,77 +25,68 @@ namespace TowerGenerator
         }
 
         public long Seed = -1;
-        public GroupStack DimensionStack { get; private set; }
-        public Connectors Connectors { get; private set; }
+        public TopologyType TopologyType { get; set; }
+        public ChunkConformationType ConformationType{ get; set; }
 
-        private TreeNode<Group> _tree;
+
+        protected TreeNode<Group> _impactTree;
         private Dictionary<string, List<Transform>> _suppression;
         private Dictionary<string, List<Transform>> _induction;
         private LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
-        private EventAggregator _treeEvents;
+        private EventAggregator _chunkEventAggregator;
 
 
-        public void Init() // configure
+        public virtual void Init() // configure
         {
             if(Log.Verbose())
                 Debug.Log("> Init");
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
-            DimensionStack = GetComponentInChildren<GroupStack>();
-            Assert.IsNotNull(DimensionStack, $"{gameObject.transform.GetDebugName()}");
             BuildImpactTree();
-            if (Log.Verbose())
-                DbgPrintImpactTree();
-#if DEBUG
-            Validate();
-#endif
         }
 
-        public Bounds CalculateBB()
+        public Bounds CalculateCurrentAABB()
         {
-            Assert.IsNotNull(_tree);
-            return _tree.Data.gameObject.BoundBox();
+            Assert.IsNotNull(_impactTree);
+            return _impactTree.Data.gameObject.BoundBox();
         }
 
-        public void SetConfiguration( int sizeIndex = -1)
+        public virtual Bounds CalculateDimensionAABB()
         {
-            if (Log.Verbose())
-                Debug.Log("> SetConfiguration");
+            transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<DimensionsIgnorant>() == null));
+            return CalculateCurrentAABB();
+        }
+
+        public void SetConfiguration()
+        {
             RandomHelper rnd = new RandomHelper(Seed);
             Debug.Log(rnd.GetCurrentSeed());
 
-            // enable all parts
+            // enable all parts besides apart from hidden
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
 
-            foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
+            foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
             {
                 Group group = treeNode.Data;
                 Assert.IsNotNull(group);
 
-                if (group == DimensionStack && sizeIndex != -1)
-                {
-                    DimensionStack.DoChoice(sizeIndex);
-                    continue;
-                }
-                
                 if (group != null)
                 {
                     if (!treeNode.Data.gameObject.activeInHierarchy)
                         continue;
-                    group.DoRndChoice(ref rnd);
-                    if (Log.Verbose())
-                        DbgPrintGroupOutcomeConfiguration(group.transform);
+                    ProcessGroupSetConfiguration(group, ref rnd);
                 }
             }
+        }
 
-            // get active connectors 
-            Connectors = GetActiveConnectors();
-            Assert.IsNotNull(Connectors);
+        public virtual void ProcessGroupSetConfiguration(Group group, ref RandomHelper rnd)
+        {
+            group.DoRndChoice(ref rnd);
         }
 
         public void EmitEventGroupChoiceDone(Group group)
         {
-            _treeEvents.Publish(new EventGroupChoiceDone(group));
+            _chunkEventAggregator.Publish(new EventGroupChoiceDone(group));
         }
 
         private void DbgPrintGroupOutcomeConfiguration(Transform groupTransform)
@@ -112,18 +102,19 @@ namespace TowerGenerator
             Debug.Log(strOutcome);
         }
 
-        private Connectors GetActiveConnectors()
-        {
-            var activeConnectors = GetComponentsInChildren<Connectors>(false);
-            Assert.IsTrue(activeConnectors.Length > 0);
-            return activeConnectors[activeConnectors.Length - 1];
-        }
+        public abstract Connector[] GetConnectors();
+
 
         private void BuildImpactTree()
         {
-            _treeEvents = new EventAggregator();
-            _tree = BuildStepRecursive(DimensionStack.transform, null, null);
+            _chunkEventAggregator = new EventAggregator();
 
+            // add root group
+            var groupRoot = GetComponent<GroupRoot>();
+            if (groupRoot == null)
+                groupRoot = gameObject.AddComponent<GroupRoot>();
+
+            _impactTree = BuildStepRecursive(groupRoot.transform, null, null);
 
             // fill up _induction
             {
@@ -166,12 +157,14 @@ namespace TowerGenerator
                     }
                 }
             }
+            if (Log.Verbose())
+                DbgPrintImpactTree();
         }
 
         private void DbgPrintImpactTree()
         {
             Debug.Log(">>>>> Impact tree");
-            foreach (var treeNode in _tree.TraverseDepthFirstPostOrder())
+            foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
                 Debug.Log($"{treeNode.Data.transform.GetDebugName()}: level:{treeNode.Level} branch level:{treeNode.BranchLevel} ");
         }
 
@@ -179,9 +172,9 @@ namespace TowerGenerator
         {
             var group = iTrans.GetComponent<Group>();
 
-            var influncer = iTrans.GetComponent<IHandle<EventGroupChoiceDone>>();
-            if (influncer != null)
-                _treeEvents.Subscribe(influncer);
+            var influencer = iTrans.GetComponent<IHandle<EventGroupChoiceDone>>();
+            if (influencer != null)
+                _chunkEventAggregator.Subscribe(influencer);
 
             if (group != null)
             {
@@ -196,8 +189,10 @@ namespace TowerGenerator
             return impactParent;
         }
 
-        private void Validate()
+#if DEBUG
+        public void Validate()
         {
+            BuildImpactTree();
             var validators = GetComponentsInChildren<BaseComponent>(true);
             foreach (var validator in validators)
             {
@@ -205,6 +200,7 @@ namespace TowerGenerator
                     Debug.LogError($"Node is not valid {validator.transform.GetDebugName()}");
             }
         }
+#endif
 
         public bool HasSuppressionLabel(string label)
         {

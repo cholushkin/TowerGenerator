@@ -8,55 +8,38 @@ namespace TowerGenerator.ChunkImporter
 {
     public static class ChunkMetaCooker
     {
-        public static MetaBase Cook(GameObject chunkObject, string dir, string name)
+        public static MetaBase Cook(GameObject chunkObject, string dir, ChunkCooker.ChunkImportInformation importInformation)
         {
-            var chunk = chunkObject.GetComponent<ChunkBase>();
+            var chunkController = chunkObject.GetComponent<ChunkControllerBase>();
+            Assert.IsNotNull(chunkController, "chunk must have a controller");
 
-            if (chunk is ChunkTowerBase)
+            var metaAsset = ScriptableObject.CreateInstance<MetaBase>();
+            string assetPathAndName = dir + "/" + importInformation.ChunkName + ".m.asset";
+
+            metaAsset.ChunkName = importInformation.ChunkName;
+            metaAsset.ChunkClassName = importInformation.ChunkClass;
+            metaAsset.ChunkConformation = chunkController.ConformationType;
+            metaAsset.TopologyType = chunkController.TopologyType;
+            metaAsset.Generation = importInformation.Generation;
+            // todo: TagSet
+
+            // AABBs
+            metaAsset.AABBs = new List<Vector3>();
+            if (chunkController is ChunkControllerDimensionsBased dimBaseController)
             {
-                var metaAsset = ScriptableObject.CreateInstance<MetaChunk>();
-                string assetPathAndName = dir + "/" + name + ".m.asset";
-
-                metaAsset.ChunkName = name;
-                metaAsset.TopologyType = chunk.GetTopologyType();
-                var groupController = chunk.GetComponent<RootGroupsController>();
-                Assert.IsNotNull(groupController, "chunk must have a group controller");
-
-                // todo: generation from fbx
-                // todo: TagSet
-
-                // AABBs
-                for (int i = 0; i < groupController.DimensionStack.GetItemsCount(); ++i)
-                    AddAabb(metaAsset, ComputeAABB(groupController, i));
-
-                AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
-                AssetDatabase.SaveAssets();
-                return metaAsset;
+                var aabbsAmount = dimBaseController.DimensionStack.GetItemsCount();
+                for (int i = 0; i < aabbsAmount; ++i)
+                {
+                    dimBaseController.SetDimensionIndex(i);
+                    metaAsset.AABBs.Add(dimBaseController.CalculateDimensionAABB().size);
+                }
             }
-            return null;
-        }
-
-        private static Vector3 ComputeAABB(RootGroupsController controller, int i )
-        {
-            // enable all parts (maybe there are nodes beside DimensionStack
-            controller.transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(true));
-
-            // enable only this AABB item
-            controller.DimensionStack.DoChoice(i);
-
-            // disable all DimensionsIgnorant nodes on whole chunk
-            var dimIgnorant = controller.transform.GetComponentsInChildren<DimensionsIgnorant>(true);
-            foreach (var dimensionsIgnorant in dimIgnorant)
-                dimensionsIgnorant.gameObject.SetActive(false);
-
-            return controller.CalculateBB().size;
-        }
-
-        private static void AddAabb(MetaChunk meta, Vector3 aabb)
-        {
-            if (meta.AABBs == null)
-                meta.AABBs = new List<Vector3>(3);
-            meta.AABBs.Add(aabb);
+            else if (chunkController is ChunkControllerCombinatorial)
+                metaAsset.AABBs.Add(chunkController.CalculateDimensionAABB().size);
+            
+            AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
+            AssetDatabase.SaveAssets();
+            return metaAsset;
         }
     }
 }

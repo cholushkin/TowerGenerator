@@ -33,7 +33,7 @@ namespace TowerGenerator
             for (int i = 0; i <= ItemStacked; ++i)
                 transform.GetChild(i).gameObject.SetActive(true);
 
-            GroupsController.EmitEventGroupChoiceDone(this);
+            ChunkController.EmitEventGroupChoiceDone(this);
         }
 
         public override void DoRndChoice(ref RandomHelper rnd)

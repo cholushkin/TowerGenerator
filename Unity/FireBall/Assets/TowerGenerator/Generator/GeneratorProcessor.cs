@@ -98,7 +98,6 @@ namespace TowerGenerator
             Assert.IsNotNull(state);
 
             GeneratorConfigBase currentConfig = null;
-            GeneratorConfigBase prevConfig = null;
 
 
             // get first generator and establish a tower
@@ -260,9 +259,23 @@ namespace TowerGenerator
                 //        transform.TransformPoint(treeNode.Data.Topology.Geometry.Position),
                 //        0.5f);
 
+                // draw chunk bounds and axis
+                var chunkCenter =
+                    transform.TransformPoint(treeNode.Data.Topology.Geometry.Bounds.center + _towerRoot.localPosition);
+
+                Gizmos.color = Color.white;
                 Gizmos.DrawWireCube(
-                    transform.TransformPoint(treeNode.Data.Topology.Geometry.Bounds.center + _towerRoot.localPosition),
+                    chunkCenter,
                     treeNode.Data.Topology.Geometry.Bounds.size);
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.forward * treeNode.Data.Topology.Geometry.Bounds.size.z);
+                Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.back * treeNode.Data.Topology.Geometry.Bounds.size.z);
+                Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.left * treeNode.Data.Topology.Geometry.Bounds.size.x);
+                Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.right * treeNode.Data.Topology.Geometry.Bounds.size.x);
+                Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.up * treeNode.Data.Topology.Geometry.Bounds.size.y);
+                Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.down * treeNode.Data.Topology.Geometry.Bounds.size.y);
+
                 var labelPos = transform.TransformPoint(treeNode.Data.Topology.Geometry.Bounds.center + _towerRoot.localPosition);
                 //    Gizmos.color = Color.black;
                 //    Gizmos.DrawWireSphere(

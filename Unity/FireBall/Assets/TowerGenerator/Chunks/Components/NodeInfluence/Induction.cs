@@ -2,7 +2,7 @@
 
 namespace TowerGenerator
 {
-    public class Induction : BaseComponent, IHandle<RootGroupsController.EventGroupChoiceDone>
+    public class Induction : BaseComponent, IHandle<ChunkControllerBase.EventGroupChoiceDone>
     {
         public string[] InductionLabels;
 
@@ -20,12 +20,12 @@ namespace TowerGenerator
             return true;
         }
 
-        public void Handle(RootGroupsController.EventGroupChoiceDone message)
+        public void Handle(ChunkControllerBase.EventGroupChoiceDone message)
         {
-            if (message.GroupChoice == OwnerGroup && gameObject.activeInHierarchy)
+            if (message.GroupChoice == InfluenceGroup && gameObject.activeInHierarchy)
             {
                 foreach (var suppressionLabel in InductionLabels)
-                    GroupsController.Induce(suppressionLabel);
+                    ChunkController.Induce(suppressionLabel);
             }
         }
     }
