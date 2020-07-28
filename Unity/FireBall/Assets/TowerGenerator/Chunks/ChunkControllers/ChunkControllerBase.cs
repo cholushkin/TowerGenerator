@@ -45,10 +45,13 @@ namespace TowerGenerator
             BuildImpactTree();
         }
 
-        public Bounds CalculateCurrentAABB()
+        public Bounds CalculateCurrentAABB(bool withMargin = true)
         {
             Assert.IsNotNull(_impactTree);
-            return _impactTree.Data.gameObject.BoundBox();
+            var bounds = _impactTree.Data.gameObject.BoundBox();
+            if(withMargin)
+                bounds.Expand(Vector3.one * TowerGeneratorConstants.ChunkMargin * 2f);
+            return bounds;
         }
 
         public virtual Bounds CalculateDimensionAABB()

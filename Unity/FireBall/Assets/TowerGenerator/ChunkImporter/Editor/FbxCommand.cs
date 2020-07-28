@@ -199,10 +199,12 @@ namespace TowerGenerator.ChunkImporter
                 if (actualParams.Length >= 1)
                 {
                     _chunkTopologyType.Value = ConvertEnum<TopologyType>(actualParams[0]);
+                    Assert.IsTrue(_chunkTopologyType.Value != TopologyType.Undefined, $"Can't parse 'ChunkTopologyType' parameter from value '{actualParams[0]}'");
                 }
                 if (actualParams.Length >= 2)
                 {
                     _chunkConformationType.Value = ConvertEnum<ChunkConformationType>(actualParams[1]);
+                    Assert.IsTrue(_chunkConformationType.Value != ChunkConformationType.Undefined, $"Can't parse 'ChunkConformationType' parameter from value '{actualParams[1]}'");
                 }
             }
 
@@ -217,7 +219,7 @@ namespace TowerGenerator.ChunkImporter
                 else if (_chunkConformationType.Value == ChunkConformationType.Stretchable)
                     chunkController = gameObject.AddComponent<ChunkControllerStretchable>();
 
-                Assert.IsNotNull(chunkController);
+                Assert.IsNotNull(chunkController, "chunk controller is null");
                 chunkController.TopologyType = _chunkTopologyType.Value;
                 chunkController.ConformationType = _chunkConformationType.Value;
                 importInformation.ChunkControllerAmount++;

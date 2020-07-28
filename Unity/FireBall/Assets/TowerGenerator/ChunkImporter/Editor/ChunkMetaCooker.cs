@@ -27,6 +27,7 @@ namespace TowerGenerator.ChunkImporter
             metaAsset.AABBs = new List<Vector3>();
             if (chunkController is ChunkControllerDimensionsBased dimBaseController)
             {
+                Assert.IsNotNull(dimBaseController.DimensionStack, "DimensionStack isn't attached");
                 var aabbsAmount = dimBaseController.DimensionStack.GetItemsCount();
                 for (int i = 0; i < aabbsAmount; ++i)
                 {

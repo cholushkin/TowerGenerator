@@ -11,6 +11,7 @@ namespace TowerGenerator
         // blocks
         public static readonly Vector3 ConnectorMargin = Vector3.one;
         public const float ConnectorAspect = 3f;
+        public const float ChunkMargin = 1f; // value being added to chunk AABB
 
         public const string ChunkClassNameTower = "Tower";
         public const string ChunkClassNameTotem = "Totem";

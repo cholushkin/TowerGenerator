@@ -34,17 +34,17 @@ namespace TowerGenerator
         // for ChunkControllerDimensionsBased we ignore all connectors from the mesh and just calculate them and add manually
         public override Connector[] GetConnectors()
         {
-            var aabb = CalculateCurrentAABB();
+            var aabb = CalculateCurrentAABB(false);
 
             // todo: remove all connectors (including children)
-            Assert.IsTrue(TopologyType!=TopologyType.Undefined);
+            Assert.IsTrue(TopologyType != TopologyType.Undefined);
 
             if (TopologyType == TopologyType.ChunkPeak)
             {
                 var bottomConnector = gameObject.AddComponent<Connector>();
                 bottomConnector.SetNormal(Vector3.down);
                 bottomConnector.transform.position = aabb.center - new Vector3(0, aabb.extents.y, 0);
-                return new Connector[]{bottomConnector};
+                return new Connector[] { bottomConnector };
             }
             else if (TopologyType == TopologyType.ChunkStd)
             {
@@ -71,6 +71,8 @@ namespace TowerGenerator
                 var backwardConnector = gameObject.AddComponent<Connector>();
                 backwardConnector.SetNormal(Vector3.forward);
                 backwardConnector.transform.position = aabb.center + new Vector3(0, 0, -aabb.extents.z);
+
+                return new Connector[] { bottomConnector, topConnector, leftConnector, rightConnector, forwardConnector, backwardConnector };
             }
             else if (TopologyType == TopologyType.ChunkFoundation)
             {

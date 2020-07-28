@@ -22,6 +22,7 @@ namespace TowerGenerator
     [Flags]
     public enum ChunkConformationType 
     {
+        Undefined = 0,
         DimensionsBased = 1,
         Combinatorial = 2,
         Stretchable = 4
