@@ -269,6 +269,13 @@ namespace TowerGenerator
                     treeNode.Data.Topology.Geometry.Bounds.size);
 
                 Gizmos.color = Color.yellow;
+                var bounds = treeNode.Data.Topology.Geometry.Bounds;
+                bounds.Expand(-Vector3.one * TowerGeneratorConstants.ChunkMargin * 2f);
+                Gizmos.DrawWireCube(
+                    chunkCenter,
+                    bounds.size);
+
+                Gizmos.color = Color.yellow;
                 Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.forward * treeNode.Data.Topology.Geometry.Bounds.size.z);
                 Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.back * treeNode.Data.Topology.Geometry.Bounds.size.z);
                 Gizmos.DrawLine(chunkCenter, chunkCenter + Vector3.left * treeNode.Data.Topology.Geometry.Bounds.size.x);

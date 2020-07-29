@@ -8,16 +8,18 @@ namespace TowerGenerator
 {
     public class ChunkControllerDimensionsBased : ChunkControllerBase
     {
-        public GroupStack DimensionStack { get; set; }
+        public GroupStack DimensionStack;
         public int DimensionIndex = -1;
 
         public void SetDimensionIndex(int index = -1)
         {
+            Assert.IsNotNull(DimensionStack);
             DimensionIndex = index;
         }
 
         public override Bounds CalculateDimensionAABB()
         {
+            Assert.IsNotNull(DimensionStack);
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<DimensionsIgnorant>() == null));
             DimensionStack.DoChoice(DimensionIndex);
             return CalculateCurrentAABB();
@@ -25,6 +27,7 @@ namespace TowerGenerator
 
         public override void ProcessGroupSetConfiguration(Group group, ref RandomHelper rnd)
         {
+            Assert.IsNotNull(DimensionStack);
             if (group == DimensionStack && DimensionIndex != -1)
                 group.DoChoice(DimensionIndex);
             else
@@ -34,6 +37,7 @@ namespace TowerGenerator
         // for ChunkControllerDimensionsBased we ignore all connectors from the mesh and just calculate them and add manually
         public override Connector[] GetConnectors()
         {
+            Assert.IsNotNull(DimensionStack);
             var aabb = CalculateCurrentAABB(false);
 
             // todo: remove all connectors (including children)
