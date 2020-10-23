@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
-    // scalable core
-    // + attachable elements 
-    public class ChunkControllerStretchable : ChunkControllerBase
+    public class ChunkControllerDynamicGrow : ChunkControllerBase
     {
         public override Connector[] GetConnectors()
         {

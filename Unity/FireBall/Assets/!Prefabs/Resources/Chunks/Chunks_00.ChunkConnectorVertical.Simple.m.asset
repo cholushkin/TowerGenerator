@@ -15,6 +15,7 @@ MonoBehaviour:
   ChunkName: Chunks_00.ChunkConnectorVertical.Simple
   TopologyType: 64
   ChunkConformation: 4
+  ShapeConfiguration: 0
   ChunkClassName: []
   Generation: 0
   TagSet:

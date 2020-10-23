@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,11 @@ namespace TowerGenerator.ChunkImporter
         [Serializable]
         public class ChunkImportInformation
         {
+            public ChunkImportInformation(string chunkName)
+            {
+                ChunkName = chunkName;
+                ConformationType = new Dictionary<ChunkConformationType, int>(32);
+            }
             public string ChunkName;
             public string[] ChunkClass;
             public uint Generation;
@@ -33,6 +39,7 @@ namespace TowerGenerator.ChunkImporter
             public int ConnectorAmount;
             public int TagAmount;
             public int GenerationAttributeAmount;
+            public Dictionary<ChunkConformationType,int>  ConformationType;
         }
 
         public static GameObject Cook(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)

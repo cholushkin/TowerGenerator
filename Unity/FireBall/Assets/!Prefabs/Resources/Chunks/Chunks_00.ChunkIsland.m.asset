@@ -15,11 +15,12 @@ MonoBehaviour:
   ChunkName: Chunks_00.ChunkIsland
   TopologyType: 4
   ChunkConformation: 1
+  ShapeConfiguration: 0
   ChunkClassName: []
   Generation: 0
   TagSet:
     Tags: []
   AABBs:
-  - {x: 8.28554, y: 8.7810135, z: 8.162837}
-  - {x: 8.28554, y: 8.7810135, z: 8.162837}
-  - {x: 8.28554, y: 8.7810135, z: 8.162837}
+  - {x: 7.28554, y: 7.781014, z: 7.162837}
+  - {x: 7.28554, y: 7.781014, z: 7.162837}
+  - {x: 7.28554, y: 7.781014, z: 7.162837}

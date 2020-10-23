@@ -15,11 +15,12 @@ MonoBehaviour:
   ChunkName: Chunks_00.ChunkStd.SimpleStdChunk
   TopologyType: 2
   ChunkConformation: 1
+  ShapeConfiguration: 0
   ChunkClassName: []
   Generation: 0
   TagSet:
     Tags: []
   AABBs:
-  - {x: 5.700814, y: 5.6515007, z: 5.6552672}
-  - {x: 10.140616, y: 11.17009, z: 10.036245}
-  - {x: 12.63727, y: 21.502665, z: 12.581511}
+  - {x: 4.700814, y: 4.6515007, z: 4.6552672}
+  - {x: 9.140616, y: 10.17009, z: 9.036245}
+  - {x: 11.63727, y: 20.502665, z: 11.581511}

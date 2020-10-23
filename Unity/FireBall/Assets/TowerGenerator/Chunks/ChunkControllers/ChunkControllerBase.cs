@@ -25,8 +25,9 @@ namespace TowerGenerator
         }
 
         public long Seed = -1;
-        public TopologyType TopologyType { get; set; }
-        public ChunkConformationType ConformationType{ get; set; }
+        public TopologyType TopologyType;
+        public ChunkConformationType ConformationType;
+        public ChunkShapeConfigurationType ShapeConfigurationType;
 
 
         protected TreeNode<Group> _impactTree;

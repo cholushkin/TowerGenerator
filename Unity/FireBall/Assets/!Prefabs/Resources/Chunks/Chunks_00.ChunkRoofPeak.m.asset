@@ -15,11 +15,12 @@ MonoBehaviour:
   ChunkName: Chunks_00.ChunkRoofPeak
   TopologyType: 1
   ChunkConformation: 1
+  ShapeConfiguration: 0
   ChunkClassName: []
   Generation: 0
   TagSet:
     Tags: []
   AABBs:
-  - {x: 13.366288, y: 10.076789, z: 13.366288}
-  - {x: 13.366288, y: 9.234263, z: 13.366288}
-  - {x: 13.366288, y: 25.287754, z: 13.366288}
+  - {x: 12.366288, y: 9.076789, z: 12.366288}
+  - {x: 12.366288, y: 8.234263, z: 12.366288}
+  - {x: 12.366288, y: 24.287754, z: 12.366288}

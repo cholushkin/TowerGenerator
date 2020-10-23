@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
 using Boo.Lang;
+using TowerGenerator.Components.DynamicGrowSegments;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -93,7 +94,7 @@ namespace TowerGenerator.ChunkImporter
 
             public override int GetExecutionPriority()
             {
-                return 1;
+                return 1; // attributes has lower priority (0 is higher priority than 1) because usually it used for configure already assigned components which has to be added by AddComponent with higher priority
             }
         }
         #endregion
@@ -216,6 +217,8 @@ namespace TowerGenerator.ChunkImporter
                     chunkController = gameObject.AddComponent<ChunkControllerCombinatorial>();
                 else if (_chunkConformationType.Value == ChunkConformationType.DimensionsBased)
                     chunkController = gameObject.AddComponent<ChunkControllerDimensionsBased>();
+                else if (_chunkConformationType.Value == ChunkConformationType.DynamicGrow)
+                    chunkController = gameObject.AddComponent<ChunkControllerDynamicGrow>();
                 else if (_chunkConformationType.Value == ChunkConformationType.Stretchable)
                     chunkController = gameObject.AddComponent<ChunkControllerStretchable>();
 
@@ -223,6 +226,9 @@ namespace TowerGenerator.ChunkImporter
                 chunkController.TopologyType = _chunkTopologyType.Value;
                 chunkController.ConformationType = _chunkConformationType.Value;
                 importInformation.ChunkControllerAmount++;
+                if(!importInformation.ConformationType.ContainsKey(_chunkConformationType.Value))
+                    importInformation.ConformationType.Add(_chunkConformationType.Value, 0);
+                importInformation.ConformationType[_chunkConformationType.Value]++;
             }
         }
 
@@ -457,6 +463,52 @@ namespace TowerGenerator.ChunkImporter
                 importInformation.Generation = _generation.Value;
             }
         }
+
+        private class ShapeConfiguration : FbxCommandAddAttribute
+        {
+            private Parameter<ChunkShapeConfigurationType> _shapeConfigurationTypeParameter;
+
+            public override string GetPayloadCommandName()
+            {
+                return "ShapeConfiguration";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                _shapeConfigurationTypeParameter = new Parameter<ChunkShapeConfigurationType> { Name = "ShapeConfiguration", Value = ChunkShapeConfigurationType.Unspecified};
+                if (parameters.Length >= 1)
+                    _shapeConfigurationTypeParameter.Value = ConvertEnum<ChunkShapeConfigurationType>(parameters);
+            }
+
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+            {
+                var controllerBase = gameObject.GetComponent<ChunkControllerBase>();
+                Assert.IsNotNull(controllerBase);
+                controllerBase.ShapeConfigurationType = _shapeConfigurationTypeParameter.Value;
+            }
+        }
+
+        private class DynamicGrowSegmentAttribute : FbxCommandAddAttribute
+        {
+            private Parameter<DynamicGrowSegmentType> _dynamicGrowSegmentParameter;
+
+            public override string GetPayloadCommandName()
+            {
+                return "DynamicGrowSegment";
+            }
+
+            public override void ParseParameters(string parameters, GameObject gameObject)
+            {
+                _dynamicGrowSegmentParameter = new Parameter<DynamicGrowSegmentType> { Name = "DynamicGrowSegment", Value = DynamicGrowSegmentType.MiddleSegment }; // set default value
+                if (parameters.Length >= 1)
+                    _dynamicGrowSegmentParameter.Value = ConvertEnum<DynamicGrowSegmentType>(parameters);
+            }
+
+            public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+            {
+                gameObject.AddComponent<DynamicGrowSegment>().SegmentType = _dynamicGrowSegmentParameter.Value;
+            }
+        }
         #endregion
 
         #region Miscellaneous logic
@@ -480,7 +532,7 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        private class Tag : FbxCommandAddComponent
+        private class Tag : FbxCommandAddAttribute
         {
             private Parameter<string> _tagName;
             private Parameter<float> _tagValue;
@@ -548,6 +600,8 @@ namespace TowerGenerator.ChunkImporter
             new Hidden(),
             new ClassName(), 
             new Generation(),
+            new ShapeConfiguration(), 
+            new DynamicGrowSegmentAttribute(), 
         };
 
         public static void Execute(FbxProps fromFbxProps, GameObject gameObject, ChunkCooker.ChunkImportInformation chunkImportInformation)

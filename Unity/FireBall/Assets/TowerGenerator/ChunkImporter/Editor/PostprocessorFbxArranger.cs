@@ -86,7 +86,7 @@ namespace TowerGenerator.ChunkImporter
 
             try
             {
-                ChunkCooker.ChunkImportInformation importInformation = new ChunkCooker.ChunkImportInformation{ ChunkName = chunkName};
+                ChunkCooker.ChunkImportInformation importInformation = new ChunkCooker.ChunkImportInformation(chunkName);
                 chunk.name = chunkName;
                 chunk = ChunkCooker.Cook(chunk, importInformation);
                 ChunkMetaCooker.Cook(chunk, dirToImort, importInformation);
