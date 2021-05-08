@@ -54,7 +54,7 @@ namespace TowerGenerator
         public void Init(long seed, Prototype prototype)
         {
             _chooser = new Chooser<NodeItem>(Nodes.ToArray(), NodesCyclerType, seed, NodeCycles);
-            var rnd = new RandomHelper(seed);
+            var rnd = RandomHelper.CreateRandomNumberGenerator(seed);
 
             foreach (var node in Nodes)
             {

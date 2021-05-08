@@ -36,7 +36,7 @@ namespace TowerGenerator
 
         public ChunkVisualConstructor Constructor;
 
-        protected StateMachine<ProcessorState> _stateMachine;
+        protected StateMachineImmediate<ProcessorState> _stateMachine;
         private GeneratorConfigBase _currentConfig;
         private Queue<TreeNode<Blueprint.Segment>> _lastSegments;
         private ExecutionFrame _frame;
@@ -52,8 +52,8 @@ namespace TowerGenerator
         {
             Debug.LogFormat($">>> StartGenerate");
 
-            _stateMachine = new StateMachine<ProcessorState>(this);
-            _stateMachine.GoTo(ProcessorState.Initialization, true);
+            _stateMachine = new StateMachineImmediate<ProcessorState>(this, ProcessorState.Initialization);
+            _stateMachine.GoTo(ProcessorState.Initialization);
 
             var state = Init(prototype, root);
 
@@ -62,7 +62,7 @@ namespace TowerGenerator
 
         public void Generate(State state)
         {
-            _stateMachine.GoTo(ProcessorState.Generating, true);
+            _stateMachine.GoTo(ProcessorState.Generating);
             StartCoroutine(GenerateRoutine(state));
         }
 

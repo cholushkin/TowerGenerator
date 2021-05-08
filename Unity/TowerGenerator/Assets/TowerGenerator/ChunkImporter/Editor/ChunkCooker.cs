@@ -70,7 +70,7 @@ namespace TowerGenerator.ChunkImporter
 
         private static void ApplyMaterials(GameObject chunk)
         {
-            var colorAtlas = AssetDatabase.LoadAssetAtPath<Material>("Assets/!Prefabs/ColorSchemes/ColorScheme.mat");
+            var colorAtlas = AssetDatabase.LoadAssetAtPath<Material>("Assets/Prefabs/ColorSchemes/ColorScheme.mat");
             Assert.IsNotNull(colorAtlas);
 
             var renders = chunk.GetComponentsInChildren<Renderer>();

@@ -10,15 +10,15 @@ namespace TowerGenerator
     public abstract class GeneratorBase
     {
         public GeneratorConfigBase Config { get; private set; }
-        protected RandomHelper _rndTopology;
-        protected RandomHelper _rndVisual;
-        protected RandomHelper _rndContent;
+        protected IPseudoRandomNumberGenerator _rndTopology;
+        protected IPseudoRandomNumberGenerator _rndVisual;
+        protected IPseudoRandomNumberGenerator _rndContent;
 
         public GeneratorBase(GeneratorConfigBase cfg)
         {
-            _rndTopology = new RandomHelper(cfg.SeedTopology);
-            _rndVisual = new RandomHelper(cfg.SeedVisual);
-            _rndContent = new RandomHelper(cfg.SeedContent);
+            _rndTopology = RandomHelper.CreateRandomNumberGenerator(cfg.SeedTopology);
+            _rndVisual = RandomHelper.CreateRandomNumberGenerator(cfg.SeedVisual);
+            _rndContent = RandomHelper.CreateRandomNumberGenerator(cfg.SeedContent);
 
             Config = cfg;
         }

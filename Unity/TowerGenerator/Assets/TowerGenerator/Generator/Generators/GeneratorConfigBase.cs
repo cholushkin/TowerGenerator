@@ -58,7 +58,7 @@ namespace TowerGenerator
         private long _initialSeedVisual;
         private long _initialSeedContent;
 
-        private RandomHelper _rnd;
+        private IPseudoRandomNumberGenerator _rnd;
 
         private readonly float[] _dirChances = new float[6];
 
@@ -75,7 +75,7 @@ namespace TowerGenerator
 #if DEBUG
             DbgValidate();
 #endif
-            var rnd = new RandomHelper(seed);
+            var rnd = RandomHelper.CreateRandomNumberGenerator(seed);
             if (SeedContent == -1)
                 SeedContent = rnd.ValueInt();
 
@@ -88,7 +88,7 @@ namespace TowerGenerator
             _initialSeedTopology = SeedContent;
             _initialSeedVisual = SeedVisual;
             _initialSeedContent = SeedContent;
-            _rnd = new RandomHelper(_initialSeedTopology);
+            _rnd = RandomHelper.CreateRandomNumberGenerator(_initialSeedTopology);
 
             // init PlacementConfigs list
             Assert.IsFalse(PlacementConfigs == null || PlacementConfigs.Count == 0, $"Generator config has no placement configs assigned {transform.GetDebugName()}");
@@ -116,7 +116,7 @@ namespace TowerGenerator
             SeedContent = _initialSeedContent;
             SeedVisual = _initialSeedVisual;
             SeedTopology = _initialSeedTopology;
-            _rnd = new RandomHelper(_initialSeedTopology);
+            _rnd = RandomHelper.CreateRandomNumberGenerator(_initialSeedTopology);
         }
 
         public PlacementConfig GetPlacementConfig(TopologyType topologyType, string specificationExpression = null)
@@ -160,7 +160,7 @@ namespace TowerGenerator
             return _rnd.FromEnumerable(placementConfigs.Where(x => x.IsStrictSpecifics == false || x.Specifics.IsEmpty()));
         }
 
-        public Vector3 GetRndPropagationDir(ref RandomHelper rnd)
+        public Vector3 GetRndPropagationDir(IPseudoRandomNumberGenerator rnd)
         {
             _dirChances[0] = AllowedDirections.Left;
             _dirChances[1] = AllowedDirections.Right;

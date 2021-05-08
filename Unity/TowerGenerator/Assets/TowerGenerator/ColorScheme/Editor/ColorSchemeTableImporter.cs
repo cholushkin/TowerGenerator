@@ -11,7 +11,7 @@ namespace TowerGenerator
         private static readonly Vector2Int TextureSizeInCells = new Vector2Int(32, 32);
         private static readonly Vector2Int TextureSize = new Vector2Int(256, 256);
         private static readonly int ExtendedColorSlots = 2;
-        private static readonly string OutputFile = "Assets/!Prefabs/ColorSchemes/{0}.png";
+        private static readonly string OutputFile = "Assets/Prefabs/ColorSchemes/{0}.png";
 
         private static void OnPostprocessAllAssets(
             string[] importedAssets,

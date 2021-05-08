@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameLib.DataStructures;
+using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
 

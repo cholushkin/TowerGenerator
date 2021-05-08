@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using GameLib.Random;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -9,7 +10,7 @@ namespace TowerGenerator
         private ChunkControllerBase _chunkController;
         public CameraEntShowroomController CameraEntShowroomController;
 
-        public void Place(MetaBase metaToPlace, long seed)
+        public void Place(MetaBase metaToPlace, IPseudoRandomNumberGeneratorState seed)
         {
             // remove _current
             Destroy(_current);

@@ -63,8 +63,8 @@ namespace TowerGenerator
 
         public void SetConfiguration()
         {
-            RandomHelper rnd = new RandomHelper(Seed);
-            Debug.Log(rnd.GetCurrentSeed());
+            IPseudoRandomNumberGenerator rnd = RandomHelper.CreateRandomNumberGenerator(Seed);
+            Debug.Log(rnd.GetState());
 
             // enable all parts besides apart from hidden
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
@@ -78,14 +78,14 @@ namespace TowerGenerator
                 {
                     if (!treeNode.Data.gameObject.activeInHierarchy)
                         continue;
-                    ProcessGroupSetConfiguration(group, ref rnd);
+                    ProcessGroupSetConfiguration(group, rnd);
                 }
             }
         }
 
-        public virtual void ProcessGroupSetConfiguration(Group group, ref RandomHelper rnd)
+        public virtual void ProcessGroupSetConfiguration(Group group, IPseudoRandomNumberGenerator rnd)
         {
-            group.DoRndChoice(ref rnd);
+            group.DoRndChoice(rnd);
         }
 
         public void EmitEventGroupChoiceDone(Group group)

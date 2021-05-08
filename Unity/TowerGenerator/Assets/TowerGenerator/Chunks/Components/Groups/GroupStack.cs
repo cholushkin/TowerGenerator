@@ -36,7 +36,7 @@ namespace TowerGenerator
             ChunkController.EmitEventGroupChoiceDone(this);
         }
 
-        public override void DoRndChoice(ref RandomHelper rnd)
+        public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
         {
             DoChoice(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
         }

@@ -11,7 +11,7 @@ namespace TowerGenerator
         public abstract void DoChoice(params int[] index);
 
         // Do DoChoice call with a random choice
-        public abstract void DoRndChoice(ref RandomHelper rnd);
+        public abstract void DoRndChoice(IPseudoRandomNumberGenerator rnd);
 
         public void DisableItems()
         {

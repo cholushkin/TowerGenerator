@@ -11,7 +11,7 @@ namespace TowerGenerator
     {
         private Blueprint _blueprint;
         private GeneratorPointer _pointers;
-        private RandomHelper _rnd;
+        private IPseudoRandomNumberGenerator _rnd;
         private Transform _towerRoot;
 
 

@@ -16,6 +16,7 @@ namespace TowerGenerator
         public Transform OutcomeRoot;
         [Tooltip("Seed used for initialize configs with -1 seeds")]
         public long ControlSeed;
+        public bool IsHomogeneousPrototypes;
 
         private Prototype _initialPrototype;
 
@@ -52,15 +53,16 @@ namespace TowerGenerator
 
         private void InitPrototypes( Transform prototypes )
         {
-            RandomHelper rnd = new RandomHelper(ControlSeed);
+            var rnd = RandomHelper.CreateRandomNumberGenerator(ControlSeed);
             if (ControlSeed == -1)
-                ControlSeed = rnd.GetCurrentSeed();
+                ControlSeed = rnd.GetState().AsNumber();
 
             var protoBehs = prototypes.GetComponentsInChildren<Prototype>();
             foreach (var prototype in protoBehs)
             {
-                prototype.Init(rnd.GetCurrentSeed());
-                rnd.Next();
+                prototype.Init(rnd.GetState().AsNumber());
+                if (!IsHomogeneousPrototypes)
+                    rnd.Next();
             }
         }
 

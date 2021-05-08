@@ -1,1 +1,1 @@
-FireBall v.1.0.a
+TowerGenerator v.1.0.a

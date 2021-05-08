@@ -22,9 +22,9 @@ namespace TowerGenerator
         public ChangeDirectionCallback DirectionChanger { get; set; }
         public GetPlacementConfigCallback PlacementConfigProvider { get; set; }
 
-        private RandomHelper _rndTopology;
-        private RandomHelper _rndVisual;
-        private RandomHelper _rndContent;
+        private IPseudoRandomNumberGenerator _rndTopology;
+        private IPseudoRandomNumberGenerator _rndVisual;
+        private IPseudoRandomNumberGenerator _rndContent;
 
         private long _seedTopology;
         private long _seedVisual;
@@ -82,9 +82,9 @@ namespace TowerGenerator
             _fromNode = from;
             TreeNode<Blueprint.Segment> nodePointer = from;
 
-            _rndTopology = new RandomHelper(_seedTopology);
-            _rndVisual = new RandomHelper(_seedVisual);
-            _rndContent = new RandomHelper(_seedContent);
+            _rndTopology = RandomHelper.CreateRandomNumberGenerator(_seedTopology);
+            _rndVisual = RandomHelper.CreateRandomNumberGenerator(_seedVisual);
+            _rndContent = RandomHelper.CreateRandomNumberGenerator(_seedContent);
 
             while (segmentCounter != targetSegmentCount)
             {

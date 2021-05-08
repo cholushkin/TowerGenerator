@@ -25,13 +25,13 @@ namespace TowerGenerator
             return CalculateCurrentAABB();
         }
 
-        public override void ProcessGroupSetConfiguration(Group group, ref RandomHelper rnd)
+        public override void ProcessGroupSetConfiguration(Group group, IPseudoRandomNumberGenerator rnd)
         {
             Assert.IsNotNull(DimensionStack);
             if (group == DimensionStack && DimensionIndex != -1)
                 group.DoChoice(DimensionIndex);
             else
-                group.DoRndChoice(ref rnd);
+                group.DoRndChoice(rnd);
         }
 
         // for ChunkControllerDimensionsBased we ignore all connectors from the mesh and just calculate them and add manually

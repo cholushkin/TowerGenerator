@@ -52,7 +52,7 @@ namespace TowerGenerator
             [Serializable]
             public class EntityControlPanel
             {
-                public long CurrentSeed;
+                public IPseudoRandomNumberGeneratorState CurrentSeed;
                 //public int GroupsNumber;
                 //public Vector3[] Sizes;
                 //public string[] Tags;
@@ -71,7 +71,7 @@ namespace TowerGenerator
 
         public int[] DelayButtonValues;
         public EntityPlace EntPlace;
-        private static RandomHelper _rnd = new RandomHelper(-1);
+        private static IPseudoRandomNumberGenerator _rnd = RandomHelper.CreateRandomNumberGenerator();
 
         static readonly Vector2 ButtonSize = new Vector2(100, 100);
         static readonly Vector2 ButtonWideSize = new Vector2(230, 100);
@@ -104,7 +104,7 @@ namespace TowerGenerator
             while (true)
             {
                 var nextMetaToShow = GetNextMeta();
-                var seed = _rnd.GetCurrentSeed();
+                var seed = _rnd.GetState();
                 Debug.Log($"Seed&Meta to show:{seed} {nextMetaToShow}");
                 if (nextMetaToShow == null)
                 {
@@ -290,7 +290,7 @@ namespace TowerGenerator
             }
         }
 
-        private void UpdateDataForMeta(MetaBase meta, long seed)
+        private void UpdateDataForMeta(MetaBase meta, IPseudoRandomNumberGeneratorState seed)
         {
             State.EntityControlPanelState.CurrentSeed = seed;
             State.CurrentMeta = meta.ToString();

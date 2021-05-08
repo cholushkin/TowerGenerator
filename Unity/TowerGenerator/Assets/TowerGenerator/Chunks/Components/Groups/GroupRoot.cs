@@ -15,7 +15,7 @@ namespace TowerGenerator
         {
         }
 
-        public override void DoRndChoice(ref RandomHelper rnd)
+        public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
         {
         }
     }

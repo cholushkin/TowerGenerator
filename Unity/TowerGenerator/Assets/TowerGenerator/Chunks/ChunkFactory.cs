@@ -5,7 +5,7 @@ namespace TowerGenerator
 {
     public class ChunkFactory 
     {
-        private static RandomHelper _rnd = new RandomHelper(-1);
+        private static IPseudoRandomNumberGenerator _rnd = RandomHelper.CreateRandomNumberGenerator();
         private static readonly float[] _angles = { 0f, 90f, 180f, 270f };
 
         public static Vector3 GetAttachPosition(Bounds parent, Vector3 attachDirection)
@@ -14,7 +14,7 @@ namespace TowerGenerator
         }
 
 
-        public static GameObject CreateChunkRnd(MetaBase meta, long seed, Transform parent, Vector3 position)
+        public static GameObject CreateChunkRnd(MetaBase meta, IPseudoRandomNumberGeneratorState seed, Transform parent, Vector3 position)
         {
             var visSegPrefab = (GameObject)Resources.Load("Chunks/" + meta.ChunkName);
             visSegPrefab.SetActive(false);
@@ -28,7 +28,7 @@ namespace TowerGenerator
             visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
 
             var baseChunkController = visSegment.GetComponent<ChunkControllerBase>();
-            baseChunkController.Seed = seed;
+            baseChunkController.Seed = seed.AsNumber();
             baseChunkController.Init();
             visSegment.SetActive(true);
             baseChunkController.SetConfiguration();
