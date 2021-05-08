@@ -32,3 +32,4 @@ sysinfo.txt
 /Builds
 *.blend1
 /Art.Src/Refs
+/Unity/TowerGenerator/.vsconfig

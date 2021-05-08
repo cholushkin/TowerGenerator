@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7402457836566982167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7402457836566982166}
+  - component: {fileID: 7402457836566982248}
+  - component: {fileID: 7402457836566982249}
+  m_Layer: 0
+  m_Name: GeneratorConfigLineUp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7402457836566982166
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7402457836566982167}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7402457836566982248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7402457836566982167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d99a7a6532599764b87f04c0c3b9eaeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TrunkSegmentsCount:
+    From: 3
+    To: 4
+  PlacementConfigs:
+  - IsStrictSpecifics: 0
+    Specifics:
+      Tags: []
+    MetaFilter:
+      Generation:
+        From: 0
+        To: 0
+      TopologyType: 1
+      BreadthRange:
+        From: 0
+        To: 0
+      HeightRange:
+        From: 0
+        To: 0
+      Wildcard: 
+      Expression: 
+    MetaProviders: []
+  - IsStrictSpecifics: 0
+    Specifics:
+      Tags: []
+    MetaFilter:
+      Generation:
+        From: 0
+        To: 0
+      TopologyType: 2
+      BreadthRange:
+        From: 0
+        To: 0
+      HeightRange:
+        From: 0
+        To: 0
+      Wildcard: 
+      Expression: 
+    MetaProviders: []
+  AllowedDirections:
+    Left: 0
+    Right: 0
+    Up: 0
+    Down: 0
+    Forward: 0
+    Back: 0
+  SeedTopology: 0
+  SeedVisual: 0
+  SeedContent: 0
+  ResetOnProcessorEnter: 0
+  IslandHeight:
+    From: 0
+    To: 0
+  IslandDistanceFromTrunk:
+    From: 0
+    To: 0
+  PropagateIslandChance: 0
+--- !u!114 &7402457836566982249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7402457836566982167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 159658d9b628fe4409b0ba1095942603, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TagSet:
+    Tags: []

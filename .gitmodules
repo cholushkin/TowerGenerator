@@ -1,0 +1,3 @@
+[submodule "Unity/TowerGenerator/Assets/Libs/GameLib"]
+	path = Unity/TowerGenerator/Assets/Libs/GameLib
+	url = git@bitbucket.org:yarilostudio/gamelib.git

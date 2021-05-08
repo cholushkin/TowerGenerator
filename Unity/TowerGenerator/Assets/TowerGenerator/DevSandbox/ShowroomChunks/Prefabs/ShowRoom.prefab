@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &151939626403982762
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 151939626403982760}
+  - component: {fileID: 151939626403982761}
+  m_Layer: 0
+  m_Name: ShowRoom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &151939626403982760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151939626403982762}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 151939628155901020}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &151939626403982761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151939626403982762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e00a7e2ed48a7941aa09e8c3a02aee2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State:
+    MetaInfosState:
+      MetasNumber: 0
+      ChunkRoofPeakNumber: 0
+      ChunkRoofPeakNumberPercent: 0
+      ChunkStdNumber: 0
+      ChunkStdNumberPercent: 0
+      ChunkIslandAndBasementNumber: 0
+      ChunkIslandAndBasementNumberPercent: 0
+      ChunkSideEarNumber: 0
+      ChunkSideEarNumberPercent: 0
+      ChunkBottomEarNumber: 0
+      ChunkBottomEarNumberPercent: 0
+      ChunkConnectorVerticalNumber: 0
+      ChunkConnectorVerticalNumberPercent: 0
+      ChunkConnectorHorizontal: 0
+      ChunkConnectorHorizontalPercent: 0
+    MetaControlPanelState:
+      ChunkRoofPeak: 0
+      ChunkStd: 0
+      ChunkIslandAndBasement: 0
+      ChunkSideEar: 0
+      ChunkBottomEar: 0
+      ChunkConnectorVertical: 0
+      ChunkConnectorHorizontal: 0
+      Delay: 3
+    ShowGUI: 1
+  EntPlaceholder: {fileID: 151939628155901020}
+--- !u!1 &151939628155901021
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 151939628155901020}
+  - component: {fileID: 6391237939642824950}
+  m_Layer: 0
+  m_Name: EntityPlaceholder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &151939628155901020
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151939628155901021}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 151939626403982760}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6391237939642824950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151939628155901021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b10da118d32c0da4cbecae5fad0bde95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

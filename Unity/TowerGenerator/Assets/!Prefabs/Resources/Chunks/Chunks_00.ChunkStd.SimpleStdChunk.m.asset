@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ddf9bedf788d3a4eb5433335f7ff256, type: 3}
+  m_Name: Chunks_00.ChunkStd.SimpleStdChunk.m
+  m_EditorClassIdentifier: 
+  ChunkName: Chunks_00.ChunkStd.SimpleStdChunk
+  TopologyType: 2
+  ChunkConformation: 1
+  ShapeConfiguration: 0
+  ChunkClassName: []
+  Generation: 0
+  TagSet:
+    Tags: []
+  AABBs:
+  - {x: 4.700814, y: 4.6515007, z: 4.6552672}
+  - {x: 9.140616, y: 10.17009, z: 9.036245}
+  - {x: 11.63727, y: 20.502665, z: 11.581511}
