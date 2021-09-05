@@ -196,6 +196,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a62c7572ac429e4d80b4585d4f4a094, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!20 &838362705 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 481525083090220777, guid: 0493819dd97853f4199660f0fa829b97,
+    type: 3}
+  m_PrefabInstance: {fileID: 481525083222357612}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &975541877 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2363361773598143491, guid: ee25dbe6afe4ddf4399388a76e9fa30a,
@@ -274,6 +280,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &1922240158 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 481525083015211732, guid: 0493819dd97853f4199660f0fa829b97,
+    type: 3}
+  m_PrefabInstance: {fileID: 481525083222357612}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &151939627409478535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -440,6 +452,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BackGroundColor.r
       value: 0.19215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 481525083015211733, guid: 0493819dd97853f4199660f0fa829b97,
+        type: 3}
+      propertyPath: Camera
+      value: 
+      objectReference: {fileID: 1922240158}
+    - target: {fileID: 481525083015211733, guid: 0493819dd97853f4199660f0fa829b97,
+        type: 3}
+      propertyPath: Duration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 481525083090220778, guid: 0493819dd97853f4199660f0fa829b97,
+        type: 3}
+      propertyPath: Camera
+      value: 
+      objectReference: {fileID: 838362705}
+    - target: {fileID: 481525083090220778, guid: 0493819dd97853f4199660f0fa829b97,
+        type: 3}
+      propertyPath: Duration
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 481525083584476468, guid: 0493819dd97853f4199660f0fa829b97,
         type: 3}
