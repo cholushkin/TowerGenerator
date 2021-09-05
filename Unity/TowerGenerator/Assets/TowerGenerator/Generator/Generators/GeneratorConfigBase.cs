@@ -107,8 +107,13 @@ namespace TowerGenerator
         {
             if (ResetOnProcessorEnter)
             {
-                ResetSeeds();
+                ResetSeeds(); // todo: replace  ResetOnProcessorEnter with saveSeeds
             }
+        }
+
+        public void OnProcessorExit()
+        {
+            // todo: save current seeds from generators
         }
 
         public virtual void ResetSeeds()

@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Assets.Plugins.Alg;
+using DG.Tweening;
 using UnityEngine;
 
 
@@ -7,16 +7,13 @@ namespace TowerGenerator
 {
     public class OrtoCameraSizeFitter : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
+        public Camera Camera;
+        public float Duration;
+
+        public void DoFit(GameObject gameObj)
         {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
+            var bbs = gameObj.BoundBox().size;
+            Camera.DOOrthoSize(bbs.y, Duration);
         }
     }
 }
