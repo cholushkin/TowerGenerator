@@ -48,6 +48,7 @@ namespace TowerGenerator.ChunkImporter
 
             ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
+            ApplyColliders(semifinishedEnt);
             ApplyMaterials(semifinishedEnt);
 
             ConfigureChunkController(semifinishedEnt); // tree
@@ -66,6 +67,17 @@ namespace TowerGenerator.ChunkImporter
                 tr.gameObject.RemoveComponent<FbxProps>();
             }
             semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);
+        }
+
+        private static void ApplyColliders(GameObject semifinishedEnt)
+        {
+            var renders = semifinishedEnt.GetComponentsInChildren<Renderer>();
+
+            foreach (var render in renders)
+            {
+                if (render.gameObject.GetComponent<IgnoreAddCollider>() == null)
+                    render.gameObject.AddComponent<MeshCollider>();
+            }
         }
 
         private static void ApplyMaterials(GameObject chunk)
