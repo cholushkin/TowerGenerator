@@ -96,14 +96,14 @@ namespace TowerGenerator
             {
                 throw new NotImplementedException();
             }
-            else if (TopologyType == TopologyType.ChunkConnectorVertical)
-            {
-                throw new NotImplementedException();
-            }
-            else if (TopologyType == TopologyType.ChunkConnectorHorizontal)
-            {
-                throw new NotImplementedException();
-            }
+            //else if (TopologyType == TopologyType.ChunkConnectorVertical)
+            //{
+            //    throw new NotImplementedException();
+            //}
+            //else if (TopologyType == TopologyType.ChunkConnectorHorizontal)
+            //{
+            //    throw new NotImplementedException();
+            //}
 
             return null;
         }

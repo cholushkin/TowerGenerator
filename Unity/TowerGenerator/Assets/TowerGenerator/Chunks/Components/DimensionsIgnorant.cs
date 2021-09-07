@@ -1,5 +1,4 @@
-﻿
-namespace TowerGenerator
+﻿namespace TowerGenerator
 {
     public class DimensionsIgnorant : BaseComponent
     {

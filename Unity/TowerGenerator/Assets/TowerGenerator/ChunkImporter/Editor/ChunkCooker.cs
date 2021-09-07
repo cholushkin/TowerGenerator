@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Plugins.Alg;
+using TowerGenerator.FbxCommands;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -19,7 +20,7 @@ namespace TowerGenerator.ChunkImporter
             }
             public string ChunkName;
             public string[] ChunkClass;
-            public uint Generation;
+            public uint MaxGeneration;
 
             public int CommandsProcessedAmount;
 
@@ -29,16 +30,15 @@ namespace TowerGenerator.ChunkImporter
             public int ChunkControllerAmount;
             public int CollisionDependentAmount;
             public int DimensionsIgnorantAmount;
-            public int DimensionsStackAmount;
             public int SuppressionAmount;
             public int SuppressedByAmount;
             public int InductionAmount;
             public int InducedByAmount;
             public int HiddenAmount;
-            public int ClassNameAmount;
             public int ConnectorAmount;
             public int TagAmount;
             public int GenerationAttributeAmount;
+            public int IgnoreAddColliderAmount;
             public Dictionary<ChunkConformationType,int>  ConformationType;
         }
 
@@ -62,7 +62,7 @@ namespace TowerGenerator.ChunkImporter
                 var fbxProp = tr.GetComponent<FbxProps>();
                 if (fbxProp == null)
                     return;
-                FbxCommand.Execute(fbxProp, tr.gameObject, chunkImportInformation);
+                FbxCommandExecutor.Execute(fbxProp, tr.gameObject, chunkImportInformation);
                 tr.gameObject.RemoveComponent<FbxProps>();
             }
             semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);

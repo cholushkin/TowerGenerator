@@ -2,7 +2,8 @@
 
 namespace TowerGenerator
 {
-    // note: one chunk must belong to only one TopologyType, but you could request multiple chunks by combining flags
+    // todo: move it to corresponding classes
+    // note: one chunk could belong to multiple TopologyType flags
     [Flags]
     public enum TopologyType
     {
@@ -13,8 +14,8 @@ namespace TowerGenerator
         ChunkSideEar = 8,
         ChunkBottomEar = 16,
         ChunkTopEar = 32,
-        ChunkConnectorVertical = 64,
-        ChunkConnectorHorizontal = 128,
+        //ChunkConnectorVertical = 64,
+        //ChunkConnectorHorizontal = 128,
     }
 
 
@@ -23,26 +24,18 @@ namespace TowerGenerator
     public enum ChunkConformationType 
     {
         Undefined = 0,
-        DimensionsBased = 1,
-        Combinatorial = 2,
-        DynamicGrow = 4,
-        Stretchable = 8
+        BasicChunkController = 1,
+        WaveFuncCollapseChunkController = 2,
+        GrowingChunkController = 4,
+        MarchingCubesChunkController = 8,
     }
 
-    [Flags]
-    public enum ChunkShapeConfigurationType
-    {
-        Unspecified = 0,
-        Vertical = 1,
-        Horizontal = 2,
-        Fat = 4
-    }
+    //[Flags]
+    //public enum DynamicGrowSegmentType
+    //{
+    //    MiddleSegment = 0,
+    //    EndingSegment = 1,
+    //    StartingSegment = 2,
+    //}
 
-    [Flags]
-    public enum DynamicGrowSegmentType
-    {
-        MiddleSegment = 0,
-        EndingSegment = 1,
-        StartingSegment = 2,
-    }
 }

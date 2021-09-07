@@ -20,7 +20,7 @@ namespace TowerGenerator.ChunkImporter
             metaAsset.ChunkClassName = importInformation.ChunkClass;
             metaAsset.ChunkConformation = chunkController.ConformationType;
             metaAsset.TopologyType = chunkController.TopologyType;
-            metaAsset.Generation = importInformation.Generation;
+            metaAsset.Generation = chunkController.Generation;
             // todo: TagSet
 
             // AABBs

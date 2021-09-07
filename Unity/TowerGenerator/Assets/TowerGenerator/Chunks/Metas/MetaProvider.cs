@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
-using GameLib.Random;
 using NCalc;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Range = GameLib.Random.Range;
 
 namespace TowerGenerator
 {

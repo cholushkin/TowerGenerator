@@ -10,7 +10,6 @@ namespace TowerGenerator
         public string ChunkName;
         public TopologyType TopologyType;
         public ChunkConformationType ChunkConformation;
-        public ChunkShapeConfigurationType ShapeConfiguration;
         public string[] ChunkClassName; // creature, tower, totem, etc.
         public uint Generation;
         public TagSet TagSet;

@@ -6,6 +6,7 @@ using GameLib.Random;
 using NCalc;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Range = GameLib.Random.Range;
 
 namespace TowerGenerator
 {
