@@ -10,37 +10,32 @@ namespace TowerGenerator.FbxCommands
 {
     public static class FbxCommandExecutor
     {
-        private class CommandItem
+        private class CommandRegistrationEntry
         {
             public delegate FbxCommandBase CommandCreator();
             public string Name;
             public CommandCreator Creator;
-            public override string ToString()
-            {
-                return base.ToString();
-            }
         }
 
-        private static readonly CommandItem[] CmdFactory =
+        private static readonly CommandRegistrationEntry[] CmdFactory =
         {
-            // Groups
-            new CommandItem{ Name = "GroupStack", Creator = ()=> new FbxCommandChunkController()},
-            new CommandItem{ Name = "GroupSet", Creator = ()=> new FbxCommandChunkGeneration()},
-            new CommandItem{ Name = "GroupSwitch", Creator = ()=> new FbxCommandCollisionDependent()},
-            new CommandItem{ Name = "ChunkController", Creator = ()=> new FbxCommandConnector()},
-            new CommandItem{ Name = "Connector", Creator = ()=> new FbxCommandDimensionsIgnorant()},
-            new CommandItem{ Name = "Tag", Creator = ()=> new FbxCommandSet()},
-            new CommandItem{ Name = "CollisionDependent", Creator = ()=> new FbxCommandGroupStack()},
-            new CommandItem{ Name = "DimensionsIgnorant", Creator = ()=> new FbxCommandGroupSwitch()},
-            new CommandItem{ Name = "Suppression", Creator = ()=> new FbxCommandHidden()},
-            new CommandItem{ Name = "SuppressedBy", Creator = ()=> new FbxCommandIgnoreAddCollider()},
-            new CommandItem{ Name = "Induction", Creator = ()=> new FbxCommandInducedBy()},
-            new CommandItem{ Name = "InducedBy", Creator = ()=> new FbxCommandInduction()},
-            new CommandItem{ Name = "Hidden", Creator = ()=> new FbxCommandSet()},
-            new CommandItem{ Name = "ClassName", Creator = ()=> new FbxCommandSuppressedBy()},
-            new CommandItem{ Name = "Generation", Creator = ()=> new FbxCommandSuppression()},
-            new CommandItem{ Name = "ComponentValue", Creator = ()=> new FbxCommandTag()},
-
+            new(){ Name = "ChunkController", Creator = ()=> new FbxCommandChunkController("ChunkController")},
+            new(){ Name = "Generation", Creator = ()=> new FbxCommandChunkGeneration("Generation")},
+            new(){ Name = "CollisionDependent", Creator = ()=> new FbxCommandCollisionDependent("CollisionDependent")},
+            new(){ Name = "Connector", Creator = ()=> new FbxCommandConnector("Connector")},
+            new(){ Name = "DimensionsIgnorant", Creator = ()=> new FbxCommandDimensionsIgnorant("DimensionsIgnorant")},
+            new(){ Name = "GeneratorConnector", Creator = ()=> new FbxCommandGeneratorConnector("GeneratorConnector")},
+            new(){ Name = "GroupSet", Creator = ()=> new FbxCommandGroupSet("GroupSet")},
+            new(){ Name = "GroupStack", Creator = ()=> new FbxCommandGroupStack("GroupStack")},
+            new(){ Name = "GroupSwitch", Creator = ()=> new FbxCommandGroupSwitch("GroupSwitch")},
+            new(){ Name = "Hidden", Creator = ()=> new FbxCommandHidden("Hidden")},
+            new(){ Name = "IgnoreAddCollider", Creator = ()=> new FbxCommandIgnoreAddCollider("IgnoreAddCollider")},
+            new(){ Name = "InducedBy", Creator = ()=> new FbxCommandInducedBy("InducedBy")},
+            new(){ Name = "Induction", Creator = ()=> new FbxCommandInduction("Induction")},
+            new(){ Name = "Set", Creator = ()=> new FbxCommandSet("Set")},
+            new(){ Name = "SuppressedBy", Creator = ()=> new FbxCommandSuppressedBy("SuppressedBy")},
+            new(){ Name = "Suppression", Creator = ()=> new FbxCommandSuppression("Suppression")},
+            new(){ Name = "Tag", Creator = ()=> new FbxCommandTag("Tag")},
         };
 
         public static void Execute(FbxProps fromFbxProps, GameObject gameObject,
@@ -62,7 +57,7 @@ namespace TowerGenerator.FbxCommands
                 if (cmdCreator == null)
                 {
                     Debug.LogError(
-                        $"Unable to find cmd '{fbxCmdName}', fbx prop name = {property.Value}; fbx prop value ={property.Name}; object = '{gameObject.transform.GetDebugName()}' ");
+                        $"Unable to find cmd '{fbxCmdName}', fbx prop name = {property.Value}; fbx prop value = {property.Name}; object = '{gameObject.transform.GetDebugName()}' ");
                     break;
                 }
 

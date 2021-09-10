@@ -10,9 +10,8 @@ public class FbxCommandConnector : FbxCommandBase
     // Connector(In|Out, ChunkStandard, ArchitectureNeutral, BiomeNeutral)
     public Connector.ConnectorType ConnectorType;
     public string[] ConnectExpressions;
-    public override string GetFbxCommandName()
+    public FbxCommandConnector(string fbxCommandName) : base(fbxCommandName)
     {
-        return "Connector";
     }
 
     public override void ParseParameters(string parameters, GameObject gameObject)
@@ -37,4 +36,6 @@ public class FbxCommandConnector : FbxCommandBase
         connector.ConnectExpressions = ConnectExpressions;
         importInformation.ConnectorAmount++;
     }
+
+
 }

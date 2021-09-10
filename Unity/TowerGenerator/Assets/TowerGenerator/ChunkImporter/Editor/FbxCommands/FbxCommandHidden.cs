@@ -8,9 +8,8 @@ namespace TowerGenerator.FbxCommands
     // To hide some objects initially you could use 'Hidden'.
     public class FbxCommandHidden : FbxCommandBase
     {
-        public override string GetFbxCommandName()
+        public FbxCommandHidden(string fbxCommandName) : base(fbxCommandName)
         {
-            return "Hidden";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

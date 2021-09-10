@@ -9,9 +9,8 @@ namespace TowerGenerator.FbxCommands
     // Nested objects are treated as stack levels which could be turned on sequentially 
     public class FbxCommandGroupStack : FbxCommandBase
     {
-        public override string GetFbxCommandName()
+        public FbxCommandGroupStack(string fbxCommandName) : base(fbxCommandName)
         {
-            return "GroupStack";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

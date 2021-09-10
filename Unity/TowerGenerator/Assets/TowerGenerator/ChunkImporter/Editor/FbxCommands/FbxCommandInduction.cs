@@ -15,9 +15,8 @@ namespace TowerGenerator.FbxCommands
     public class FbxCommandInduction: FbxCommandBase
     {
         public string[] InductionLabels;
-        public override string GetFbxCommandName()
+        public FbxCommandInduction(string fbxCommandName) : base(fbxCommandName)
         {
-            return "Induction";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

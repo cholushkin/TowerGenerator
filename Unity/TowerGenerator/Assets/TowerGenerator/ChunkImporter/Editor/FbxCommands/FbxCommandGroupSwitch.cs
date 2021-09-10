@@ -9,9 +9,8 @@ namespace TowerGenerator.FbxCommands
     // No parameters
     public class FbxCommandGroupSwitch : FbxCommandBase
     {
-        public override string GetFbxCommandName()
+        public FbxCommandGroupSwitch(string fbxCommandName) : base(fbxCommandName)
         {
-            return "GroupSwitch";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

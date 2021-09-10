@@ -14,10 +14,8 @@ namespace TowerGenerator.FbxCommands
     {
         public ChunkControllerBase.ChunkController ChunkControllerType;
         public TagSet ChunkTagSet;
-        
-        public override string GetFbxCommandName()
+        public FbxCommandChunkController(string fbxCommandName) : base(fbxCommandName)
         {
-            return "ChunkController";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

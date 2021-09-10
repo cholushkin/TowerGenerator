@@ -13,9 +13,9 @@ namespace TowerGenerator.FbxCommands
     public class FbxCommandSuppressedBy : FbxCommandBase
     {
         public string[] SuppressionLabels;
-        public override string GetFbxCommandName()
+
+        public FbxCommandSuppressedBy(string fbxCommandName) : base(fbxCommandName)
         {
-            return "SuppressedBy";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

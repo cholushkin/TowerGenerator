@@ -15,9 +15,8 @@ namespace TowerGenerator.FbxCommands
     {
         public string TagName;
         public float TagValue;
-        public override string GetFbxCommandName()
+        public FbxCommandTag(string fbxCommandName) : base(fbxCommandName)
         {
-            return "Tag";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

@@ -18,9 +18,8 @@ namespace TowerGenerator.FbxCommands
         public string PropertyName;
         public string PropertyValue;
 
-        public override string GetFbxCommandName()
+        public FbxCommandSet(string fbxCommandName) : base(fbxCommandName)
         {
-            return "Set";
         }
 
         public override int GetExecutionPriority()

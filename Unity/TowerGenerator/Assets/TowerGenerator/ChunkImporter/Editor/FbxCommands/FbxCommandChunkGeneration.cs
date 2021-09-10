@@ -9,12 +9,15 @@ namespace TowerGenerator.FbxCommands
     // Потому что генератор работает на заданном диапазоне пололений чанков.
     // Если же результат генерации предполагает включать в себя новые добавленные позже чанки, тогда в генераторе должен быть отключен фильтр по поколениям.
 
+    // Example:
+    // Generation(2)
+
     public class FbxCommandChunkGeneration : FbxCommandBase
     {
         public uint Generation;
-        public override string GetFbxCommandName()
+
+        public FbxCommandChunkGeneration(string fbxCommandName) : base(fbxCommandName)
         {
-            return "ChunkGeneration";
         }
 
         public override int GetExecutionPriority()
@@ -41,6 +44,8 @@ namespace TowerGenerator.FbxCommands
             if (Generation > importInformation.MaxGeneration)
                 importInformation.MaxGeneration = Generation;
         }
+
+
     }
 }
        

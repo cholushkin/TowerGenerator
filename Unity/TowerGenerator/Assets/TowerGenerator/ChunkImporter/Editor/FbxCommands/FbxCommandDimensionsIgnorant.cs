@@ -6,9 +6,8 @@ namespace TowerGenerator.FbxCommands
 {
     public class FbxCommandDimensionsIgnorant: FbxCommandBase
     {
-        public override string GetFbxCommandName()
+        public FbxCommandDimensionsIgnorant(string fbxCommandName) : base(fbxCommandName)
         {
-            return "DimensionsIgnorant";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

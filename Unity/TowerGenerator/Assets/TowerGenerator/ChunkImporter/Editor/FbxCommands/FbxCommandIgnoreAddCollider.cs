@@ -9,9 +9,8 @@ namespace TowerGenerator.FbxCommands
 
     public class FbxCommandIgnoreAddCollider : FbxCommandBase
     {
-        public override string GetFbxCommandName()
+        public FbxCommandIgnoreAddCollider(string fbxCommandName) : base(fbxCommandName)
         {
-            return "IgnoreAddCollider";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

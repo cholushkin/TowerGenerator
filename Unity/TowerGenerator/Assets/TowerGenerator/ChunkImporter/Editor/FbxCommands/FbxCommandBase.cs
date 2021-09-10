@@ -11,8 +11,18 @@ namespace TowerGenerator.FbxCommands
         protected const int PriorityHighest = 0;
         protected const int PriorityLowest = Int32.MaxValue;
         public string RawInputFromFbx;
+        private readonly string _fbxCommandName;
 
-        public abstract string GetFbxCommandName();
+        protected FbxCommandBase(string fbxCommandName)
+        {
+            _fbxCommandName = fbxCommandName;
+        }
+
+        public string GetFbxCommandName()
+        {
+            return _fbxCommandName;
+        }
+
         public abstract void ParseParameters(string parameters, GameObject gameObject);
         public abstract void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation);
         public virtual int GetExecutionPriority()

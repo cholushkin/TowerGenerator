@@ -15,9 +15,8 @@ namespace TowerGenerator.FbxCommands
     {
         public CollisionDependent.FragmentRelation FragmentDomination;
 
-        public override string GetFbxCommandName()
+        public FbxCommandCollisionDependent(string fbxCommandName) : base(fbxCommandName)
         {
-            return "CollisionDependent";
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

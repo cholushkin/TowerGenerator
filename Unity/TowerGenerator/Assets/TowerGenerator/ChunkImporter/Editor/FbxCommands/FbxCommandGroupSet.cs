@@ -19,9 +19,8 @@ namespace TowerGenerator.FbxCommands
         public int MinObjectsSelected;
         public int MaxObjectsSelected;
 
-        public override string GetFbxCommandName()
+        public FbxCommandGroupSet(string fbxCommandName) : base(fbxCommandName)
         {
-            return "AddGroupSet";
         }
 
         public override void ParseParameters(string parametersString, GameObject gameObject)
