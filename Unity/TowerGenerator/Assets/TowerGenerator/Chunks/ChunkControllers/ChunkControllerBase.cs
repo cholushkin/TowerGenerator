@@ -25,8 +25,8 @@ namespace TowerGenerator
         public const string ChunkBottomEarTag = "ChunkBottomEar";
         public const string ChunkTopEarTag = "ChunkTopEar";
 
-       // note: one chunk must belong to only one ChunkConformationType, but you could request multiple chunks by combining flags
-       [Flags]
+        // note: one chunk must belong to only one ChunkController, but you could request multiple ChunkController types by combining flags
+        [Flags]
         public enum ChunkController
         {
             Undefined = 0,

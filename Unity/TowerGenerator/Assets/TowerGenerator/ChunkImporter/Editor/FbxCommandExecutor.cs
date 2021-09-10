@@ -15,6 +15,10 @@ namespace TowerGenerator.FbxCommands
             public delegate FbxCommandBase CommandCreator();
             public string Name;
             public CommandCreator Creator;
+            public override string ToString()
+            {
+                return base.ToString();
+            }
         }
 
         private static readonly CommandItem[] CmdFactory =
@@ -64,13 +68,17 @@ namespace TowerGenerator.FbxCommands
 
                 var cmd = cmdCreator.Creator();
                 cmd.ParseParameters(fbxParameters, gameObject);
+                cmd.SetRawInputFromFbx(fbxCmdName, fbxParameters);
                 commands.Add(cmd);
                 chunkImportInformation.CommandsProcessedAmount++;
             }
 
             // execute commands by their priorities
             foreach (var cmd in commands.OrderBy(c => c.GetExecutionPriority()))
+            {
+                Debug.Log($"Executing {cmd.RawInputFromFbx} on {gameObject.transform.GetDebugName()}");
                 cmd.Execute(gameObject, chunkImportInformation);
+            }
         }
 
         // note: fbx command could end with digit due to fbx props naming traits

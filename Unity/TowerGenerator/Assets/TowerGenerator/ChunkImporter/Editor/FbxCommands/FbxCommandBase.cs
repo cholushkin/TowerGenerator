@@ -10,6 +10,7 @@ namespace TowerGenerator.FbxCommands
     {
         protected const int PriorityHighest = 0;
         protected const int PriorityLowest = Int32.MaxValue;
+        public string RawInputFromFbx;
 
         public abstract string GetFbxCommandName();
         public abstract void ParseParameters(string parameters, GameObject gameObject);
@@ -17,6 +18,11 @@ namespace TowerGenerator.FbxCommands
         public virtual int GetExecutionPriority()
         {
             return PriorityHighest;
+        }
+
+        public void SetRawInputFromFbx(string fbxCmdName, string fbxParameters)
+        {
+            RawInputFromFbx = $"{fbxCmdName}({fbxParameters})";
         }
 
         #region Conversion helpers
