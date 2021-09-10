@@ -5,16 +5,15 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator.ChunkImporter
 {
-    public class PostprocessorFbxProperties : AssetPostprocessor
+    public class PostprocessorAddFbxProperties : AssetPostprocessor
     {
         // Due to a bug in unity that doesn't allow attach more than one script to game object ("IDENTIFIER UNIQUENESS VIOLATION" WARNING POPS UP WHEN ADDING MULTIPLE MONOBEHAVIOUR TO MODEL PREFAB ROOT VIA ASSETPOSTPROCESSOR)
         // warning appears in the console - "Identifier uniqueness violation: 'xxx'. Scripted Importers do not guarantee that subsequent imports of this asset will properly re-link to these targets."
-
         public void OnPostprocessGameObjectWithUserProperties(GameObject gObj, string[] names, System.Object[] values)
         {
             ModelImporter modelImporter = assetImporter as ModelImporter;
             Debug.Assert(modelImporter != null, nameof(modelImporter) + " != null");
-            if (ChunkImporterHelper.IsChunkPackFbx(modelImporter.assetPath))
+            if (ChunkImporterHelper.IsNeededToImportChunkPackFbx(modelImporter.assetPath))
             {
                 ProcessFbxProps(gObj, names, values);
                 return;

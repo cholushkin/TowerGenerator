@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace TowerGenerator.ChunkImporter
 {
-    public class PostprocessorFbxArranger : AssetPostprocessor
+    public class ChunkImporter : AssetPostprocessor
     {
         private static void OnPostprocessAllAssets(
             string[] importedAssets,
@@ -22,7 +22,7 @@ namespace TowerGenerator.ChunkImporter
                 //var root = Path.GetPathRoot(assetPath);
                 //var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
 
-                if (ChunkImporterHelper.IsChunkPackFbx(assetPath))
+                if (ChunkImporterHelper.IsNeededToImportChunkPackFbx(assetPath))
                 {
                     // ImportChunks
                     //  delete old chunks with such names
