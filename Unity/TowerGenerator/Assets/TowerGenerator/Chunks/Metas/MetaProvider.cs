@@ -16,7 +16,7 @@ namespace TowerGenerator
         public class Filter
         {
             public Range Generation;
-            public TopologyType TopologyType;
+            //public TopologyType TopologyType;
             public Range BreadthRange;
             public Range HeightRange;
             public string Wildcard;
@@ -30,10 +30,10 @@ namespace TowerGenerator
                 return metas.Where(m => Generation.IsIn(m.Generation));
             }
 
-            public IEnumerable<MetaBase> FilterEntType(IEnumerable<MetaBase> metas)
-            {
-                return metas.Where(m => (TopologyType & m.TopologyType) != 0);
-            }
+            //public IEnumerable<MetaBase> FilterEntType(IEnumerable<MetaBase> metas)
+            //{
+            //    return metas.Where(m => (TopologyType & m.TopologyType) != 0);
+            //}
 
             public IEnumerable<MetaBase> FilterNameWildcard(IEnumerable<MetaBase> metas)
             {
@@ -67,7 +67,9 @@ namespace TowerGenerator
                 if (breadth == Range.InfiniteRange && height == Range.InfiniteRange)
                     return metas;
 
-                return metas.Where(x=>_checkSizes(x, breadth, height));
+                return metas;
+                //return metas.Where(x=>_checkSizes(x, breadth, height));
+
             }
 
             public override string ToString()
@@ -121,19 +123,19 @@ namespace TowerGenerator
                 return false;
             }
 
-            static bool _checkSizes(MetaBase meta, Range breadthRange, Range heightRange)
-            {
-                Assert.IsTrue(meta.AABBs.Count > 0);
-                foreach (var metaAABB in meta.AABBs)
-                {
-                    var xIsOK = metaAABB.x >= breadthRange.From && metaAABB.x <= breadthRange.To;
-                    var zIsOK = metaAABB.z >= breadthRange.From && metaAABB.z <= breadthRange.To;
-                    var heightIsOK = metaAABB.y >= heightRange.From && metaAABB.y <= heightRange.To;
-                    if (xIsOK && zIsOK && heightIsOK)
-                        return true;
-                }
-                return false;
-            }
+            //static bool _checkSizes(MetaBase meta, Range breadthRange, Range heightRange)
+            //{
+            //    Assert.IsTrue(meta.AABBs.Count > 0);
+            //    foreach (var metaAABB in meta.AABBs)
+            //    {
+            //        var xIsOK = metaAABB.x >= breadthRange.From && metaAABB.x <= breadthRange.To;
+            //        var zIsOK = metaAABB.z >= breadthRange.From && metaAABB.z <= breadthRange.To;
+            //        var heightIsOK = metaAABB.y >= heightRange.From && metaAABB.y <= heightRange.To;
+            //        if (xIsOK && zIsOK && heightIsOK)
+            //            return true;
+            //    }
+            //    return false;
+            //}
         }
 
         public MetaBase[] Metas;
@@ -168,7 +170,7 @@ namespace TowerGenerator
 
             IEnumerable<MetaBase> filteredResult = metas;
 
-            filteredResult = filter.FilterEntType(filteredResult);
+            //filteredResult = filter.FilterEntType(filteredResult);
             filteredResult = filter.FilterGeneration(filteredResult);
             filteredResult = filter.FilterNameWildcard(filteredResult);
             filteredResult = filter.FilterTagExpression(filteredResult);

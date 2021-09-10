@@ -7,14 +7,14 @@ namespace TowerGenerator.FbxCommands
 {
     // Adds ChunkController to the node. ChunkController mostly controls randomization of the chunk.
     // Examples:
-    // ChunkController(ChunkFoundation, GrowingChunkController)
-    // ChunkController() // by default parameters are: ChunkStd, BasicChunkController
-    // ChunkController(ChunkFoundation) // first parameter is ChunkFoundation, second by default is BasicChunkController
-    // ChunkController(ChunkTopEar|ChunkPeak)
+    // ChunkController(BasicChunkController, ChunkBasement)
+    // ChunkController() // by default parameters are: BasicChunkController, null
+    // ChunkController(BasicChunkController, ChunkTopEar, ChunkPeak, BiomeJungle, ArchitectureCubism)
     public class FbxCommandChunkController : FbxCommandBase
     {
-        public TopologyType ChunkTopologyType;
-        public ChunkConformationType ChunkConformationType;
+        public ChunkControllerBase.ChunkController ChunkControllerType;
+        public TagSet ChunkTagSet;
+        
         public override string GetFbxCommandName()
         {
             return "ChunkController";
@@ -25,8 +25,8 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
 
             // set defaults parameters first
-            ChunkTopologyType = TopologyType.ChunkStd;
-            ChunkConformationType = ChunkConformationType.BasicChunkController;
+            ChunkControllerType = ChunkControllerBase.ChunkController.BasicChunkController;
+            ChunkTagSet = new TagSet();
 
             if (string.IsNullOrWhiteSpace(parameters))
                 return; // keep default values if there is no parameters
@@ -35,15 +35,18 @@ namespace TowerGenerator.FbxCommands
             Assert.IsTrue(actualParams.Length is 1 or 2);
             if (actualParams.Length >= 1) // we have first parameter
             {
-                ChunkTopologyType = ConvertEnum<TopologyType>(actualParams[0]);
-                Assert.IsTrue(ChunkTopologyType != TopologyType.Undefined, $"Can't parse 'ChunkTopologyType' parameter from value '{actualParams[0]}'");
-                Assert.IsTrue(Numbers.CountBits((uint)ChunkTopologyType) == 1, "More than one flag set");
+                ChunkControllerType = ConvertEnum<ChunkControllerBase.ChunkController>(actualParams[0]);
+                Assert.IsTrue(ChunkControllerType != ChunkControllerBase.ChunkController.Undefined, $"Can't parse 'ChunkTopologyType' parameter from value '{actualParams[0]}'");
+                Assert.IsTrue(Numbers.CountBits((uint)ChunkControllerType) == 1, "More than one flag set");
             }
 
             if (actualParams.Length >= 2) // we have second parameter
             {
-                ChunkConformationType = ConvertEnum<ChunkConformationType>(actualParams[1]);
-                Assert.IsTrue(ChunkConformationType != ChunkConformationType.Undefined, $"Can't parse 'ChunkConformationType' parameter from value '{actualParams[1]}'");
+                for (int i = 1; i < actualParams.Length; ++i)
+                {
+                    var tagName = actualParams[i];
+                    ChunkTagSet.SetTag(tagName, 1f);
+                }
             }
         }
 
@@ -54,26 +57,23 @@ namespace TowerGenerator.FbxCommands
 
             ChunkControllerBase chunkController = null;
 
-            if (ChunkConformationType == ChunkConformationType.BasicChunkController)
-                chunkController = gameObject.AddComponent<ChunkControllerCombinatorial>();
-            //else if (ChunkConformationType == ChunkConformationType.DimensionsBased)
-            //    chunkController = gameObject.AddComponent<ChunkControllerDimensionsBased>();
-            //else if (ChunkConformationType == ChunkConformationType.DynamicGrow)
-            //    chunkController = gameObject.AddComponent<ChunkControllerDynamicGrow>();
-            //else if (ChunkConformationType == ChunkConformationType.Stretchable)
-            //    chunkController = gameObject.AddComponent<ChunkControllerStretchable>();
-
-            Assert.IsNotNull(chunkController, "chunk controller is null");
             Assert.IsNull(gameObject.GetComponent<ChunkControllerBase>(), "no ChunkController should be attached before");
 
+            if (ChunkControllerType == ChunkControllerBase.ChunkController.BasicChunkController)
+                chunkController = gameObject.AddComponent<ChunkControllerBase>();
 
-            chunkController.TopologyType = ChunkTopologyType;
-            chunkController.ConformationType = ChunkConformationType;
+            Assert.IsNotNull(chunkController, "chunk controller is null");
+            
+            chunkController.ChunkControllerType = ChunkControllerType;
+            chunkController.ChunkTagSet = ChunkTagSet;
 
             importInformation.ChunkControllerAmount++;
-            if (!importInformation.ConformationType.ContainsKey(ChunkConformationType))
-                importInformation.ConformationType.Add(ChunkConformationType, 0);
-            importInformation.ConformationType[ChunkConformationType]++;
+            foreach (var tag in ChunkTagSet.Tags)
+            {
+                if (!importInformation.ChunkTags.ContainsKey(tag.Name))
+                    importInformation.ChunkTags.Add(tag.Name, 0);
+                importInformation.ChunkTags[tag.Name]++;
+            }
         }
     }
 }

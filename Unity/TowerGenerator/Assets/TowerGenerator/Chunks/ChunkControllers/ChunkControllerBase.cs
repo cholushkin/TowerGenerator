@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using Assets.Plugins.Alg;
 using Events;
@@ -12,8 +13,30 @@ using Random = UnityEngine.Random;
 
 namespace TowerGenerator
 {
-    public abstract class ChunkControllerBase : MonoBehaviour
+    public class ChunkControllerBase : MonoBehaviour
     {
+        // Tags used for specifying chunk topology
+        public const string ChunkPeekTag = "ChunkPeek";
+        public const string ChunkStandardTag = "ChunkStandard";
+        public const string ChunkBasementTag = "ChunkBasement";
+        public const string ChunkIslandAndBasementTag = "ChunkIslandAndBasement";
+        public const string ChunkIslandTag = "ChunkIsland";
+        public const string ChunkSideEarTag = "ChunkSideEar";
+        public const string ChunkBottomEarTag = "ChunkBottomEar";
+        public const string ChunkTopEarTag = "ChunkTopEar";
+
+       // note: one chunk must belong to only one ChunkConformationType, but you could request multiple chunks by combining flags
+       [Flags]
+        public enum ChunkController
+        {
+            Undefined = 0,
+            BasicChunkController = 1,
+            WaveFuncCollapseChunkController = 2,
+            GrowingChunkController = 4,
+            MarchingCubesChunkController = 8,
+        }
+
+
         public class EventGroupChoiceDone
         {
             public EventGroupChoiceDone(Group group)
@@ -24,9 +47,11 @@ namespace TowerGenerator
             public Group GroupChoice { get; }
         }
 
+        public TagSet ChunkTagSet;
+        public ChunkController ChunkControllerType;
+        public Connector[] Connectors;
+
         public long Seed = -1;
-        public TopologyType TopologyType;
-        public ChunkConformationType ConformationType;
         public uint Generation;
 
 
@@ -106,8 +131,10 @@ namespace TowerGenerator
             Debug.Log(strOutcome);
         }
 
-        public abstract Connector[] GetConnectors();
-
+        public Connector[] GetActiveConnectors()
+        {
+            throw new NotImplementedException();
+        }
 
         private void BuildImpactTree()
         {

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Assets.Plugins.Alg;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -17,26 +15,10 @@ namespace TowerGenerator.ChunkImporter
             string assetPathAndName = dir + "/" + importInformation.ChunkName + ".m.asset";
 
             metaAsset.ChunkName = importInformation.ChunkName;
-            metaAsset.ChunkClassName = importInformation.ChunkClass;
-            metaAsset.ChunkConformation = chunkController.ConformationType;
-            metaAsset.TopologyType = chunkController.TopologyType;
+            metaAsset.ChunkControllerType = chunkController.ChunkControllerType;
             metaAsset.Generation = chunkController.Generation;
-            // todo: TagSet
-
-            // AABBs
-            metaAsset.AABBs = new List<Vector3>();
-            if (chunkController is ChunkControllerDimensionsBased dimBaseController)
-            {
-                Assert.IsNotNull(dimBaseController.DimensionStack, "DimensionStack isn't attached");
-                var aabbsAmount = dimBaseController.DimensionStack.GetItemsCount();
-                for (int i = 0; i < aabbsAmount; ++i)
-                {
-                    dimBaseController.SetDimensionIndex(i);
-                    metaAsset.AABBs.Add(dimBaseController.CalculateDimensionAABB().size);
-                }
-            }
-            else if (chunkController is ChunkControllerCombinatorial)
-                metaAsset.AABBs.Add(chunkController.CalculateDimensionAABB().size);
+            metaAsset.TagSet = chunkController.ChunkTagSet;//new TagSet(chunkController.ChunkTagSet);
+            metaAsset.AABB = chunkController.CalculateDimensionAABB().size;
             
             AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
             AssetDatabase.SaveAssets();

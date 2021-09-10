@@ -28,7 +28,7 @@ namespace TowerGenerator
             public TagSet Specifics; // example: HugePeeks, VerticalIslandOnly or Establishments
             public MetaProvider.Filter MetaFilter;
             public MetaProvider[] MetaProviders; // if empty then use all of them
-            public TopologyType TopologyType => MetaFilter.TopologyType;
+//            public TopologyType TopologyType => MetaFilter.TopologyType;
         }
 
         [Serializable]
@@ -125,45 +125,46 @@ namespace TowerGenerator
             _rnd = RandomHelper.CreateRandomNumberGenerator(_initialSeedTopology);
         }
 
-        public PlacementConfig GetPlacementConfig(TopologyType topologyType, string specificationExpression = null)
+        public PlacementConfig GetPlacementConfig(/*TopologyType topologyType, string specificationExpression = null*/)
         {
-            // get all placement configs of such topologyType
-            var placementConfigs = PlacementConfigs.Where(x => x.TopologyType.HasFlag(topologyType)).ToArray();
-            if (!placementConfigs.Any())
-                return null;
+            return null;
+            //// get all placement configs of such topologyType
+            //var placementConfigs = PlacementConfigs.Where(x => x.TopologyType.HasFlag(topologyType)).ToArray();
+            //if (!placementConfigs.Any())
+            //    return null;
 
-            // get random with specification
-            if (!string.IsNullOrEmpty(specificationExpression))
-            {
-                void ParameterDefaultValueHandler(string _, ParameterArgs args)
-                {
-                    args.Result = 0f;
-                }
+            //// get random with specification
+            //if (!string.IsNullOrEmpty(specificationExpression))
+            //{
+            //    void ParameterDefaultValueHandler(string _, ParameterArgs args)
+            //    {
+            //        args.Result = 0f;
+            //    }
 
-                bool CheckTagsPass(PlacementConfig placementConfig, Expression interpreter)
-                {
-                    if (placementConfig.Specifics == null || placementConfig.Specifics.IsEmpty())
-                    {
-                        Assert.IsFalse(placementConfig.IsStrictSpecifics);
-                        return false;
-                    }
+            //    bool CheckTagsPass(PlacementConfig placementConfig, Expression interpreter)
+            //    {
+            //        if (placementConfig.Specifics == null || placementConfig.Specifics.IsEmpty())
+            //        {
+            //            Assert.IsFalse(placementConfig.IsStrictSpecifics);
+            //            return false;
+            //        }
 
-                    var specificsDictionary = placementConfig.Specifics.AsNCalcDictionary();
-                    Assert.IsNotNull(specificsDictionary);
-                    interpreter.Parameters = specificsDictionary;
-                    return (bool)interpreter.Evaluate();
-                }
+            //        var specificsDictionary = placementConfig.Specifics.AsNCalcDictionary();
+            //        Assert.IsNotNull(specificsDictionary);
+            //        interpreter.Parameters = specificsDictionary;
+            //        return (bool)interpreter.Evaluate();
+            //    }
 
-                var expression = new Expression(specificationExpression);
-                expression.EvaluateParameter += ParameterDefaultValueHandler;
-                var specifics = placementConfigs.Where(x => CheckTagsPass(x, expression)).ToArray();
-                if (specifics.Any())
-                    return _rnd.FromEnumerable(specifics);
-                else
-                    return null;
-            }
+            //    var expression = new Expression(specificationExpression);
+            //    expression.EvaluateParameter += ParameterDefaultValueHandler;
+            //    var specifics = placementConfigs.Where(x => CheckTagsPass(x, expression)).ToArray();
+            //    if (specifics.Any())
+            //        return _rnd.FromEnumerable(specifics);
+            //    else
+            //        return null;
+            //}
 
-            return _rnd.FromEnumerable(placementConfigs.Where(x => x.IsStrictSpecifics == false || x.Specifics.IsEmpty()));
+            //return _rnd.FromEnumerable(placementConfigs.Where(x => x.IsStrictSpecifics == false || x.Specifics.IsEmpty()));
         }
 
         public Vector3 GetRndPropagationDir(IPseudoRandomNumberGenerator rnd)

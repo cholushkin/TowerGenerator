@@ -25,12 +25,27 @@ namespace TowerGenerator
             }
 
             public string Name;
-            [Range(0,1)]
+            [Range(0, 1)]
             public float Value;
         }
 
         public List<Tag> Tags;
-        
+
+
+        public TagSet()
+        {
+            Tags = new List<Tag>();
+        }
+
+        public TagSet(TagSet otherTagset)
+        {
+            if (otherTagset.Tags != null)
+            {
+                Tags = new List<Tag>(otherTagset.Tags.Count);
+                for (int i = 0; i < otherTagset.Tags.Count; ++i)
+                    Tags.Add(new Tag(otherTagset.Tags[i].Name, otherTagset.Tags[i].Value));
+            }
+        }
 
         public void SetTag(Tag tag)
         {
@@ -110,10 +125,10 @@ namespace TowerGenerator
             foreach (var tag in Tags)
                 _dictionary.Add(tag.Name, new Tag(tag.Name, tag.Value));
         }
-        
+
         public Dictionary<string, Tag> AsDictionary()
         {
-            if(_dictionary == null)
+            if (_dictionary == null)
                 UpdateDictionary();
             return _dictionary;
         }

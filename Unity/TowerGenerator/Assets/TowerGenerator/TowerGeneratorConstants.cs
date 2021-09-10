@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
+    // todo: get rid of this file
 
     public static class TowerGeneratorConstants
     {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -8,12 +7,12 @@ namespace TowerGenerator
     public class MetaBase : ScriptableObject
     {
         public string ChunkName;
-        public TopologyType TopologyType;
-        public ChunkConformationType ChunkConformation;
-        public string[] ChunkClassName; // creature, tower, totem, etc.
+        public ChunkControllerBase.ChunkController ChunkControllerType;
+        public TagSet TagSet; // topology, labels, architecture, biome, etc.
+        public string[] InConnectorsExpressions; // expressions for in-connectors
+        public string[] OutConnectorsExpressions; // expressions for out-connectors
         public uint Generation;
-        public TagSet TagSet;
-        public List<Vector3> AABBs; // each dimension AABB (for combinatorial conformation it's only one value here)
+        public Vector3 AABB; // maximum AABB for the chunk
 
         public override string ToString()
         {

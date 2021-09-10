@@ -59,9 +59,6 @@ namespace TowerGenerator
             visSegController.Seed = bpSegment.Visual.Seed;
             visSegController.Init();
             visSegment.SetActive(true);
-            if(visSegController is ChunkControllerDimensionsBased dimBasedController)
-                dimBasedController.SetDimensionIndex(topology.Geometry.SizeIndex);
-
             visSegController.SetConfiguration();
 
             // centering

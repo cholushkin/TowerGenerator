@@ -6,7 +6,10 @@ using UnityEngine.Assertions;
 
 public class FbxCommandConnector : FbxCommandBase
 {
-    public string[] SupportedTags;
+    // Example:
+    // Connector(In|Out, ChunkStandard, ArchitectureNeutral, BiomeNeutral)
+    public Connector.ConnectorType ConnectorType;
+    public string[] ConnectExpressions;
     public override string GetFbxCommandName()
     {
         return "Connector";
@@ -16,7 +19,11 @@ public class FbxCommandConnector : FbxCommandBase
     {
         Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
         Assert.IsFalse(string.IsNullOrWhiteSpace(parameters));
-        SupportedTags = parameters.Split(',');
+        var paramsSeparated = parameters.Split(',');
+        ConnectorType = ConvertEnum<Connector.ConnectorType>(paramsSeparated[0]);
+        if(paramsSeparated.Length > 1)
+            paramsSeparated.CopyTo(ConnectExpressions, 1);
+
     }
 
     public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
@@ -26,7 +33,8 @@ public class FbxCommandConnector : FbxCommandBase
         Assert.IsNull(gameObject.GetComponent<Connector>());
 
         var connector = gameObject.AddComponent<Connector>();
-        connector.SupportedTags = SupportedTags;
+        connector.ConnectorMode = ConnectorType;
+        connector.ConnectExpressions = ConnectExpressions;
         importInformation.ConnectorAmount++;
     }
 }

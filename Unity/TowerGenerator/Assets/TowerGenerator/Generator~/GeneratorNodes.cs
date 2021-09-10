@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GameLib;
 using GameLib.Random;
-using Malee;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -17,15 +16,10 @@ namespace TowerGenerator
             public GameObject GeneratorNode;
         }
 
-        [Serializable]
-        public class GeneratorNodesList : ReorderableArray<NodeItem>
-        {
-        }
 
         //public bool ResetOnProcessorEnter;
 
-        [Reorderable]
-        public GeneratorNodesList Nodes;
+        public NodeItem[] Nodes;
 
         [Tooltip("-1 is infinite")] public int NodeCycles;
         public CyclerType NodesCyclerType;
@@ -53,7 +47,7 @@ namespace TowerGenerator
 
         public void Init(long seed, Prototype prototype)
         {
-            _chooser = new Chooser<NodeItem>(Nodes.ToArray(), NodesCyclerType, seed, NodeCycles);
+            _chooser = new Chooser<NodeItem>(Nodes, NodesCyclerType, seed, NodeCycles);
             var rnd = RandomHelper.CreateRandomNumberGenerator(seed);
 
             foreach (var node in Nodes)
@@ -89,7 +83,7 @@ namespace TowerGenerator
 
         public int GetNodesCount()
         {
-            return Nodes.Count;
+            return Nodes.Length;
         }
     }
 }

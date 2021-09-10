@@ -16,10 +16,9 @@ namespace TowerGenerator.ChunkImporter
             public ChunkImportInformation(string chunkName)
             {
                 ChunkName = chunkName;
-                ConformationType = new Dictionary<ChunkConformationType, int>(32);
+                ChunkTags = new Dictionary<string, int>(32);
             }
             public string ChunkName;
-            public string[] ChunkClass;
             public uint MaxGeneration;
 
             public int CommandsProcessedAmount;
@@ -39,7 +38,7 @@ namespace TowerGenerator.ChunkImporter
             public int TagAmount;
             public int GenerationAttributeAmount;
             public int IgnoreAddColliderAmount;
-            public Dictionary<ChunkConformationType,int>  ConformationType;
+            public Dictionary<string ,int>  ChunkTags;
         }
 
         public static GameObject Cook(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 
@@ -7,26 +6,23 @@ namespace TowerGenerator
 {
     public class Connector : BaseComponent
     {
-        public string[] SupportedTags;
-        // todo: expressions with tags to calculate compatibility of chunks
-        // todo: add FbxCommand FilterConnection to support expressions 
-        public void SetNormal(Vector3 direction)
+        [Flags]
+        public enum ConnectorType
         {
-            transform.forward = direction;
+            Undefined = 0,
+            In = 1,
+            Out = 2
         }
 
-        public Vector3 GetNormal()
-        {
-            return transform.forward;
-        }
+        public Vector3 Normal;
+        public Vector3 Forward;
+        public float RotationSectorAngle;
+        public ConnectorType ConnectorMode; // In, Out or InOut
+        public string[] ConnectExpressions;
+    }
 
-        public void SetForward(Vector3 direction)
-        {
-        }
+    public static class ConnectorHelper
+    {
 
-        public Vector3 GetForward()
-        {
-            return transform.forward;
-        }
     }
 }
