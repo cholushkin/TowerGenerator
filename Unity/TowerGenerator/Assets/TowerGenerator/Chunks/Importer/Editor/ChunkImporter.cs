@@ -21,8 +21,11 @@ namespace TowerGenerator.ChunkImporter
             {
                 //var root = Path.GetPathRoot(assetPath);
                 //var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
+                var source = ChunkImporterHelper.GetSource(assetPath);
+                if(source == null)
+                    continue;
 
-                if (ChunkImporterHelper.IsNeededToImportChunkPackFbx(assetPath))
+                if (source.EnableImport)
                 {
                     // ImportChunks
                     //  delete old chunks with such names

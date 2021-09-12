@@ -12,4 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22e85d0d500c41646aad61b31bf8ef33, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  Sources: []
+  Sources:
+  - Name: Towers
+    EnableImport: 0
+    EnableCleanupFbx: 1
+    ImportPath: Assets/TowerGenerator/Chunks/!ImportFbx/Tower
+    OutputPath: Assets/TowerGenerator/Chunks/Prefabs/Tower
+  - Name: Scrub
+    EnableImport: 0
+    EnableCleanupFbx: 1
+    ImportPath: Assets/TowerGenerator/Chunks/!ImportFbx/Scrub
+    OutputPath: Assets/TowerGenerator/Chunks/Prefabs/Scrub

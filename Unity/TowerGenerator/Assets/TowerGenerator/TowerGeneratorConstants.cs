@@ -14,9 +14,7 @@ namespace TowerGenerator
         public const float ConnectorAspect = 3f;
         public const float ChunkMargin = 0.5f; // value being added to chunk AABB
 
-        public const string ChunkClassNameTower = "Tower";
-        public const string ChunkClassNameTotem = "Totem";
-        public const string ChunkClassNameCreature = "Creature";
+
 
 
         #region ---------- Paths ---------- 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -16,7 +15,8 @@ namespace TowerGenerator.ChunkImporter
                 return false;
 
             var inOneOfTheSource = false;
-            foreach (var source in TowerGeneratorSettings.instance.Sources)
+            var settings = ScriptableObjectUtility.GetInstanceOfSingletonScriptableObject<TowerGeneratorSettings>();
+            foreach (var source in settings.Sources)
                 if (path.StartsWith(source.ImportPath))
                 {
                     inOneOfTheSource = true;
@@ -33,9 +33,11 @@ namespace TowerGenerator.ChunkImporter
             return (fbxProbs == null || (fbxProbs.Properties.FirstOrDefault(x => x.Name == "IgnoreImport") != null));
         }
 
-        public static TowerGeneratorSettings.Source GetSourceOfAsset(string path)
+        public static TowerGeneratorSettings.Source GetSource(string assetPath)
         {
-            throw new NotImplementedException();
+            var settings = ScriptableObjectUtility.GetInstanceOfSingletonScriptableObject<TowerGeneratorSettings>();
+            var source = settings.Sources.FirstOrDefault(x=> assetPath.StartsWith(x.ImportPath));
+            return source;
         }
     }
 

@@ -1,21 +1,22 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 
 
 namespace TowerGenerator
 {
-    [FilePath("TowerGenerator/Settings/Settings.asset", FilePathAttribute.Location.ProjectFolder)]
     [CreateAssetMenu(fileName = "Settings",
         menuName = "ScriptableObjects/TowerGeneratorSettings", order = 1)]
                                           
-    public class TowerGeneratorSettings : ScriptableSingleton<TowerGeneratorSettings>
+    public class TowerGeneratorSettings : ScriptableObject
     {
         [Serializable]
         public class Source
         {
-            public string Name;
-            public bool IsEnabled;
+            public string Name; // name of the source
+            
+            public bool EnableImport; // enable/disable importing for this source
+            public bool EnableCleanupFbx; // enable/disable fbx cleanup
+
             public string ImportPath;
             public string OutputPath;
         }

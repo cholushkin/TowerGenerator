@@ -41,5 +41,10 @@ namespace TowerGenerator.ChunkImporter
             }
             Assert.IsTrue(fbxProps.Properties.Count>0);
         }
+
+        public override int GetPostprocessOrder()
+        {
+            return 0;
+        }
     }
 }
