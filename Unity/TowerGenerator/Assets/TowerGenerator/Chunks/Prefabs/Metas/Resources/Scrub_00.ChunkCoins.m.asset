@@ -9,18 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22e85d0d500c41646aad61b31bf8ef33, type: 3}
-  m_Name: Settings
+  m_Script: {fileID: 11500000, guid: 5ddf9bedf788d3a4eb5433335f7ff256, type: 3}
+  m_Name: Scrub_00.ChunkCoins.m
   m_EditorClassIdentifier: 
-  MetasPath: Assets/TowerGenerator/Chunks/Prefabs/Metas/Resources
-  Sources:
-  - Name: Tower
-    EnableImport: 0
-    EnableCleanupFbx: 1
-    ImportPath: Assets/TowerGenerator/Chunks/!ImportFbx/Tower
-    OutputPath: Assets/TowerGenerator/Chunks/Prefabs/Tower
-  - Name: Scrub
+  ChunkName: Scrub_00.ChunkCoins
+  Source:
+    Name: Scrub
     EnableImport: 1
     EnableCleanupFbx: 1
     ImportPath: Assets/TowerGenerator/Chunks/!ImportFbx/Scrub
     OutputPath: Assets/TowerGenerator/Chunks/Prefabs/Scrub
+  ChunkControllerType: 1
+  TagSet:
+    Tags:
+    - Name: ' ChunkStandard'
+      Value: 1
+  Generation: 0
+  ChunkMargin: 1
+  AABB: {x: 2.5113797, y: 2.0743394, z: 2.494525}

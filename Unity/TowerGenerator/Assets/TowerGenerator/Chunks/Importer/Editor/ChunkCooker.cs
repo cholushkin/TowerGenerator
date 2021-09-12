@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Assets.Plugins.Alg;
 using TowerGenerator.FbxCommands;
 using UnityEditor;
@@ -16,17 +15,13 @@ namespace TowerGenerator.ChunkImporter
             public ChunkImportInformation(string chunkName)
             {
                 ChunkName = chunkName;
-                ChunkTags = new Dictionary<string, int>(32);
             }
             public string ChunkName;
-            public uint MaxGeneration;
-
             public int CommandsProcessedAmount;
 
             public int GroupStackAmount;
             public int GroupSetAmount;
             public int GroupSwitchAmount;
-            public int ChunkControllerAmount;
             public int CollisionDependentAmount;
             public int DimensionsIgnorantAmount;
             public int SuppressionAmount;
@@ -35,10 +30,15 @@ namespace TowerGenerator.ChunkImporter
             public int InducedByAmount;
             public int HiddenAmount;
             public int ConnectorAmount;
-            public int TagAmount;
-            public int GenerationAttributeAmount;
             public int IgnoreAddColliderAmount;
-            public Dictionary<string ,int>  ChunkTags;
+            public uint Generation;
+            public TagSet ChunkTagSet;
+            public ChunkControllerBase.ChunkController ChunkControllerType;
+
+            public override string ToString()
+            {
+                return JsonUtility.ToJson(this, true);
+            }
         }
 
         public static GameObject Cook(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)

@@ -47,12 +47,8 @@ namespace TowerGenerator
             public Group GroupChoice { get; }
         }
 
-        public TagSet ChunkTagSet;
-        public ChunkController ChunkControllerType;
-        public Connector[] Connectors;
-
         public long Seed = -1;
-        public uint Generation;
+        public MetaBase Meta;
 
 
         protected TreeNode<Group> _impactTree;
@@ -60,6 +56,7 @@ namespace TowerGenerator
         private Dictionary<string, List<Transform>> _induction;
         private LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
         private EventAggregator _chunkEventAggregator;
+        
 
 
         public virtual void Init() // configure
@@ -76,7 +73,7 @@ namespace TowerGenerator
             Assert.IsNotNull(_impactTree);
             var bounds = _impactTree.Data.gameObject.BoundBox();
             if(withMargin)
-                bounds.Expand(Vector3.one * TowerGeneratorConstants.ChunkMargin * 2f);
+                bounds.Expand(Vector3.one * Meta.ChunkMargin * 2f);
             return bounds;
         }
 

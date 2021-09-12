@@ -21,6 +21,7 @@ namespace TowerGenerator
             public string OutputPath;
         }
 
+        public string MetasPath;
         public Source[] Sources;
     }
 }

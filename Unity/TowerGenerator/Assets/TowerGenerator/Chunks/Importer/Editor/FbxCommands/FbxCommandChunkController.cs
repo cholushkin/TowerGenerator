@@ -61,17 +61,9 @@ namespace TowerGenerator.FbxCommands
                 chunkController = gameObject.AddComponent<ChunkControllerBase>();
 
             Assert.IsNotNull(chunkController, "chunk controller is null");
-            
-            chunkController.ChunkControllerType = ChunkControllerType;
-            chunkController.ChunkTagSet = ChunkTagSet;
 
-            importInformation.ChunkControllerAmount++;
-            foreach (var tag in ChunkTagSet.Tags)
-            {
-                if (!importInformation.ChunkTags.ContainsKey(tag.Name))
-                    importInformation.ChunkTags.Add(tag.Name, 0);
-                importInformation.ChunkTags[tag.Name]++;
-            }
+            importInformation.ChunkControllerType = ChunkControllerType;
+            importInformation.ChunkTagSet = ChunkTagSet;
         }
     }
 }

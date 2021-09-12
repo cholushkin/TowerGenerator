@@ -138,8 +138,18 @@ namespace TowerGenerator
             //}
         }
 
+        public bool InitOnAwake;
         public MetaBase[] Metas;
+        public TowerGeneratorSettings Settings;
         private bool _isInited;
+
+
+        void Awake()
+        {
+            if(InitOnAwake && !_isInited)
+                Init();
+        }
+
 
         public void Init()
         {
@@ -151,7 +161,7 @@ namespace TowerGenerator
             }
             else
             {
-                Metas = Resources.LoadAll<MetaBase>(TowerGeneratorConstants.Chunks);
+                Metas = Resources.LoadAll<MetaBase>(Settings.MetasPath);
                 Debug.Log($"{transform.GetDebugName()}: {Metas.Length} metas loaded.");
             }
             _isInited = true;

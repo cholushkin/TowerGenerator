@@ -39,13 +39,8 @@ namespace TowerGenerator.FbxCommands
             var chunkController = gameObject.GetComponent<ChunkControllerBase>();
             Assert.IsNotNull(chunkController);
 
-            importInformation.GenerationAttributeAmount++;
-            chunkController.Generation = Generation;
-            if (Generation > importInformation.MaxGeneration)
-                importInformation.MaxGeneration = Generation;
+            importInformation.Generation = Generation;
         }
-
-
     }
 }
        

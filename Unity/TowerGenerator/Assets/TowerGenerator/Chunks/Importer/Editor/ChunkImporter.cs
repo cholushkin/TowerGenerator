@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -42,7 +41,7 @@ namespace TowerGenerator.ChunkImporter
                     }
 
                     // extracting entities from the pack
-                    ExtractChunks(assetObj, packName);
+                    ExtractChunks(assetObj, packName, source);
                 }
             }
             //EditorUtility.SetDirty(_metas);
@@ -61,10 +60,10 @@ namespace TowerGenerator.ChunkImporter
 
 
 
-        private static void ExtractChunks(GameObject assetObject, string packName)
+        private static void ExtractChunks(GameObject assetObject, string packName, TowerGeneratorSettings.Source source )
         {
             // --- delete all (previous) chunks of this content pack and their metas
-            DirectoryInfo dir = new DirectoryInfo(TowerGeneratorConstants.PathChunks);
+            DirectoryInfo dir = new DirectoryInfo(source.OutputPath);
             FileInfo[] info = dir.GetFiles(packName + ".*");
             foreach (FileInfo f in info)
             {
@@ -77,13 +76,13 @@ namespace TowerGenerator.ChunkImporter
             foreach (Transform ent in assetObject.transform)
             {
                 var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
-                ExtractChunk(ent, TowerGeneratorConstants.PathChunks, fullEntName);
+                ExtractChunk(ent, fullEntName, source);
             }
             AssetDatabase.Refresh();
         }
 
         // write patterns, add design-time stuff, do hierarchy reorganizations
-        private static void ExtractChunk(Transform chunkTransform, string dirToImort, string chunkName)
+        private static void ExtractChunk(Transform chunkTransform, string chunkName, TowerGeneratorSettings.Source source)
         {
             var chunk = Object.Instantiate(chunkTransform.gameObject);
 
@@ -92,9 +91,9 @@ namespace TowerGenerator.ChunkImporter
                 ChunkCooker.ChunkImportInformation importInformation = new ChunkCooker.ChunkImportInformation(chunkName);
                 chunk.name = chunkName;
                 chunk = ChunkCooker.Cook(chunk, importInformation);
-                ChunkMetaCooker.Cook(chunk, dirToImort, importInformation);
-                PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(dirToImort, chunkName + ".prefab"));
-                Debug.LogFormat($"Chunk imported successfully: {0}", importInformation);
+                ChunkMetaCooker.Cook(chunk, source, importInformation);
+                PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(source.OutputPath, chunkName + ".prefab"));
+                Debug.Log($"Chunk imported successfully: {importInformation}");
             }
             catch (Exception e)
             {
