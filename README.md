@@ -1,1 +1,1 @@
-TowerGenerator v.1.0.a
+TowerGenerator gamelib submodule
