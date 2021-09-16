@@ -139,8 +139,8 @@ namespace TowerGenerator
         }
 
         public bool InitOnAwake;
-        public MetaBase[] Metas;
-        public TowerGeneratorSettings Settings;
+        public List<MetaBase> Metas; // use this meta pool
+        public string[] ResourcePaths; // load metas as resources by these paths additionally (if presented)
         private bool _isInited;
 
 
@@ -154,16 +154,23 @@ namespace TowerGenerator
         public void Init()
         {
             Assert.IsFalse(_isInited);
-            if (Metas.Length != 0)
+            if (ResourcePaths == null || ResourcePaths.Length == 0)
             {
-                Debug.Log("Using defined metas set instead of loading");
-                Debug.Log($"Metas using: {Metas.Length}");
+                Debug.Log("Using defined metas set");
             }
             else
             {
-                Metas = Resources.LoadAll<MetaBase>(Settings.MetasPath);
-                Debug.Log($"{transform.GetDebugName()}: {Metas.Length} metas loaded.");
+                // load metas from all provided resource folders
+                Metas ??= new List<MetaBase>();
+
+                foreach (var path in ResourcePaths)
+                {
+                    Debug.Log($"Loading metas from path provided: {path}");
+                    var metas = Resources.LoadAll<MetaBase>(path);
+                    Metas.AddRange(metas);
+                }
             }
+            Debug.Log($"{transform.GetDebugName()}: {Metas.Count} metas in the pool.");
             _isInited = true;
         }
 
@@ -204,7 +211,7 @@ namespace TowerGenerator
         void DbgTestNoFilter()
         {
             var metas = GetMetas();
-            Debug.Log($"NO FILTER: count = {metas.Count()} of {Metas.Length}");
+            Debug.Log($"NO FILTER: count = {metas.Count()} of {Metas.Count}");
             DbgPrintMetas(metas);
         }
 

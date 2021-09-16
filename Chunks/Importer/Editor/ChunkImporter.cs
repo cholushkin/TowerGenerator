@@ -16,23 +16,18 @@ namespace TowerGenerator.ChunkImporter
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
+            // process imported chunk packs
             foreach (string assetPath in importedAssets)
             {
-                //var root = Path.GetPathRoot(assetPath);
-                //var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
                 var source = ChunkImporterHelper.GetSource(assetPath);
-                if(source == null)
+                if (source == null)
                     continue;
 
-                if (source.EnableImport)
+                if (source.EnableChunkGeneration)
                 {
-                    // ImportChunks
-                    //  delete old chunks with such names
-                    //  extract new
                     Debug.Log($"Importing content pack: '{assetPath}'");
+                    
                     var packName = Path.GetFileNameWithoutExtension(assetPath);
-
-                    // load prefab as asset
                     var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                     if (assetObj == null)
                     {
@@ -44,34 +39,53 @@ namespace TowerGenerator.ChunkImporter
                     ExtractChunks(assetObj, packName, source);
                 }
             }
-            //EditorUtility.SetDirty(_metas);
-            // todo: deletedAssets
-            // todo: delete all ents and metas of deleted content pack
-            foreach (string assetPath in deletedAssets)
+
+            // process deleted chunk packs
+            foreach (string deletedAssetPath in deletedAssets)
             {
-                //var root = Path.GetPathRoot(assetPath);
-                //var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
-                //if (ContentPacksParentDir == parentDir)
-                //{
-                //    Debug.Log($"{assetPath} was deleted todo: delete ents from it");
-                //}
+                var source = ChunkImporterHelper.GetSource(deletedAssetPath);
+                if (source == null)
+                    continue;
+
+                var packName = Path.GetFileNameWithoutExtension(deletedAssetPath);
+                DeleteChunks(source, packName);
+                DeleteMetas(source, packName);
             }
+
+            // todo: also check metas and chunks that don't belong to any of existing sources
         }
 
-
-
-        private static void ExtractChunks(GameObject assetObject, string packName, TowerGeneratorSettings.Source source )
+        private static void DeleteMetas(TowerGeneratorImportSource source, string packName)
         {
-            // --- delete all (previous) chunks of this content pack and their metas
-            DirectoryInfo dir = new DirectoryInfo(source.OutputPath);
-            FileInfo[] info = dir.GetFiles(packName + ".*");
+            DirectoryInfo dir = new DirectoryInfo(source.ChunksOutputPath);
+            FileInfo[] info = dir.GetFiles(packName + ".meta.*"); // delete all chunks with name starting with packName
             foreach (FileInfo f in info)
             {
                 Debug.Log($"deleting {f.Name}");
                 f.Delete();
             }
             AssetDatabase.Refresh();
+        }
 
+        private static void DeleteChunks(TowerGeneratorImportSource source, string packName)
+        {
+            DirectoryInfo dir = new DirectoryInfo(source.ChunksOutputPath);
+            FileInfo[] info = dir.GetFiles(packName + ".*"); // delete all chunks with name starting with packName
+            foreach (FileInfo f in info)
+            {
+                Debug.Log($"deleting {f.Name}");
+                f.Delete();
+            }
+            AssetDatabase.Refresh();
+        }
+
+
+        private static void ExtractChunks(GameObject assetObject, string packName, TowerGeneratorImportSource source)
+        {
+            // --- delete all previous chunks and metas of this content pack
+            DeleteChunks(source, packName);
+            DeleteMetas(source, packName);
+            
             // process all ents inside fbx
             foreach (Transform ent in assetObject.transform)
             {
@@ -82,7 +96,7 @@ namespace TowerGenerator.ChunkImporter
         }
 
         // write patterns, add design-time stuff, do hierarchy reorganizations
-        private static void ExtractChunk(Transform chunkTransform, string chunkName, TowerGeneratorSettings.Source source)
+        private static void ExtractChunk(Transform chunkTransform, string chunkName, TowerGeneratorImportSource source)
         {
             var chunk = Object.Instantiate(chunkTransform.gameObject);
 
@@ -92,7 +106,7 @@ namespace TowerGenerator.ChunkImporter
                 chunk.name = chunkName;
                 chunk = ChunkCooker.Cook(chunk, importInformation);
                 ChunkMetaCooker.Cook(chunk, source, importInformation);
-                PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(source.OutputPath, chunkName + ".prefab"));
+                PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"));
                 Debug.Log($"Chunk imported successfully: {importInformation}");
             }
             catch (Exception e)
@@ -103,8 +117,8 @@ namespace TowerGenerator.ChunkImporter
             {
                 Object.DestroyImmediate(chunk);
             }
-            
-            
+
+
         }
 
         // removes <> from name

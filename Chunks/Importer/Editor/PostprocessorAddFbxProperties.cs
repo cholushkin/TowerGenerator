@@ -13,14 +13,14 @@ namespace TowerGenerator.ChunkImporter
         {
             ModelImporter modelImporter = assetImporter as ModelImporter;
             Debug.Assert(modelImporter != null, nameof(modelImporter) + " != null");
-            if (ChunkImporterHelper.IsNeededToImportChunkPackFbx(modelImporter.assetPath))
+            if (ChunkImporterHelper.GetSource(modelImporter.assetPath).EnableChunkGeneration && !ChunkImporterHelper.IsObjectIgnored(gObj))
             {
-                ProcessFbxProps(gObj, names, values);
+                ProcessAddingFbxProps(gObj, names, values);
                 return;
             }
         }
 
-        private void ProcessFbxProps(GameObject gObj, string[] names, object[] values)
+        private void ProcessAddingFbxProps(GameObject gObj, string[] names, object[] values)
         {
             var isIgnore = names.FirstOrDefault(x => x == "IgnoreImport") != null;
             if (isIgnore)
