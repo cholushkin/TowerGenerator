@@ -68,6 +68,11 @@ namespace TowerGenerator
             BuildImpactTree();
         }
 
+        public TreeNode<Group> GetImpactTree()
+        {
+            return _impactTree;
+        }
+
         public Bounds CalculateCurrentAABB(bool withMargin = true)
         {
             Assert.IsNotNull(_impactTree);

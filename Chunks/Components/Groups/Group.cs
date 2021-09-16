@@ -1,4 +1,5 @@
-﻿using GameLib.Random;
+﻿using System.Collections.Generic;
+using GameLib.Random;
 using UnityEngine;
 
 
@@ -12,6 +13,17 @@ namespace TowerGenerator
 
         // Do DoChoice call with a random choice
         public abstract void DoRndChoice(IPseudoRandomNumberGenerator rnd);
+
+        public List<int> GetState()
+        {
+            List<int> actives = new List<int>(transform.childCount);
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.activeInHierarchy)
+                    actives.Add(child.GetSiblingIndex());
+            }
+            return actives;
+        }
 
         public void DisableItems()
         {
