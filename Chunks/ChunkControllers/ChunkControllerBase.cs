@@ -1,8 +1,6 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using Assets.Plugins.Alg;
-using Events;
 using GameLib.DataStructures;
 using GameLib.Log;
 using GameLib.Random;
@@ -15,6 +13,11 @@ namespace TowerGenerator
 {
     public class ChunkControllerBase : MonoBehaviour
     {
+        public class EventNodeActiveStateChanged
+        {
+            public GameObject Node;
+        }
+
         // Tags used for specifying chunk topology
         public const string ChunkPeekTag = "ChunkPeek";
         public const string ChunkStandardTag = "ChunkStandard";
@@ -36,17 +39,6 @@ namespace TowerGenerator
             MarchingCubesChunkController = 8,
         }
 
-
-        public class EventGroupChoiceDone
-        {
-            public EventGroupChoiceDone(Group group)
-            {
-                GroupChoice = group;
-            }
-
-            public Group GroupChoice { get; }
-        }
-
         public long Seed = -1;
         public MetaBase Meta;
 
@@ -55,13 +47,11 @@ namespace TowerGenerator
         private Dictionary<string, List<Transform>> _suppression;
         private Dictionary<string, List<Transform>> _induction;
         private LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
-        private EventAggregator _chunkEventAggregator;
-        
 
 
         public virtual void Init() // configure
         {
-            if(Log.Verbose())
+            if (Log.Verbose())
                 Debug.Log("> Init");
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
@@ -77,7 +67,7 @@ namespace TowerGenerator
         {
             Assert.IsNotNull(_impactTree);
             var bounds = _impactTree.Data.gameObject.BoundBox();
-            if(withMargin)
+            if (withMargin)
                 bounds.Expand(Vector3.one * Meta.ChunkMargin * 2f);
             return bounds;
         }
@@ -115,11 +105,6 @@ namespace TowerGenerator
             group.DoRndChoice(rnd);
         }
 
-        public void EmitEventGroupChoiceDone(Group group)
-        {
-            _chunkEventAggregator.Publish(new EventGroupChoiceDone(group));
-        }
-
         private void DbgPrintGroupOutcomeConfiguration(Transform groupTransform)
         {
             var comp = groupTransform.GetComponent<Group>();
@@ -140,8 +125,6 @@ namespace TowerGenerator
 
         private void BuildImpactTree()
         {
-            _chunkEventAggregator = new EventAggregator();
-
             // add root group
             var groupRoot = GetComponent<GroupRoot>();
             if (groupRoot == null)
@@ -205,10 +188,6 @@ namespace TowerGenerator
         {
             var group = iTrans.GetComponent<Group>();
 
-            var influencer = iTrans.GetComponent<IHandle<EventGroupChoiceDone>>();
-            if (influencer != null)
-                _chunkEventAggregator.Subscribe(influencer);
-
             if (group != null)
             {
                 var newGroup = new TreeNode<Group>(group);
@@ -235,6 +214,53 @@ namespace TowerGenerator
         }
 #endif
 
+        public void SetNodeActiveState(Transform node, bool newActiveState)
+        {
+            // trying to set existing state to the node ?
+            if(node.gameObject.activeSelf == newActiveState)
+                return;
+
+            if (newActiveState) // new suppressors/inductor revealed - let them work
+            {
+                node.gameObject.SetActive(true); // enable
+                if (node.gameObject.activeInHierarchy == false) // set active to obscured node
+                    return;
+
+                var suppressions = node.GetComponentsInChildren<Suppression>(false); // get all visible suppression nodes after enabling starting from the node
+                var inductions = node.GetComponentsInChildren<Induction>(false);
+                
+                foreach (var suppression in suppressions)
+                    foreach (var suppressionLabel in suppression.SuppressionLabels)
+                        Suppress(suppressionLabel);
+
+                foreach (var induction in inductions)
+                    foreach (var inductionLabel in induction.InductionLabels)
+                        Induce(inductionLabel);
+            }
+            else // active suppressors disabled - need to reverse suppress
+            {
+                if (node.gameObject.activeInHierarchy == false) // set not active to obscured node
+                {
+                    node.gameObject.SetActive(false); // disable
+                    return;
+                }
+                var suppressions = node.GetComponentsInChildren<Suppression>(false); // get all visible suppression nodes before disabling starting from the node
+                var inductions = node.GetComponentsInChildren<Induction>(false);
+
+                node.gameObject.SetActive(false); // disable
+
+                foreach (var suppression in suppressions)
+                    foreach (var suppressionLabel in suppression.SuppressionLabels)
+                        Suppress(suppressionLabel, true);
+                
+                foreach (var induction in inductions)
+                    foreach (var inductionLabel in induction.InductionLabels)
+                        Induce(inductionLabel, true);
+            }
+
+            GlobalEventAggregator.EventAggregator.Publish(new EventNodeActiveStateChanged { Node = node.gameObject });
+        }
+
         public bool HasSuppressionLabel(string label)
         {
             Assert.IsNotNull(_suppression);
@@ -247,18 +273,18 @@ namespace TowerGenerator
             return _induction.ContainsKey(label);
         }
 
-        internal void Induce(string inductionLabel)
+        internal void Induce(string inductionLabel, bool reverse = false)
         {
             var influencedObjects = _induction[inductionLabel];
             foreach (var influencedObject in influencedObjects)
-                influencedObject.gameObject.SetActive(true);
+                influencedObject.gameObject.SetActive(!reverse);
         }
 
-        public void Suppress(string suppressionLabel)
+        public void Suppress(string suppressionLabel, bool reverse = false)
         {
             var influencedObjects = _suppression[suppressionLabel];
             foreach (var influencedObject in influencedObjects)
-                influencedObject.gameObject.SetActive(false);
+                SetNodeActiveState(influencedObject, reverse);
         }
     }
 }

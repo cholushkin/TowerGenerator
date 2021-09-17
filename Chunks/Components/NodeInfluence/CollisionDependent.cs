@@ -1,4 +1,5 @@
-﻿
+﻿using UnityEngine.Assertions;
+
 namespace TowerGenerator
 {
     // Dominant fragment always suppress Submissive fragment. If other collision object is not a CollisionDependent it always has higher priority.
@@ -13,5 +14,11 @@ namespace TowerGenerator
         }
 
         public FragmentRelation FragmentDomination;
+
+        public void ProcessCollision()
+        {
+            Assert.IsTrue(gameObject.activeSelf && gameObject.activeInHierarchy);
+            ChunkController.SetNodeActiveState(transform, false);
+        }
     }
 }

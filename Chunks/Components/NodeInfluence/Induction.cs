@@ -2,7 +2,7 @@
 
 namespace TowerGenerator
 {
-    public class Induction : BaseComponent, IHandle<ChunkControllerBase.EventGroupChoiceDone>
+    public class Induction : BaseComponent
     {
         public string[] InductionLabels;
 
@@ -18,15 +18,6 @@ namespace TowerGenerator
             if (InductionLabels.Length < 1)
                 return false;
             return true;
-        }
-
-        public void Handle(ChunkControllerBase.EventGroupChoiceDone message)
-        {
-            if (message.GroupChoice == InfluenceGroup && gameObject.activeInHierarchy)
-            {
-                foreach (var suppressionLabel in InductionLabels)
-                    ChunkController.Induce(suppressionLabel);
-            }
         }
     }
 }

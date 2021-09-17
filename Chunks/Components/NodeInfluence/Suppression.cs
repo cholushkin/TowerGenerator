@@ -1,11 +1,10 @@
 ﻿using Events;
-using UnityEngine;
 
 
 namespace TowerGenerator
 {
 
-    public class Suppression : BaseComponent, IHandle<ChunkControllerBase.EventGroupChoiceDone>
+    public class Suppression : BaseComponent
     {
         public string[] SuppressionLabels;
 
@@ -21,15 +20,6 @@ namespace TowerGenerator
             if (SuppressionLabels.Length < 1)
                 return false;
             return true;
-        }
- 
-        public void Handle(ChunkControllerBase.EventGroupChoiceDone message)
-        {
-            if (message.GroupChoice == InfluenceGroup && gameObject.activeInHierarchy)
-            {
-                foreach (var suppressionLabel in SuppressionLabels)
-                    ChunkController.Suppress(suppressionLabel);
-            }
         }
     }
 }

@@ -17,9 +17,5 @@ namespace TowerGenerator
 
         [HideInInspector]
         public ChunkControllerBase ChunkController;
-
-
-        [HideInInspector]
-        public Group InfluenceGroup;
     }
 }

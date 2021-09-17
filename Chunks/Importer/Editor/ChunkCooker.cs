@@ -101,7 +101,6 @@ namespace TowerGenerator.ChunkImporter
             foreach (var baseComponent in baseComponents)
             {
                 baseComponent.ChunkController = chunkController;
-                baseComponent.InfluenceGroup = baseComponent.transform.GetComponentInParent<Group>(); 
             }
 
             chunkController.Validate();

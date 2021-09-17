@@ -30,8 +30,8 @@ namespace TowerGenerator
             Assert.IsTrue(ItemSelected < GetItemsCount());
 
             DisableItems();
-            transform.GetChild(ItemSelected).gameObject.SetActive(true);
-            ChunkController.EmitEventGroupChoiceDone(this);
+            var child = transform.GetChild(ItemSelected);
+            ChunkController.SetNodeActiveState(child, true);
         }
 
         public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)

@@ -59,9 +59,11 @@ namespace TowerGenerator
         {
             DisableItems();
             ItemsSelectedAmount = indexes.Length;
-            foreach (var t in indexes)
-                transform.GetChild(t).gameObject.SetActive(true);
-            ChunkController.EmitEventGroupChoiceDone(this);
+            foreach (var i in indexes)
+            {
+                var child = transform.GetChild(i);
+                ChunkController.SetNodeActiveState(child, true);
+            }
         }
 
         public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
