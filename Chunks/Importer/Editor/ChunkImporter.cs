@@ -104,8 +104,11 @@ namespace TowerGenerator.ChunkImporter
             {
                 ChunkCooker.ChunkImportInformation importInformation = new ChunkCooker.ChunkImportInformation(chunkName);
                 chunk.name = chunkName;
-                chunk = ChunkCooker.Cook(chunk, importInformation);
-                ChunkMetaCooker.Cook(chunk, source, importInformation);
+                chunk = ChunkCooker.Cook(source, chunk, importInformation);
+
+                if(source.EnableMetaGeneration)
+                    ChunkMetaCooker.Cook(chunk, source, importInformation);
+
                 PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"));
                 Debug.Log($"Chunk imported successfully: {importInformation}");
             }

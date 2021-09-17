@@ -33,10 +33,12 @@ namespace TowerGenerator.FbxCommands
             Assert.IsFalse(string.IsNullOrWhiteSpace(parameters));
 
             var classAndParams = parameters.Split(new[] { ',' }, 2);
-            Assert.IsTrue(classAndParams.Length==2);
-            
             ComponentClassName = classAndParams[0].Split('[')[0].Trim();
-            ComponentIndex = ConvertInt(classAndParams[0].Split('[')[1].Trim());
+            ComponentIndex = ConvertInt(classAndParams[0].Split('[', ']')[1].Trim());
+
+            if (classAndParams.Length == 1)
+                return; // only add component
+
             PropertyName = classAndParams[1].Split('=')[0].Trim();
             PropertyValue = classAndParams[1].Split('=')[1].Trim();
         }
@@ -49,11 +51,14 @@ namespace TowerGenerator.FbxCommands
             Type compType = CustomTypeConvertor.GetType(ComponentClassName);
 
             var components = gameObject.GetComponents(compType);
-            //if (components == null || components.Length <= ComponentIndex)
-            //{
-            //    gameObject.AddComponent(compType);
-            //    components = gameObject.GetComponents(compType);
-            //}
+            if (components == null || components.Length <= ComponentIndex) // no components with such index, add it
+            {
+                gameObject.AddComponent(compType);
+                components = gameObject.GetComponents(compType);
+            }
+
+            if (PropertyName == null)
+                return; // only add component
 
             var comp = components[ComponentIndex];
 

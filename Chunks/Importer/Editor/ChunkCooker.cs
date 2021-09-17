@@ -41,14 +41,16 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public static GameObject Cook(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
+        public static GameObject Cook(TowerGeneratorImportSource source, GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
             ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
             ApplyColliders(semifinishedEnt);
-            ApplyMaterials(semifinishedEnt);
+
+            if (source.ApplyMaterials)
+                ApplyMaterials(semifinishedEnt);
 
             ConfigureChunkController(semifinishedEnt); // tree
 

@@ -12,6 +12,8 @@ namespace TowerGenerator
         public bool EnableChunkGeneration; // enable/disable importing for this source
         public bool EnableCleanupFbx; // enable/disable fbx cleanup
 
+        public bool ApplyMaterials;
+
         public string ImportPath; // chunk pack folder with fbx or blend files
         public string MetasOutputPath; // generate metas to this directory
         public string ChunksOutputPath; // generate chunks to this directory

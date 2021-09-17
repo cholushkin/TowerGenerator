@@ -3,40 +3,53 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
 using TowerGenerator.ChunkImporter;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace TowerGenerator.FbxCommands
 {
+    [InitializeOnLoad]
     public static class FbxCommandExecutor
     {
-        private class CommandRegistrationEntry
+        public class CommandRegistrationEntry
         {
             public delegate FbxCommandBase CommandCreator();
             public string Name;
             public CommandCreator Creator;
         }
 
-        private static readonly CommandRegistrationEntry[] CmdFactory =
+        private static List<CommandRegistrationEntry> _commandsRegistered;
+
+        static FbxCommandExecutor()
         {
-            new(){ Name = "ChunkController", Creator = ()=> new FbxCommandChunkController("ChunkController")},
-            new(){ Name = "Generation", Creator = ()=> new FbxCommandChunkGeneration("Generation")},
-            new(){ Name = "CollisionDependent", Creator = ()=> new FbxCommandCollisionDependent("CollisionDependent")},
-            new(){ Name = "Connector", Creator = ()=> new FbxCommandConnector("Connector")},
-            new(){ Name = "DimensionsIgnorant", Creator = ()=> new FbxCommandDimensionsIgnorant("DimensionsIgnorant")},
-            new(){ Name = "GeneratorConnector", Creator = ()=> new FbxCommandGeneratorConnector("GeneratorConnector")},
-            new(){ Name = "GroupSet", Creator = ()=> new FbxCommandGroupSet("GroupSet")},
-            new(){ Name = "GroupStack", Creator = ()=> new FbxCommandGroupStack("GroupStack")},
-            new(){ Name = "GroupSwitch", Creator = ()=> new FbxCommandGroupSwitch("GroupSwitch")},
-            new(){ Name = "Hidden", Creator = ()=> new FbxCommandHidden("Hidden")},
-            new(){ Name = "IgnoreAddCollider", Creator = ()=> new FbxCommandIgnoreAddCollider("IgnoreAddCollider")},
-            new(){ Name = "InducedBy", Creator = ()=> new FbxCommandInducedBy("InducedBy")},
-            new(){ Name = "Induction", Creator = ()=> new FbxCommandInduction("Induction")},
-            new(){ Name = "Set", Creator = ()=> new FbxCommandSet("Set")},
-            new(){ Name = "SuppressedBy", Creator = ()=> new FbxCommandSuppressedBy("SuppressedBy")},
-            new(){ Name = "Suppression", Creator = ()=> new FbxCommandSuppression("Suppression")},
-            new(){ Name = "Tag", Creator = ()=> new FbxCommandTag("Tag")},
-        };
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "ChunkController", Creator = () => new FbxCommandChunkController("ChunkController") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Generation", Creator = () => new FbxCommandChunkGeneration("Generation") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "CollisionDependent", Creator = () => new FbxCommandCollisionDependent("CollisionDependent") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Connector", Creator = () => new FbxCommandConnector("Connector") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "DimensionsIgnorant", Creator = () => new FbxCommandDimensionsIgnorant("DimensionsIgnorant") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GeneratorConnector", Creator = () => new FbxCommandGeneratorConnector("GeneratorConnector") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupSet", Creator = () => new FbxCommandGroupSet("GroupSet") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupStack", Creator = () => new FbxCommandGroupStack("GroupStack") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupSwitch", Creator = () => new FbxCommandGroupSwitch("GroupSwitch") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Hidden", Creator = () => new FbxCommandHidden("Hidden") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "IgnoreAddCollider", Creator = () => new FbxCommandIgnoreAddCollider("IgnoreAddCollider") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "InducedBy", Creator = () => new FbxCommandInducedBy("InducedBy") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Induction", Creator = () => new FbxCommandInduction("Induction") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Set", Creator = () => new FbxCommandSet("Set") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "SuppressedBy", Creator = () => new FbxCommandSuppressedBy("SuppressedBy") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Suppression", Creator = () => new FbxCommandSuppression("Suppression") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Tag", Creator = () => new FbxCommandTag("Tag") });
+        }
+
+        public static void RegisterFbxCommand(CommandRegistrationEntry entry)
+        {
+            if (_commandsRegistered == null)
+                _commandsRegistered = new List<CommandRegistrationEntry>();
+
+            Assert.IsFalse(_commandsRegistered.Contains(entry), $"already registered {entry.Name}");
+            _commandsRegistered.Add(entry);
+        }
 
         public static void Execute(FbxProps fromFbxProps, GameObject gameObject,
             ChunkCooker.ChunkImportInformation chunkImportInformation)
@@ -53,7 +66,7 @@ namespace TowerGenerator.FbxCommands
                 string fbxCmdName = ParseFbxCommand(property);
                 string fbxParameters = property.Value;
 
-                var cmdCreator = CmdFactory.FirstOrDefault(x => x.Name == fbxCmdName);
+                var cmdCreator = _commandsRegistered.FirstOrDefault(x => x.Name == fbxCmdName);
                 if (cmdCreator == null)
                 {
                     Debug.LogError(
@@ -62,8 +75,9 @@ namespace TowerGenerator.FbxCommands
                 }
 
                 var cmd = cmdCreator.Creator();
-                cmd.ParseParameters(fbxParameters, gameObject);
                 cmd.SetRawInputFromFbx(fbxCmdName, fbxParameters);
+                Debug.Log($"Parsing {cmd.RawInputFromFbx} on {gameObject.transform.GetDebugName()}");
+                cmd.ParseParameters(fbxParameters, gameObject);
                 commands.Add(cmd);
                 chunkImportInformation.CommandsProcessedAmount++;
             }
