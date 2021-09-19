@@ -8,8 +8,6 @@ namespace TowerGenerator
 {
     public class GroupSwitch : Group
     {
-        public int ItemSelected { get; private set; }
-
         public override bool IsValid()
         {
             var itemsCount = GetItemsCount();
@@ -22,22 +20,33 @@ namespace TowerGenerator
             return true;
         }
 
-        public override void DoChoice(params int[] index)
+        protected override void SetState(params int[] index)
         {
             Assert.IsTrue(index.Length == 1);
-            ItemSelected = index[0];
-            Assert.IsTrue(ItemSelected >= 0);
-            Assert.IsTrue(ItemSelected < GetItemsCount());
+            var itemIndex = index[0];
+            Assert.IsTrue(itemIndex >= 0);
+            Assert.IsTrue(itemIndex < GetItemsCount());
 
-            DisableItems();
-            var child = transform.GetChild(ItemSelected);
-            ChunkController.SetNodeActiveState(child, true);
+            for (int i = 0; i < transform.childCount; ++i)
+            {
+                var child = transform.GetChild(i);
+                var needToEnable = i == itemIndex;
+                ChunkController.SetNodeActiveState(child, needToEnable);
+            }
         }
 
-        public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
+        public override void EnableItem(int index, bool flag)
+        {
+            if(flag == false)
+                Debug.LogError($"GroupSwitch is not supposed to disable item {gameObject.transform.GetDebugName()}");
+
+            SetState(index);
+        }
+
+        public override void SetRandomState(IPseudoRandomNumberGenerator rnd)
         {
             Assert.IsTrue(GetItemsCount() > 0);
-            DoChoice(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
+            SetState(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
         }
     }
 }

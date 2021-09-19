@@ -7,8 +7,6 @@ namespace TowerGenerator
 {
     public class GroupStack : Group
     {
-        public int ItemStacked { get; private set; }
-
         public override bool IsValid()
         {
             var itemsCount = GetItemsCount();
@@ -21,25 +19,32 @@ namespace TowerGenerator
             return true;
         }
 
-        public override void DoChoice(params int[] index)
+        protected override void SetState(params int[] index)
         {
             Assert.IsTrue(index.Length == 1);
-            ItemStacked = index[0];
-            Assert.IsTrue(ItemStacked >= 0);
-            Assert.IsTrue(ItemStacked < GetItemsCount());
+            var stackTo = index[0];
+            Assert.IsTrue(stackTo  >= 0);
+            Assert.IsTrue(stackTo < GetItemsCount());
 
-            DisableItems();
-
-            for (int i = 0; i <= ItemStacked; ++i)
+            for (int i = 0; i < transform.childCount; ++i)
             {
                 var child = transform.GetChild(i);
-                ChunkController.SetNodeActiveState(child, true);
+                var needToEnable = i <= stackTo;
+                ChunkController.SetNodeActiveState(child, needToEnable);
             }
         }
 
-        public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
+        public override void EnableItem(int index, bool flag)
         {
-            DoChoice(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
+            if (flag)
+                SetState(index);
+            else
+                SetState(Mathf.Min(index - 1, 0));
+        }
+
+        public override void SetRandomState(IPseudoRandomNumberGenerator rnd)
+        {
+            SetState(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
         }
     }
 }

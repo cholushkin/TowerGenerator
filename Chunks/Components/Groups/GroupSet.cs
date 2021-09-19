@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameLib.Random;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
@@ -11,7 +12,6 @@ namespace TowerGenerator
     {
         public int MinObjectsSelected; // default 0
         public int MaxObjectsSelected; // default transform.childCount
-        public int ItemsSelectedAmount { get; private set; }
 
         public override bool IsValid()
         {
@@ -55,24 +55,31 @@ namespace TowerGenerator
             return true;
         }
 
-        public override void DoChoice(params int[] indexes)
+        protected override void SetState(params int[] indexes)
         {
-            DisableItems();
-            ItemsSelectedAmount = indexes.Length;
-            foreach (var i in indexes)
+            for (int i = 0; i < transform.childCount; ++i)
             {
                 var child = transform.GetChild(i);
-                ChunkController.SetNodeActiveState(child, true);
+                var needToEnable = indexes.Contains(i);
+                ChunkController.SetNodeActiveState(child, needToEnable);
             }
         }
 
-        public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
-        {   
+        public override void EnableItem(int index, bool flag)
+        {
+            var child = transform.GetChild(index);
+            ChunkController.SetNodeActiveState(child, flag);
+            Assert.IsTrue(GetState().Count >= MinObjectsSelected);
+            Assert.IsTrue(GetState().Count <= MaxObjectsSelected);
+        }
+
+        public override void SetRandomState(IPseudoRandomNumberGenerator rnd)
+        {
             int[] itemsIndexes = new int[GetItemsCount()];
             for (int i = 0; i < GetItemsCount(); ++i)
                 itemsIndexes[i] = i;
             var choices = rnd.FromArray(itemsIndexes, rnd.FromRangeIntInclusive(MinObjectsSelected, MaxObjectsSelected));
-            DoChoice(choices);
+            SetState(choices);
         }
     }
 }

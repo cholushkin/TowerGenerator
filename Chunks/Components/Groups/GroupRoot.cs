@@ -11,11 +11,15 @@ namespace TowerGenerator
             return true;
         }
 
-        public override void DoChoice(params int[] index)
+        protected override void SetState(params int[] index)
         {
         }
 
-        public override void DoRndChoice(IPseudoRandomNumberGenerator rnd)
+        public override void SetRandomState(IPseudoRandomNumberGenerator rnd)
+        {
+        }
+
+        public override void EnableItem(int index, bool flag)
         {
         }
     }

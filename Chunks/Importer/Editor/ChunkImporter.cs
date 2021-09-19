@@ -70,7 +70,7 @@ namespace TowerGenerator.ChunkImporter
         private static void DeleteChunks(TowerGeneratorImportSource source, string packName)
         {
             DirectoryInfo dir = new DirectoryInfo(source.ChunksOutputPath);
-            FileInfo[] info = dir.GetFiles(packName + ".*"); // delete all chunks with name starting with packName
+            FileInfo[] info = dir.GetFiles(packName + ".prefab"); // delete all chunks with name starting with packName
             foreach (FileInfo f in info)
             {
                 Debug.Log($"deleting {f.Name}");
@@ -92,6 +92,8 @@ namespace TowerGenerator.ChunkImporter
                 var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
                 ExtractChunk(ent, fullEntName, source);
             }
+
+            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 

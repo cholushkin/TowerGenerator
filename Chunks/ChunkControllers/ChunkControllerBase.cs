@@ -56,6 +56,7 @@ namespace TowerGenerator
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
             BuildImpactTree();
+            InitializeTreeState();
         }
 
         public TreeNode<Group> GetImpactTree()
@@ -78,31 +79,35 @@ namespace TowerGenerator
             return CalculateCurrentAABB();
         }
 
-        public void SetConfiguration()
+        private void InitializeTreeState()
         {
-            IPseudoRandomNumberGenerator rnd = RandomHelper.CreateRandomNumberGenerator(Seed);
-            Debug.Log(rnd.GetState());
-
-            // enable all parts besides apart from hidden
+            // enable all parts apart from Hidden
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
 
             foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
             {
                 Group group = treeNode.Data;
-                Assert.IsNotNull(group);
-
-                if (group != null)
-                {
-                    if (!treeNode.Data.gameObject.activeInHierarchy)
-                        continue;
-                    ProcessGroupSetConfiguration(group, rnd);
-                }
+                
+                // disable all children in the group
+                foreach (var groupChild in group.transform.Children())
+                    groupChild.gameObject.SetActive(false);
             }
         }
 
-        public virtual void ProcessGroupSetConfiguration(Group group, IPseudoRandomNumberGenerator rnd)
+        // Sets random state of the chunk using current Seed
+        public void SetConfiguration()
         {
-            group.DoRndChoice(rnd);
+            IPseudoRandomNumberGenerator rnd = RandomHelper.CreateRandomNumberGenerator(Seed);
+            Debug.Log(rnd.GetState());
+
+            foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
+            {
+                Group group = treeNode.Data;
+            
+                // set random state to the group if it's active
+                if (treeNode.Data.gameObject.activeInHierarchy)
+                    group.SetRandomState(rnd);
+            }
         }
 
         private void DbgPrintGroupOutcomeConfiguration(Transform groupTransform)

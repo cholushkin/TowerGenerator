@@ -4,6 +4,7 @@ using TowerGenerator.FbxCommands;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Rendering;
 
 namespace TowerGenerator.ChunkImporter
 {
@@ -47,7 +48,8 @@ namespace TowerGenerator.ChunkImporter
 
             ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
-            ApplyColliders(semifinishedEnt);
+            if(source.AddColliders)
+                ApplyColliders(semifinishedEnt);
 
             if (source.ApplyMaterials)
                 ApplyMaterials(semifinishedEnt);
@@ -77,7 +79,10 @@ namespace TowerGenerator.ChunkImporter
             foreach (var render in renders)
             {
                 if (render.gameObject.GetComponent<IgnoreAddCollider>() == null)
-                    render.gameObject.AddComponent<MeshCollider>();
+                {
+                    if(render.gameObject.GetComponent<MeshCollider>()==null)
+                        render.gameObject.AddComponent<MeshCollider>();
+                }
             }
         }
 
@@ -91,6 +96,7 @@ namespace TowerGenerator.ChunkImporter
             foreach (var render in renders)
             {
                 render.material = colorAtlas;
+                render.receiveShadows = false;
             }
         }
 
