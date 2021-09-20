@@ -40,6 +40,7 @@ namespace TowerGenerator.FbxCommands
             RegisterFbxCommand(new CommandRegistrationEntry { Name = "SuppressedBy", Creator = () => new FbxCommandSuppressedBy("SuppressedBy") });
             RegisterFbxCommand(new CommandRegistrationEntry { Name = "Suppression", Creator = () => new FbxCommandSuppression("Suppression") });
             RegisterFbxCommand(new CommandRegistrationEntry { Name = "Tag", Creator = () => new FbxCommandTag("Tag") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Material", Creator = () => new FbxCommandMaterial("Material") });
         }
 
         public static void RegisterFbxCommand(CommandRegistrationEntry entry)

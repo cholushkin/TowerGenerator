@@ -4,7 +4,6 @@ using TowerGenerator.FbxCommands;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Rendering;
 
 namespace TowerGenerator.ChunkImporter
 {
