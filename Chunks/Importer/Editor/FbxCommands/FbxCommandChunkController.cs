@@ -30,7 +30,7 @@ namespace TowerGenerator.FbxCommands
                 return; // keep default values if there is no parameters
 
             var actualParams = parameters.Split(',');
-            Assert.IsTrue(actualParams.Length is 1 or 2);
+            Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2);
             if (actualParams.Length >= 1) // we have first parameter
             {
                 ChunkControllerType = ConvertEnum<ChunkControllerBase.ChunkController>(actualParams[0]);

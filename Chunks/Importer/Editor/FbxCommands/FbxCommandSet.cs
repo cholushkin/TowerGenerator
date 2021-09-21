@@ -64,7 +64,7 @@ namespace TowerGenerator.FbxCommands
 
             var fieldInfo = compType.GetField(PropertyName,
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            if (fieldInfo is not null)
+            if (fieldInfo != null)
             {
                 var fType = fieldInfo.FieldType;
                 object fieldValue;

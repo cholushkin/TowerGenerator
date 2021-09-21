@@ -35,7 +35,7 @@ namespace TowerGenerator.FbxCommands
                 return; // keep default values if there is no parameters
 
             var actualParams = parametersString.Split(',');
-            Assert.IsTrue(actualParams.Length is 1 or 2, "The number of arguments should be 0, 1 or 2");
+            Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2, "The number of arguments should be 0, 1 or 2");
 
             if (actualParams.Length >= 1)
                 MinObjectsSelected = ConvertInt(actualParams[0]);

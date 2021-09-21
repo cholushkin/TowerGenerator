@@ -30,7 +30,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsTrue(!string.IsNullOrWhiteSpace(parameters));
 
             var actualParams = parameters.Split(',');
-            Assert.IsTrue(actualParams.Length is 1 or 2);
+            Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2);
 
             if (actualParams.Length >= 1)
                 TagName = actualParams[0];
