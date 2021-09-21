@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Plugins.Alg;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -17,38 +18,38 @@ namespace TowerGenerator
         {
             if (MinObjectsSelected < 0)
             {
-                Debug.LogError($"MinObjectSelected is less than zero: {MinObjectsSelected}");
+                Debug.LogError($"{transform.GetDebugName()} MinObjectSelected is less than zero: {MinObjectsSelected}");
                 return false;
             }
 
             if (MinObjectsSelected > MaxObjectsSelected)
             {
-                Debug.LogError($"MinObjectsSelected is greater than MaxObjectsSelected: {MinObjectsSelected} > {MaxObjectsSelected}");
+                Debug.LogError($"{transform.GetDebugName()} MinObjectsSelected is greater than MaxObjectsSelected: {MinObjectsSelected} > {MaxObjectsSelected}");
                 return false;
             }
 
             if (MaxObjectsSelected < 0)
             {
-                Debug.LogError($"MaxObjectsSelected is less than zero: {MaxObjectsSelected}");
+                Debug.LogError($"{transform.GetDebugName()} MaxObjectsSelected is less than zero: {MaxObjectsSelected}");
                 return false;
             }
 
             var itemsCount = GetItemsCount();
             if (itemsCount < 1)
             {
-                Debug.LogError($"Items count is less than 1: {itemsCount}");
+                Debug.LogError($"{transform.GetDebugName()} Items count is less than 1: {itemsCount}");
                 return false;
             }
 
             if (MaxObjectsSelected > itemsCount)
             {
-                Debug.LogError($"MaxObjectsSelected is greater than items count: {MaxObjectsSelected} > {itemsCount}");
+                Debug.LogError($"{transform.GetDebugName()} MaxObjectsSelected is greater than items count: {MaxObjectsSelected} > {itemsCount}");
                 return false;
             }
 
             if (MinObjectsSelected > itemsCount)
             {
-                Debug.LogError($"MinObjectsSelected is greater than items count: {MinObjectsSelected} > {itemsCount}");
+                Debug.LogError($"{transform.GetDebugName()} MinObjectsSelected is greater than items count: {MinObjectsSelected} > {itemsCount}");
                 return false;
             }
 
