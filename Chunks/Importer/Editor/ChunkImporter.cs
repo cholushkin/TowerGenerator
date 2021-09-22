@@ -112,7 +112,7 @@ namespace TowerGenerator.ChunkImporter
                     ChunkMetaCooker.Cook(chunk, source, importInformation);
 
                 PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"));
-                Debug.Log($"Chunk imported successfully: {importInformation}");
+                Debug.Log($"Chunk {AssetDatabase.AssetPathToGUID(Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"))} imported successfully: {importInformation}");
             }
             catch (Exception e)
             {
