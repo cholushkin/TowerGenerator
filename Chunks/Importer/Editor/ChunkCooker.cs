@@ -85,9 +85,11 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
+        // be default TowerGenerator applies color scheme material
+        // but you can override material on specific objects by "Material" fbx command
         private static void ApplyMaterials(GameObject chunk)
         {
-            var colorAtlas = AssetDatabase.LoadAssetAtPath<Material>("Assets/Prefabs/ColorSchemes/ColorScheme.mat");
+            var colorAtlas = Resources.Load<Material>("ColorScheme.mat");
             Assert.IsNotNull(colorAtlas);
 
             var renders = chunk.GetComponentsInChildren<Renderer>();

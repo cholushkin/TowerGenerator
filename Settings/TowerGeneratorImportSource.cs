@@ -13,10 +13,12 @@ namespace TowerGenerator
         public bool EnableCleanupFbx; // enable/disable fbx cleanup
 
         public bool AddColliders;
-        public bool ApplyMaterials;
+        public bool ApplyMaterials; // apply default TowerGenerator material ColorScheme
 
         public string ImportPath; // chunk pack folder with fbx or blend files
         public string MetasOutputPath; // generate metas to this directory
         public string ChunksOutputPath; // generate chunks to this directory
+
+        public float Scale = 1f;
     }
 }

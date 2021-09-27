@@ -13,11 +13,12 @@ namespace TowerGenerator.ChunkImporter
         {
             ModelImporter modelImporter = assetImporter as ModelImporter;
             Debug.Assert(modelImporter != null, nameof(modelImporter) + " != null");
-            if (ChunkImporterHelper.GetSource(modelImporter.assetPath).EnableChunkGeneration)
-            {
-                ProcessAddingFbxProps(gObj, names, values);
+
+            var source = ChunkImporterHelper.GetSource(modelImporter.assetPath);
+            if(source == null)
                 return;
-            }
+            if (source.EnableChunkGeneration)
+                ProcessAddingFbxProps(gObj, names, values);
         }
 
         private void ProcessAddingFbxProps(GameObject gObj, string[] names, object[] values)

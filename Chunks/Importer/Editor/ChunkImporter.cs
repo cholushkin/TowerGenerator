@@ -92,7 +92,7 @@ namespace TowerGenerator.ChunkImporter
                 var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
                 ExtractChunk(ent, fullEntName, source);
             }
-
+            
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -108,11 +108,15 @@ namespace TowerGenerator.ChunkImporter
                 chunk.name = chunkName;
                 chunk = ChunkCooker.Cook(source, chunk, importInformation);
 
+                chunk.transform.localScale *= source.Scale;
+
                 if(source.EnableMetaGeneration)
                     ChunkMetaCooker.Cook(chunk, source, importInformation);
 
-                PrefabUtility.SaveAsPrefabAsset(chunk, Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"));
-                Debug.Log($"Chunk {AssetDatabase.AssetPathToGUID(Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"))} imported successfully: {importInformation}");
+                var fullPath = Path.Combine(source.ChunksOutputPath, chunkName + ".prefab");
+                PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
+                AssetDatabase.ImportAsset(fullPath);
+                Debug.Log($"Chunk {chunkName}(guid:{AssetDatabase.AssetPathToGUID(Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"))}) imported successfully: {importInformation}");
             }
             catch (Exception e)
             {
