@@ -9,7 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8ecd289a62072a40a850caa03c47840, type: 3}
-  m_Name: VersionHistory
+  m_Script: {fileID: 11500000, guid: b9d8044fcc3cb4940a5956b027dcbb42, type: 3}
+  m_Name: VersionHistoryImportSettings
   m_EditorClassIdentifier: 
-  Versions: []
+  ModuleName: Game
+  UserCLDirectory: Assets/Game/VersionHistory/ChangeLists
+  OutputDirectory: Assets/Game/VersionHistory
