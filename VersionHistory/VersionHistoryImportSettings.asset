@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9d8044fcc3cb4940a5956b027dcbb42, type: 3}
   m_Name: VersionHistoryImportSettings
   m_EditorClassIdentifier: 
-  ModuleName: Game
-  UserCLDirectory: Assets/Game/VersionHistory/ChangeLists
-  OutputDirectory: Assets/Game/VersionHistory
+  ModuleName: TowerGenerator
+  UserCLDirectory: Assets/Libs/TowerGenerator/VersionHistory/ChangeLists
+  OutputDirectory: Assets/Libs/TowerGenerator/VersionHistory
