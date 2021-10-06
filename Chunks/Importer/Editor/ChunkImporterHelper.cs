@@ -20,6 +20,8 @@ namespace TowerGenerator.ChunkImporter
 
 
             var sources = ScriptableObjectUtility.GetInstancesOfScriptableObject<TowerGeneratorImportSource>();
+            if (sources == null)
+                return null;
             foreach (var src in sources)
             {
                 if (assetFullPath.StartsWith(src.ImportPath))
