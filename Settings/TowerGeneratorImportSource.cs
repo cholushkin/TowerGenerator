@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
-    [CreateAssetMenu(fileName = "TowerGeneratorImportSettings",
+    [CreateAssetMenu(fileName = "TowerGeneratorImportSource",
         menuName = "ScriptableObjects/TowerGeneratorSettings", order = 1)]
                                           
     public class TowerGeneratorImportSource : ScriptableObject

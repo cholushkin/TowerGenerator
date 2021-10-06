@@ -116,7 +116,7 @@ namespace TowerGenerator.ChunkImporter
                 var fullPath = Path.Combine(source.ChunksOutputPath, chunkName + ".prefab");
                 PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
                 AssetDatabase.ImportAsset(fullPath);
-                Debug.Log($"Chunk {chunkName}(guid:{AssetDatabase.AssetPathToGUID(Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"))}) imported successfully: {importInformation}");
+                Debug.Log($"Chunk {chunkName}(guid:{AssetDatabase.AssetPathToGUID(Path.Combine(source.ChunksOutputPath, chunkName + ".prefab"))} path:{source.ChunksOutputPath}) imported successfully: {importInformation}");
             }
             catch (Exception e)
             {
