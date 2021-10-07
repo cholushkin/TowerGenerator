@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,7 +10,6 @@ namespace TowerGenerator
         private static readonly Vector2Int TextureSizeInCells = new Vector2Int(32, 32);
         private static readonly Vector2Int TextureSize = new Vector2Int(256, 256);
         private static readonly int ExtendedColorSlots = 2;
-        private static readonly string OutputFile = "Assets/Prefabs/ColorSchemes/{0}.png";
 
         private static void OnPostprocessAllAssets(
             string[] importedAssets,
@@ -21,14 +19,28 @@ namespace TowerGenerator
         {
             foreach (string assetPath in importedAssets)
             {
-                var root = Path.GetPathRoot(assetPath);
-                var parentDir = Path.GetDirectoryName(assetPath).Split(Path.DirectorySeparatorChar).Last();
-
-                if (IsColorSchemeTableCsv(assetPath))
-                {
-                    GenerateTextureAtlas(assetPath);
-                }
+                var source = GetSource(assetPath);
+                if (source != null)
+                    GenerateTextureAtlas(assetPath, source);
             }
+        }
+
+        private static ColorSchemeImportSource GetSource(string path)
+        {
+            var extension = Path.GetExtension(path);
+            if (!extension.Equals(".csv"))
+                return null;
+
+            var sources = ScriptableObjectUtility.GetInstancesOfScriptableObject<ColorSchemeImportSource>();
+
+            if (sources == null)
+                return null;
+            foreach (var src in sources)
+            {
+                if (path.StartsWith(src.ImportPath))
+                    return src;
+            }
+            return null;
         }
 
         private static void DrawCell(Texture2D tex, Vector2Int pointer, Color clr)
@@ -40,7 +52,7 @@ namespace TowerGenerator
                 }
         }
 
-        private static void GenerateTextureAtlas(string assetPath)
+        private static void GenerateTextureAtlas(string assetPath, ColorSchemeImportSource src)
         {
             var colorSchemeTableName = Path.GetFileNameWithoutExtension(assetPath);
             using (var reader = new StreamReader(assetPath))
@@ -50,21 +62,21 @@ namespace TowerGenerator
                 var clr = new Color();
                 var curCol = 0;
 
-                while (!reader.EndOfStream) 
+                while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
                     var hexColors = line.Split(';');
 
                     for (int i = 0; i < hexColors.Length;)
                     {
-                        pointer.x = curCol*(1+ExtendedColorSlots);
+                        pointer.x = curCol * (1 + ExtendedColorSlots);
                         if (!ColorUtility.TryParseHtmlString(hexColors[i++], out clr))
                         {
                             Debug.LogError("Unable to parse color from csv");
                             return;
                         }
 
-                        DrawCell(texture,pointer,clr);
+                        DrawCell(texture, pointer, clr);
                         pointer.x++;
 
 
@@ -82,7 +94,7 @@ namespace TowerGenerator
                             }
                         }
                         pointer.y++;
-                    }                                       
+                    }
                     curCol++;
                     pointer.y = 0;
                 }
@@ -90,18 +102,12 @@ namespace TowerGenerator
                 texture.Apply();
                 byte[] pngData = texture.EncodeToPNG();
                 if (pngData != null)
-                    File.WriteAllBytes(string.Format(OutputFile, colorSchemeTableName), pngData);
+                    File.WriteAllBytes($"{src.OutputPath}/{colorSchemeTableName}.png", pngData);
                 Object.DestroyImmediate(texture);
 
             }
-            AssetDatabase.ImportAsset(string.Format(OutputFile, colorSchemeTableName));
+            AssetDatabase.ImportAsset($"{src.OutputPath}/{colorSchemeTableName}.png");
         }
-
-        private static bool IsColorSchemeTableCsv(string assetPath)
-        {
-            return assetPath.EndsWith(".CST.csv");
-        }
-
     }
 
 }

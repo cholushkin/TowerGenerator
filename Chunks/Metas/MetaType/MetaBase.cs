@@ -7,7 +7,6 @@ namespace TowerGenerator
     public class MetaBase : ScriptableObject
     {
         public string ChunkName;
-        public TowerGeneratorImportSource ImportSource;
         public ChunkControllerBase.ChunkController ChunkControllerType;
         public TagSet TagSet; // topology, labels, architecture, biome, etc.
         public uint Generation;

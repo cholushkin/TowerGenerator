@@ -6,7 +6,7 @@ namespace TowerGenerator.ChunkImporter
 {
     public static class ChunkMetaCooker
     {
-        public static MetaBase Cook(GameObject chunkObject, TowerGeneratorImportSource source, ChunkCooker.ChunkImportInformation importInformation)
+        public static MetaBase Cook(GameObject chunkObject, ChunkImportSettings source, ChunkCooker.ChunkImportInformation importInformation)
         {
             Debug.Log($"Cooking meta for {chunkObject.name}");
             var chunkController = chunkObject.GetComponent<ChunkControllerBase>();
@@ -14,10 +14,9 @@ namespace TowerGenerator.ChunkImporter
 
             var metaAsset = ScriptableObject.CreateInstance<MetaBase>();
 
-            string assetPathAndName = source.MetasOutputPath + "/" + importInformation.ChunkName + ".meta.asset";
+            string assetPathAndName = source.MetasOutputPath + "/" + importInformation.ChunkName + ".cmeta.asset";
 
             chunkController.Meta = metaAsset;
-            metaAsset.ImportSource = source;
             metaAsset.ChunkName = importInformation.ChunkName;
             metaAsset.ChunkControllerType = importInformation.ChunkControllerType;
             metaAsset.Generation = importInformation.Generation;

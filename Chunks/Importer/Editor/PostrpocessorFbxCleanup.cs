@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using Assets.Plugins.Alg;
 using UnityEditor;
 using UnityEngine;
@@ -12,27 +13,25 @@ namespace TowerGenerator.ChunkImporter
     {
         void OnPostprocessModel(GameObject fbxOrBlendObject)
         {
-            var source = ChunkImporterHelper.GetSource(assetImporter.assetPath);
-            if(source == null)
+            var settings = ChunkImportSettingsManager.GetImportSettingsByPath(assetImporter.assetPath);
+            if(settings == null)
                 return;
+            if (!settings.EnableCleanupFbx)
+                return;
+            Debug.Log($"Cleaning fbx {fbxOrBlendObject.transform.GetDebugName()}");
+            var safeChildrenList = fbxOrBlendObject.transform.Children().ToList();
 
-            if (source.EnableCleanupFbx)
+            foreach (Transform child in safeChildrenList)
             {
-                Debug.Log($"Clearing {fbxOrBlendObject.transform.GetDebugName()}");
-                var safeChildrenList = fbxOrBlendObject.transform.Children().ToList();
-
-                foreach (Transform child in safeChildrenList)
+                if (ChunkImporterHelper.IsObjectIgnored(child.gameObject))
                 {
-                    if (ChunkImporterHelper.IsObjectIgnored(child.gameObject))
-                    {
-                        var meshFilters = child.gameObject.GetComponentsInChildren<MeshFilter>();
+                    var meshFilters = child.gameObject.GetComponentsInChildren<MeshFilter>();
 
-                        foreach (var t in meshFilters)
-                            if (t.sharedMesh != null)
-                                Object.DestroyImmediate(t.sharedMesh);
+                    foreach (var t in meshFilters)
+                        if (t.sharedMesh != null)
+                            Object.DestroyImmediate(t.sharedMesh);
 
-                        Object.DestroyImmediate(child.gameObject);
-                    }
+                    Object.DestroyImmediate(child.gameObject);
                 }
             }
         }

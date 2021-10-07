@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -11,14 +12,14 @@ namespace TowerGenerator.ChunkImporter
         // warning appears in the console - "Identifier uniqueness violation: 'xxx'. Scripted Importers do not guarantee that subsequent imports of this asset will properly re-link to these targets."
         public void OnPostprocessGameObjectWithUserProperties(GameObject gObj, string[] names, System.Object[] values)
         {
-            ModelImporter modelImporter = assetImporter as ModelImporter;
-            Debug.Assert(modelImporter != null, nameof(modelImporter) + " != null");
-
-            var source = ChunkImporterHelper.GetSource(modelImporter.assetPath);
-            if(source == null)
+            var settings = ChunkImportSettingsManager.GetImportSettingsByPath(assetImporter.assetPath);
+            if(settings == null)
                 return;
-            if (source.EnableChunkGeneration)
-                ProcessAddingFbxProps(gObj, names, values);
+
+            if (!settings.EnableChunkGeneration)
+                return;
+
+            ProcessAddingFbxProps(gObj, names, values);
         }
 
         private void ProcessAddingFbxProps(GameObject gObj, string[] names, object[] values)
@@ -40,7 +41,7 @@ namespace TowerGenerator.ChunkImporter
             {
                 fbxProps.AddProperty(names[i], values[i].ToString());
             }
-            Assert.IsTrue(fbxProps.Properties.Count>0);
+            Assert.IsTrue(fbxProps.Properties.Count > 0);
         }
 
         public override int GetPostprocessOrder()

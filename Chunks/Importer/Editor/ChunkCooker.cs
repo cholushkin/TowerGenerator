@@ -1,7 +1,6 @@
 ﻿using System;
 using Assets.Plugins.Alg;
 using TowerGenerator.FbxCommands;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -41,16 +40,16 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public static GameObject Cook(TowerGeneratorImportSource source, GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
+        public static GameObject Cook(ChunkImportSettings settings, GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
             ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
-            if(source.AddColliders)
+            if(settings.AddColliders)
                 ApplyColliders(semifinishedEnt);
 
-            if (source.ApplyMaterials)
+            if (settings.ApplyMaterials)
                 ApplyMaterials(semifinishedEnt);
 
             ConfigureChunkController(semifinishedEnt); // tree
