@@ -19,6 +19,11 @@ namespace TowerGenerator
         {
         }
 
+        public override void SetInitialState()
+        {
+            // for root group don't need to disable children
+        }
+
         public override void EnableItem(int index, bool flag)
         {
         }

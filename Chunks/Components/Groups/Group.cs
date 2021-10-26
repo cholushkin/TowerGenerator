@@ -23,6 +23,12 @@ namespace TowerGenerator
             return actives;
         }
 
+        public virtual void SetInitialState()
+        {
+            for (int i = 0; i < transform.childCount; ++i)
+                transform.GetChild(i).gameObject.SetActive(false);
+        }
+
         public abstract void SetRandomState(IPseudoRandomNumberGenerator rnd);
 
 

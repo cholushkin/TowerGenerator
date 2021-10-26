@@ -87,10 +87,7 @@ namespace TowerGenerator
             foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
             {
                 Group group = treeNode.Data;
-                
-                // disable all children in the group
-                foreach (var groupChild in group.transform.Children())
-                    groupChild.gameObject.SetActive(false);
+                group.SetInitialState();
             }
         }
 
@@ -130,8 +127,8 @@ namespace TowerGenerator
 
         private void BuildImpactTree()
         {
-            // add root group
-            var groupRoot = GetComponent<GroupRoot>();
+            // add root group if needed
+            var groupRoot = GetComponent<Group>();
             if (groupRoot == null)
                 groupRoot = gameObject.AddComponent<GroupRoot>();
 
@@ -195,6 +192,7 @@ namespace TowerGenerator
 
             if (group != null)
             {
+                group.ChunkController = this;
                 var newGroup = new TreeNode<Group>(group);
                 impactParent?.AddChild(newGroup);
                 impactParent = newGroup;
