@@ -46,7 +46,7 @@ namespace TowerGenerator
         protected TreeNode<Group> _impactTree;
         private Dictionary<string, List<Transform>> _suppression;
         private Dictionary<string, List<Transform>> _induction;
-        private LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
+        public LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
 
 
         public virtual void Init() // configure
@@ -55,6 +55,8 @@ namespace TowerGenerator
                 Debug.Log("> Init");
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
+            if (Log.Normal())
+                Debug.Log($"{transform.GetDebugName()} Seed {Seed}");
             BuildImpactTree();
             InitializeTreeState();
         }
@@ -95,7 +97,6 @@ namespace TowerGenerator
         public void SetConfiguration()
         {
             IPseudoRandomNumberGenerator rnd = RandomHelper.CreateRandomNumberGenerator(Seed);
-            Debug.Log(rnd.GetState());
 
             foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
             {
