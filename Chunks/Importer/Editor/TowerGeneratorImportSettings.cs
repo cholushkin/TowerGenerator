@@ -54,7 +54,7 @@ namespace TowerGenerator
         {
             if (string.IsNullOrEmpty(assetName))
                 return null;
-            if (_registeredChunkImportSettings.TryGetValue(assetName, out var settings))
+            if (_registeredChunkImportSettings != null && _registeredChunkImportSettings.TryGetValue(assetName, out var settings))
                 return settings;
             return null;
         }
