@@ -1,0 +1,17 @@
+*.unityproj
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.sln
+*.cs~
+*.csproj
+*.pidb.meta
+sysinfo.txt
+!cone.obj
+!quad4point.obj
+!scrap.obj
+/Builds
+*.blend1

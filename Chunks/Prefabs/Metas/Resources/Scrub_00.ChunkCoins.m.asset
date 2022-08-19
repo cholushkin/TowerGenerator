@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ddf9bedf788d3a4eb5433335f7ff256, type: 3}
+  m_Name: Scrub_00.ChunkCoins.m
+  m_EditorClassIdentifier: 
+  ChunkName: Scrub_00.ChunkCoins
+  Source:
+    Name: Scrub
+    EnableImport: 1
+    EnableCleanupFbx: 1
+    ImportPath: Assets/TowerGenerator/Chunks/!ImportFbx/Scrub
+    OutputPath: Assets/TowerGenerator/Chunks/Prefabs/Scrub
+  ChunkControllerType: 1
+  TagSet:
+    Tags:
+    - Name: ' ChunkStandard'
+      Value: 1
+  Generation: 0
+  ChunkMargin: 1
+  AABB: {x: 2.5113797, y: 2.0743394, z: 2.494525}
