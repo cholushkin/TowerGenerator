@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Assets.Plugins.Alg;
-using NCalc;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Range = GameLib.Random.Range;
@@ -46,13 +45,15 @@ namespace TowerGenerator
             public IEnumerable<MetaBase> FilterTagExpression(IEnumerable<MetaBase> metas)
             {
                 if (string.IsNullOrEmpty(Expression))
-                    return metas;                         
+                    return metas;
+
+                throw new NotImplementedException("xLua implementation");
 
                 // todo: cache expression
-                var expression = new Expression(Expression);
-                expression.EvaluateParameter += _parameterDefaultValueHandler;
-                expression.EvaluateFunction += _tagFunctionsHandler;
-                return metas.Where(x => _checkTagsPass(x, expression));
+                //var expression = new Expression(Expression);
+                //expression.EvaluateParameter += _parameterDefaultValueHandler;
+                //expression.EvaluateFunction += _tagFunctionsHandler;
+                //return metas.Where(x => _checkTagsPass(x, expression));
             }
 
             public IEnumerable<MetaBase> FilterSize(IEnumerable<MetaBase> metas)
@@ -82,30 +83,30 @@ namespace TowerGenerator
                 return "^" + Regex.Escape(value).Replace("\\*", ".*") + "$";
             }
 
-            private static bool _checkTagsPass(MetaBase meta, Expression interpreter)
-            {
-                if (meta.TagSet == null || meta.TagSet.IsEmpty())
-                    return false;
+            //private static bool _checkTagsPass(MetaBase meta, Expression interpreter)
+            //{
+            //    if (meta.TagSet == null || meta.TagSet.IsEmpty())
+            //        return false;
 
-                var metaParameters = meta.TagSet.AsNCalcDictionary();
-                Assert.IsNotNull(metaParameters);
-                interpreter.Parameters = metaParameters;
-                return (bool)interpreter.Evaluate();
-            }
+            //    var metaParameters = meta.TagSet.AsNCalcDictionary();
+            //    Assert.IsNotNull(metaParameters);
+            //    interpreter.Parameters = metaParameters;
+            //    return (bool)interpreter.Evaluate();
+            //}
 
-            static void _parameterDefaultValueHandler(string name, ParameterArgs args)
-            {
-                args.Result = 0f;
-            }
+            //static void _parameterDefaultValueHandler(string name, ParameterArgs args)
+            //{
+            //    args.Result = 0f;
+            //}
 
-            static void _tagFunctionsHandler(string name, FunctionArgs args)
-            {
-                if (name == "Has")
-                {
-                    float val = (float)args.Parameters[0].Evaluate();
-                    args.Result = val > 0f;
-                }
-            }
+            //static void _tagFunctionsHandler(string name, FunctionArgs args)
+            //{
+            //    if (name == "Has")
+            //    {
+            //        float val = (float)args.Parameters[0].Evaluate();
+            //        args.Result = val > 0f;
+            //    }
+            //}
 
             public static bool IsAABBInside(Vector3 AABB, Range breadthRange, Range heightRange)
             {
