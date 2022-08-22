@@ -43,10 +43,10 @@ namespace TowerGenerator.FbxCommands
             PropertyValue = classAndParams[1].Split('=')[1].Trim();
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
 
             Type compType = CustomTypeConvertor.GetType(ComponentClassName);
 

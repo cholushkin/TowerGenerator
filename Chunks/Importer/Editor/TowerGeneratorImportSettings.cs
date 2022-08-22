@@ -6,9 +6,13 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
+    // You can specify different import settings per Fbx or for group of Fbx with the same base name. 
+    // Every Fbx could contain one or more Chunks inside
+
     public class ChunkImportSettings
     {
         public bool EnableMetaGeneration;
+        public bool IsPack = true; // contains multiple chunks in one FBX. Also affect output prefab names.
         public bool EnableChunkGeneration = true; // enable/disable importing for this source
         public bool EnableCleanupFbx = true; // enable/disable fbx cleanup
 
@@ -38,7 +42,7 @@ namespace TowerGenerator
                 return;
             }
 
-            Debug.Log($"Registering settings for {assetName}");
+            Debug.Log($"Registering ChunkImportSettings for '{assetName}'");
             _registeredChunkImportSettings.Add(assetName, entry);
         }
 
@@ -47,7 +51,11 @@ namespace TowerGenerator
             var ext = Path.GetExtension(assetPath);
             if (ext != ".blend" && ext != ".fbx")
                 return null;
-            return GetImportSettings(Path.GetFileNameWithoutExtension(assetPath));
+
+            var fileNameNoExt = Path.GetFileNameWithoutExtension(assetPath);
+            var fileNameNoIndexes = fileNameNoExt.Split('.')[0];
+
+            return GetImportSettings(fileNameNoIndexes);
         }
 
         public static ChunkImportSettings GetImportSettings(string assetName) // without dir and extension

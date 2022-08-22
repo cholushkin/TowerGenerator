@@ -38,10 +38,10 @@ namespace TowerGenerator.FbxCommands
                 TagValue = ConvertFloat01(actualParams[1]);
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
 
             var tagHolder = gameObject.GetComponent<TagHolder>();
             if (tagHolder == null)

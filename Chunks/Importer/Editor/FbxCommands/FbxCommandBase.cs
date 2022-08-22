@@ -24,7 +24,7 @@ namespace TowerGenerator.FbxCommands
         }
 
         public abstract void ParseParameters(string parameters, GameObject gameObject);
-        public abstract void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation);
+        public abstract void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState);
         public virtual int GetExecutionPriority()
         {
             return PriorityHighest;

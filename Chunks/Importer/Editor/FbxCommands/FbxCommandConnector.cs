@@ -25,16 +25,16 @@ public class FbxCommandConnector : FbxCommandBase
 
     }
 
-    public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+    public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
     {
         Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-        Assert.IsNotNull(importInformation);
+        Assert.IsNotNull(importState);
         Assert.IsNull(gameObject.GetComponent<Connector>());
 
         var connector = gameObject.AddComponent<Connector>();
         connector.ConnectorMode = ConnectorType;
         connector.ConnectExpressions = ConnectExpressions;
-        importInformation.ConnectorAmount++;
+        importState.ConnectorAmount++;
     }
 
 

@@ -52,8 +52,7 @@ namespace TowerGenerator.FbxCommands
             _commandsRegistered.Add(entry);
         }
 
-        public static void Execute(FbxProps fromFbxProps, GameObject gameObject,
-            ChunkCooker.ChunkImportInformation chunkImportInformation)
+        public static void Execute(FbxProps fromFbxProps, GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(fromFbxProps);
             Assert.IsNotNull(gameObject);
@@ -80,14 +79,14 @@ namespace TowerGenerator.FbxCommands
                 Debug.Log($"Parsing {cmd.RawInputFromFbx} on {gameObject.transform.GetDebugName()}");
                 cmd.ParseParameters(fbxParameters, gameObject);
                 commands.Add(cmd);
-                chunkImportInformation.CommandsProcessedAmount++;
+                importState.CommandsProcessedAmount++;
             }
 
             // execute commands by their priorities
             foreach (var cmd in commands.OrderBy(c => c.GetExecutionPriority()))
             {
                 Debug.Log($"Executing {cmd.RawInputFromFbx} on {gameObject.transform.GetDebugName()}");
-                cmd.Execute(gameObject, chunkImportInformation);
+                cmd.Execute(gameObject, importState);
             }
         }
 

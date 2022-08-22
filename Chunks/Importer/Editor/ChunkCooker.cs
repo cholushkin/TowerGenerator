@@ -9,11 +9,12 @@ namespace TowerGenerator.ChunkImporter
     public static class ChunkCooker
     {
         [Serializable]
-        public class ChunkImportInformation
+        public class ChunkImportState
         {
-            public ChunkImportInformation(string chunkName)
+            public ChunkImportState(string chunkName, ChunkImportSettings importSettings)
             {
                 ChunkName = chunkName;
+                ImportSettings = importSettings;
             }
             public string ChunkName;
             public int CommandsProcessedAmount;
@@ -31,8 +32,10 @@ namespace TowerGenerator.ChunkImporter
             public int ConnectorAmount;
             public int IgnoreAddColliderAmount;
             public uint Generation;
+            public int CollidersApplied;
             public TagSet ChunkTagSet;
             public ChunkControllerBase.ChunkController ChunkControllerType;
+            public readonly ChunkImportSettings ImportSettings;
 
             public override string ToString()
             {
@@ -40,24 +43,24 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public static GameObject Cook(ChunkImportSettings settings, GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
+        public static GameObject Cook(ChunkImportSettings settings, GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
             ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
-            if(settings.AddColliders)
-                ApplyColliders(semifinishedEnt);
+            if (settings.AddColliders)
+                ApplyColliders(semifinishedEnt, chunkImportInformation);
 
             if (settings.ApplyMaterials)
-                ApplyMaterials(semifinishedEnt);
+                ApplyMaterials(semifinishedEnt, chunkImportInformation);
 
-            ConfigureChunkController(semifinishedEnt); // tree
+            ConfigureChunkController(semifinishedEnt, chunkImportInformation); // tree
 
             return semifinishedEnt;
         }
 
-        private static void ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportInformation chunkImportInformation)
+        private static void ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             void ProcessCommand(Transform tr)
             {
@@ -70,29 +73,32 @@ namespace TowerGenerator.ChunkImporter
             semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);
         }
 
-        private static void ApplyColliders(GameObject semifinishedEnt)
+        private static void ApplyColliders(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             var renders = semifinishedEnt.GetComponentsInChildren<Renderer>();
+            Assert.IsTrue(renders.Length > 0, "");
 
             foreach (var render in renders)
             {
                 if (render.gameObject.GetComponent<IgnoreAddCollider>() == null)
                 {
-                    if(render.gameObject.GetComponent<MeshCollider>()==null)
+                    if (render.gameObject.GetComponent<MeshCollider>() == null)
+                    {
                         render.gameObject.AddComponent<MeshCollider>();
+                        chunkImportInformation.CollidersApplied++;
+                    }
                 }
             }
         }
 
         // be default TowerGenerator applies color scheme material
         // but you can override material on specific objects by "Material" fbx command
-        private static void ApplyMaterials(GameObject chunk)
+        private static void ApplyMaterials(GameObject chunk, ChunkImportState chunkImportInformation)
         {
             var colorAtlas = Resources.Load<Material>("ColorScheme.mat");
-            Assert.IsNotNull(colorAtlas);
+            Assert.IsNotNull(colorAtlas, ChunkImporterHelper.AddStateInformation("Can't find ColorScheme.mat material in a project", chunkImportInformation));
 
             var renders = chunk.GetComponentsInChildren<Renderer>();
-
             foreach (var render in renders)
             {
                 render.material = colorAtlas;
@@ -100,12 +106,12 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        private static void ConfigureChunkController(GameObject chunk)
+        private static void ConfigureChunkController(GameObject chunkSemicooked, ChunkImportState chunkImportInformation)
         {
-            var chunkController = chunk.GetComponent<ChunkControllerBase>();
-            Assert.IsNotNull(chunkController);
+            var chunkController = chunkSemicooked.GetComponent<ChunkControllerBase>();
+            Assert.IsNotNull(chunkController, ChunkImporterHelper.AddStateInformation("There is no ChunkControllerBase on chunk. Probably missing ChunkController prop on chunk root in fbx", chunkImportInformation));
 
-            var baseComponents = chunk.GetComponentsInChildren<BaseComponent>(true);
+            var baseComponents = chunkSemicooked.GetComponentsInChildren<BaseComponent>(true);
             foreach (var baseComponent in baseComponents)
             {
                 baseComponent.ChunkController = chunkController;

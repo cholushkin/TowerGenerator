@@ -48,10 +48,10 @@ namespace TowerGenerator.FbxCommands
             }
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
 
             ChunkControllerBase chunkController = null;
 
@@ -62,8 +62,8 @@ namespace TowerGenerator.FbxCommands
 
             Assert.IsNotNull(chunkController, "chunk controller is null");
 
-            importInformation.ChunkControllerType = ChunkControllerType;
-            importInformation.ChunkTagSet = ChunkTagSet;
+            importState.ChunkControllerType = ChunkControllerType;
+            importState.ChunkTagSet = ChunkTagSet;
         }
     }
 }

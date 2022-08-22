@@ -26,16 +26,15 @@ namespace TowerGenerator.FbxCommands
             SuppressionLabels = parameters.Split(',');
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
             Assert.IsNull(gameObject.GetComponent<SuppressedBy>());
-
 
             var comp = gameObject.AddComponent<SuppressedBy>();
             comp.SuppressionLabels = SuppressionLabels;
-            importInformation.SuppressedByAmount++;
+            importState.SuppressedByAmount++;
         }
     }
 }

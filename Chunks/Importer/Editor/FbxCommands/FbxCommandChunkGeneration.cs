@@ -4,11 +4,12 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator.FbxCommands
 {
-    // Версия чанка или его поколение. Для детерминированной генерации нужно иметь возможность фильтравать множество всех доступных чанков по их поколению.
-    // В дальнейшем, когда добавляется новый чанк с поздним номером поколения в уже существующий билд (деплой, релиз, версию) это не разрушит рандомную генерацию старых башен. 
-    // Потому что генератор работает на заданном диапазоне пололений чанков.
-    // Если же результат генерации предполагает включать в себя новые добавленные позже чанки, тогда в генераторе должен быть отключен фильтр по поколениям.
-
+    // Chunk generation helps to filter set of all available chunks by the specific group id (generation).
+    // Later on when new generation of chunks added to the build the old consistency of seed based random result will not be broken. 
+    // Because the process of generation always works on a specified range of generation IDs currently available in a build.
+    // However if the result of random generation has to include all available chunks then generation filter should be disabled.
+    // Note: There are 2 generation words in one context, this could be confusing. Generation as a noun is an group id of the chunks ( FbxCommandChunkGeneration )
+    // Generation as a verb is a process of procedural creation of a tower.
     // Example:
     // Generation(2)
 
@@ -32,14 +33,14 @@ namespace TowerGenerator.FbxCommands
             Generation = ConvertUInt(parameters);
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
             var chunkController = gameObject.GetComponent<ChunkControllerBase>();
             Assert.IsNotNull(chunkController);
 
-            importInformation.Generation = Generation;
+            importState.Generation = Generation;
         }
     }
 }

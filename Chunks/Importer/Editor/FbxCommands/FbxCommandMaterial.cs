@@ -1,8 +1,6 @@
 using TowerGenerator.ChunkImporter;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
-
 
 namespace TowerGenerator.FbxCommands
 {
@@ -21,7 +19,7 @@ namespace TowerGenerator.FbxCommands
             MaterialName = parameters.Trim();
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             var materialToApply = Resources.Load<Material>($"{MaterialName}");
             Assert.IsNotNull(materialToApply, $"Can't load material {MaterialName}.mat");

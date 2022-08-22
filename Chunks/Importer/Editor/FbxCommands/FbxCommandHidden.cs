@@ -17,14 +17,14 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
             Assert.IsNull(gameObject.GetComponent<Hidden>());
 
             gameObject.AddComponent<Hidden>();
-            importInformation.HiddenAmount++;
+            importState.HiddenAmount++;
         }
     }
 }

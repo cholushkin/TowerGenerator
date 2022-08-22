@@ -6,7 +6,7 @@ namespace TowerGenerator.ChunkImporter
 {
     public static class ChunkMetaCooker
     {
-        public static MetaBase Cook(GameObject chunkObject, ChunkImportSettings source, ChunkCooker.ChunkImportInformation importInformation)
+        public static MetaBase Cook(GameObject chunkObject, ChunkImportSettings source, ChunkCooker.ChunkImportState importState)
         {
             Debug.Log($"Cooking meta for {chunkObject.name}");
             var chunkController = chunkObject.GetComponent<ChunkControllerBase>();
@@ -14,13 +14,13 @@ namespace TowerGenerator.ChunkImporter
 
             var metaAsset = ScriptableObject.CreateInstance<MetaBase>();
 
-            string assetPathAndName = source.MetasOutputPath + "/" + importInformation.ChunkName + ".cmeta.asset";
+            string assetPathAndName = source.MetasOutputPath + "/" + importState.ChunkName + ".cmeta.asset";
 
             chunkController.Meta = metaAsset;
-            metaAsset.ChunkName = importInformation.ChunkName;
-            metaAsset.ChunkControllerType = importInformation.ChunkControllerType;
-            metaAsset.Generation = importInformation.Generation;
-            metaAsset.TagSet = importInformation.ChunkTagSet;
+            metaAsset.ChunkName = importState.ChunkName;
+            metaAsset.ChunkControllerType = importState.ChunkControllerType;
+            metaAsset.Generation = importState.Generation;
+            metaAsset.TagSet = importState.ChunkTagSet;
             metaAsset.ChunkMargin = 1f; // todo: FbxCommand ChunkMargin(0)
             metaAsset.AABB = chunkController.CalculateDimensionAABB().size;
             

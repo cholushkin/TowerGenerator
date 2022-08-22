@@ -19,14 +19,14 @@ namespace TowerGenerator.FbxCommands
             Assert.IsTrue(string.IsNullOrWhiteSpace(parameters), "There should not be parameters for the command 'AddGroupStack'");
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportInformation importInformation)
+        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsNotNull(importInformation);
+            Assert.IsNotNull(importState);
             Assert.IsNull(gameObject.GetComponent<GroupStack>(), "no GroupStack should be attached before");
             var groupStack = gameObject.AddComponent<GroupStack>();
             Assert.IsTrue(groupStack.IsValid(), $"{gameObject.transform.GetDebugName()} {GetFbxCommandName()} is invalid");
-            importInformation.GroupStackAmount++;
+            importState.GroupStackAmount++;
         }
     }
 }
