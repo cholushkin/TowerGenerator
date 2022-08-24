@@ -13,8 +13,8 @@ namespace TowerGenerator
     {
         public bool EnableMetaGeneration;
         public bool IsPack = true; // contains multiple chunks in one FBX. Also affect output prefab names.
-        public bool EnableChunkGeneration = true; // enable/disable importing for this source
-        public bool EnableCleanupFbx = true; // enable/disable fbx cleanup
+        public bool EnableImport = true; // enable/disable importing for this source of import
+        public bool EnableCleanupFbxRoot = true; // enable/disable fbx cleanup
 
         public bool AddColliders;
         public bool ApplyMaterials; // apply default TowerGenerator material ColorScheme

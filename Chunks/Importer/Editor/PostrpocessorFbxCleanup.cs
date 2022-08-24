@@ -16,9 +16,12 @@ namespace TowerGenerator.ChunkImporter
             var settings = ChunkImportSettingsManager.GetImportSettingsByPath(assetImporter.assetPath);
             if(settings == null)
                 return;
-            if (!settings.EnableCleanupFbx)
+            if (!settings.EnableCleanupFbxRoot)
                 return;
-            Debug.Log($"Cleaning fbx {fbxOrBlendObject.transform.GetDebugName()}");
+            if (!settings.IsPack) 
+                return;
+
+            Debug.Log($"Cleaning FBX chunks pack {fbxOrBlendObject.transform.GetDebugName()}");
             var safeChildrenList = fbxOrBlendObject.transform.Children().ToList();
 
             foreach (Transform child in safeChildrenList)

@@ -20,36 +20,37 @@ namespace TowerGenerator.ChunkImporter
             foreach (string assetPath in importedAssets)
             {
                 var settings = ChunkImportSettingsManager.GetImportSettingsByPath(assetPath);
+                
                 if(settings == null)
                     continue;
-                if (settings.EnableChunkGeneration)
-                {
-                    if (settings.IsPack)
-                    {
-                        Debug.Log($"Importing content pack: '{assetPath}'");
-                        var packName = Path.GetFileNameWithoutExtension(assetPath);
-                        var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                        if (assetObj == null)
-                        {
-                            Debug.LogError($"Error: can't load asset at path {assetPath}");
-                            continue;
-                        }
+                if (!settings.EnableImport) 
+                    continue;
 
-                        // Extracting all chunks from the pack
-                        ExtractChunks(assetObj, packName, settings);
-                    }
-                    else
+                if (settings.IsPack)
+                {
+                    Debug.Log($"Importing content pack: '{assetPath}'");
+                    var packName = Path.GetFileNameWithoutExtension(assetPath);
+                    var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                    if (assetObj == null)
                     {
-                        Debug.Log($"Importing chunk: '{assetPath}'");
-                        var chunkName = Path.GetFileNameWithoutExtension(assetPath);
-                        var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                        if (assetObj == null)
-                        {
-                            Debug.LogError($"Error: can't load asset at path {assetPath}");
-                            continue;
-                        }
-                        ExtractChunk(assetObj, chunkName, settings);
+                        Debug.LogError($"Error: can't load asset at path {assetPath}");
+                        continue;
                     }
+
+                    // Extracting all chunks from the pack
+                    ExtractChunks(assetObj, packName, settings);
+                }
+                else
+                {
+                    Debug.Log($"Importing chunk: '{assetPath}'");
+                    var chunkName = Path.GetFileNameWithoutExtension(assetPath);
+                    var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                    if (assetObj == null)
+                    {
+                        Debug.LogError($"Error: can't load asset at path {assetPath}");
+                        continue;
+                    }
+                    ExtractChunk(assetObj, chunkName, settings);
                 }
             }
             AssetDatabase.SaveAssets();
