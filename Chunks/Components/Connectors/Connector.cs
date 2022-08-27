@@ -10,14 +10,14 @@ namespace TowerGenerator
         public enum ConnectorType
         {
             Undefined = 0,
-            In = 1,
-            Out = 2
+            Pin = 1,
+            Hole = 2
         }
 
         public Vector3 Normal;
         public Vector3 Forward;
         public float RotationSectorAngle;
-        public ConnectorType ConnectorMode; // In, Out or InOut
+        public ConnectorType ConnectorMode; // Pin, Hole or Pin+Hole
         public string[] ConnectExpressions;
     }
 
