@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace TowerGenerator.ChunkImporter
 {
+    // todo: make it work with non pack fbx
     // Cleans up on import the FBX removing all objects which:
     // * has no FbxProp script attached to the root 
     // * has IgnoreImport property attached

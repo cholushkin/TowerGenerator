@@ -80,8 +80,6 @@ namespace TowerGenerator.ChunkImporter
                 }
             }
             AssetDatabase.Refresh();
-
-            // todo: also check metas and chunks that don't belong to any of existing sources
         }
 
         private static void DeleteMetas(ChunkImportSettings source, string packName) // not unity meta

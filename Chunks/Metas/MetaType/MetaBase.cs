@@ -12,7 +12,11 @@ namespace TowerGenerator
         public uint Generation;
         public float ChunkMargin;
         
-        public Vector3 AABB; // maximum AABB for the chunk
+        public Vector3 AABB; // Axed-aligned bounding box
+        public Vector3 OBB; // Oriented bounding box
+
+        public string ChunkPath;
+        public string MetaPath;
 
         public override string ToString()
         {

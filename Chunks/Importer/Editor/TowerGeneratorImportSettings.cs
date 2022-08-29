@@ -7,22 +7,21 @@ using UnityEngine;
 namespace TowerGenerator
 {
     // You can specify different import settings per Fbx or for group of Fbx with the same base name. 
-    // Every Fbx could contain one or more Chunks inside
-
+    // ChunkImportSettings is also referenced as "chunk import source" in comments
     public class ChunkImportSettings
     {
-        public bool EnableMetaGeneration;
-        public bool IsPack = true; // contains multiple chunks in one FBX. Also affect output prefab names.
-        public bool EnableImport = true; // enable/disable importing for this source of import
-        public bool EnableCleanupFbxRoot = true; // enable/disable fbx cleanup
+        public bool EnableMetaGeneration; // Turns on/off meta generation for this source of import
+        public bool IsPack = true; // TRUE - FBX contains multiple chunks. FALSE - one FBX contains one chunk inside
+        public bool EnableImport = true; // Enable/disable importing for this import source
+        public bool EnableCleanupFbxRoot = true; // Enable/disable fbx cleanup
 
-        public bool AddColliders;
-        public bool ApplyMaterials; // apply default TowerGenerator material ColorScheme
+        public bool AddColliders; // Enable/disable adding collider to each Renderer
+        public bool ApplyMaterials; // Apply default TowerGenerator material ColorScheme
 
-        public string MetasOutputPath; // generate metas to this directory
-        public string ChunksOutputPath = "Assets/Libs/TowerGenerator/Prefabs/Chunks"; // generate chunks to this directory
+        public string MetasOutputPath; // All generated metas of this import source will be saved to this directory. If not specified then ChunksOutputPath
+        public string ChunksOutputPath; // All imported chunks are going to be saved to this directory. If not specified "Assets" will be used
 
-        public float Scale = 1f;
+        public float Scale = 1f; // Additionally scales imported chunks by this value
     }
 
 
@@ -31,19 +30,20 @@ namespace TowerGenerator
     {
         private static Dictionary<string, ChunkImportSettings> _registeredChunkImportSettings;
 
-        public static void RegisterChunkImportSettings(string assetName, ChunkImportSettings entry)
+        // Register Import Settings for any fbx which name starts from nameStartFrom
+        public static void RegisterChunkImportSettings(string nameStartFrom, ChunkImportSettings entry)
         {
             if (_registeredChunkImportSettings == null)
                 _registeredChunkImportSettings = new Dictionary<string, ChunkImportSettings>();
 
-            if (_registeredChunkImportSettings.ContainsKey(assetName) && _registeredChunkImportSettings[assetName] != null)
+            if (_registeredChunkImportSettings.ContainsKey(nameStartFrom) && _registeredChunkImportSettings[nameStartFrom] != null)
             {
-                Debug.LogWarning($"Settings for {assetName} is already registered");
+                Debug.LogWarning($"Settings for {nameStartFrom} is already registered");
                 return;
             }
 
-            Debug.Log($"Registering ChunkImportSettings for '{assetName}'");
-            _registeredChunkImportSettings.Add(assetName, entry);
+            Debug.Log($"Registering ChunkImportSettings for '{nameStartFrom}'");
+            _registeredChunkImportSettings.Add(nameStartFrom, entry);
         }
 
         public static ChunkImportSettings GetImportSettingsByPath(string assetPath)
