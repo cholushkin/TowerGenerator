@@ -1,4 +1,5 @@
-﻿using GameLib.Random;
+﻿using Assets.Plugins.Alg;
+using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -7,12 +8,20 @@ namespace TowerGenerator
 {
     public class GroupStack : Group
     {
+        public int MinIndexSelected; // default -1
         public override bool IsValid()
         {
             var itemsCount = GetItemsCount();
-            if (itemsCount < 2)
+            if (itemsCount < 1)
             {
-                Debug.LogError($"Items count is less than 2: {itemsCount} < 2");
+                Debug.LogError($"Items count is less than 1: {itemsCount} < 1");
+                return false;
+            }
+
+            var rightRange = MinIndexSelected >= -1 && MinIndexSelected < itemsCount;
+            if (!rightRange)
+            {
+                Debug.LogError($"{transform.GetDebugName()} MinIndexSelected is : {MinIndexSelected}. Should be -1 to {itemsCount-1}");
                 return false;
             }
 

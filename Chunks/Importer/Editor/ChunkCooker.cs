@@ -11,10 +11,10 @@ namespace TowerGenerator.ChunkImporter
         [Serializable]
         public class ChunkImportState
         {
-            public ChunkImportState(string chunkName, ChunkImportSettings importSettings)
+            public ChunkImportState(string chunkName, ChunkImportSource importSource)
             {
                 ChunkName = chunkName;
-                ImportSettings = importSettings;
+                ImportSource = importSource;
             }
             public string ChunkName;
             public int CommandsProcessedAmount;
@@ -35,7 +35,7 @@ namespace TowerGenerator.ChunkImporter
             public int CollidersApplied;
             public TagSet ChunkTagSet;
             public ChunkControllerBase.ChunkController ChunkControllerType;
-            public readonly ChunkImportSettings ImportSettings;
+            public readonly ChunkImportSource ImportSource;
 
             public override string ToString()
             {
@@ -43,16 +43,16 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public static GameObject Cook(ChunkImportSettings settings, GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
+        public static GameObject Cook(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
             ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
 
-            if (settings.AddColliders)
+            if (importSource.AddColliders)
                 ApplyColliders(semifinishedEnt, chunkImportInformation);
 
-            if (settings.ApplyMaterials)
+            if (importSource.ApplyMaterials)
                 ApplyMaterials(semifinishedEnt, chunkImportInformation);
 
             ConfigureChunkController(semifinishedEnt, chunkImportInformation); // tree

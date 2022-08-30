@@ -9,6 +9,10 @@ namespace TowerGenerator.FbxCommands
     // Nested objects are treated as stack levels which could be turned on sequentially 
     public class FbxCommandGroupStack : FbxCommandBase
     {
+        // parameters
+        public int MinIndexSelected;
+
+
         public FbxCommandGroupStack(string fbxCommandName) : base(fbxCommandName)
         {
         }
@@ -16,7 +20,18 @@ namespace TowerGenerator.FbxCommands
         public override void ParseParameters(string parameters, GameObject gameObject)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsTrue(string.IsNullOrWhiteSpace(parameters), "There should not be parameters for the command 'AddGroupStack'");
+
+
+            // set default values for parameters
+            MinIndexSelected = -1;
+
+            if (string.IsNullOrWhiteSpace(parameters))
+                return; // keep default values if there is no parameters
+
+            var actualParams = parameters.Split(',');
+            Assert.IsTrue(actualParams.Length == 1, "The number of arguments should be 0, 1");
+
+            MinIndexSelected = ConvertInt(parameters);
         }
 
         public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)

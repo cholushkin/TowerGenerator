@@ -11,7 +11,7 @@ namespace TowerGenerator.ChunkImporter
         // warning appears in the console - "Identifier uniqueness violation: 'xxx'. Scripted Importers do not guarantee that subsequent imports of this asset will properly re-link to these targets."
         public void OnPostprocessGameObjectWithUserProperties(GameObject gObj, string[] names, System.Object[] values)
         {
-            var settings = ChunkImportSettingsManager.GetImportSettingsByPath(assetImporter.assetPath);
+            var settings = ChunkImportSourceManager.GetChunkImportSource(assetImporter.assetPath);
             if(settings == null)
                 return;
 

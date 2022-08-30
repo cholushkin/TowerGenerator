@@ -14,7 +14,7 @@ namespace TowerGenerator.ChunkImporter
     {
         void OnPostprocessModel(GameObject fbxOrBlendObject)
         {
-            var settings = ChunkImportSettingsManager.GetImportSettingsByPath(assetImporter.assetPath);
+            var settings = ChunkImportSourceManager.GetChunkImportSource(assetImporter.assetPath);
             if(settings == null)
                 return;
             if (!settings.EnableCleanupFbxRoot)

@@ -49,6 +49,10 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNotNull(importState);
 
             Type compType = CustomTypeConvertor.GetType(ComponentClassName);
+            if (compType == null)
+            {
+                Debug.LogError($"No type {ComponentClassName}");
+            }
 
             var components = gameObject.GetComponents(compType);
             if (components == null || components.Length <= ComponentIndex) // no components with such index, add it
