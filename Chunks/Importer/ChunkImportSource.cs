@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,11 +29,16 @@ namespace TowerGenerator
         private string _metasOutputPath;
         [SerializeField]
         private string _chunksOutputPath;
+    }
 
+    public static class ChunkImportSourceHelper
+    {
         public static string GetPathInResources(string fullPath)
         {
             Assert.IsTrue(fullPath.Contains("Resources"));
-            return fullPath.Substring(fullPath.IndexOf("Resources") + 10);
+            return fullPath.Substring(fullPath.IndexOf("Resources", StringComparison.Ordinal) + 10);   
         }
     }
+
+
 }
