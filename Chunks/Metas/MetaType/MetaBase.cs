@@ -12,7 +12,7 @@ namespace TowerGenerator
         public uint Generation;
         public float ChunkMargin;
         
-        public Vector3 AABB; // Axed-aligned bounding box
+        public Vector3 AABB; // Axed-aligned maximum bounding box
         public Vector3 OBB; // Oriented bounding box
         public ChunkImportSource ImportSource;
 
