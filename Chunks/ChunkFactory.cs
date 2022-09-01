@@ -16,7 +16,8 @@ namespace TowerGenerator
 
         public static GameObject CreateChunkRnd(MetaBase meta, IPseudoRandomNumberGeneratorState seed, Transform parent, Vector3 position)
         {
-            var visSegPrefab = (GameObject)Resources.Load("Chunks/" + meta.ChunkName);
+            var pathInResources = ChunkImportSource.GetPathInResources(meta.ImportSource.ChunksOutputPath);            
+            var visSegPrefab = (GameObject)Resources.Load(pathInResources + "/" + meta.ChunkName);
             visSegPrefab.SetActive(false);
             var visSegment = Object.Instantiate(visSegPrefab);
             visSegment.name = visSegPrefab.name;

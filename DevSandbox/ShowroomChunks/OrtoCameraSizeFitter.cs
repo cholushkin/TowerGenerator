@@ -10,6 +10,12 @@ namespace TowerGenerator
         public Camera Camera;
         public float Duration;
 
+        public void Reset()
+        {
+            Camera = GetComponent<Camera>();
+            Duration = 1.0f;
+        }
+
         public void DoFit(GameObject gameObj)
         {
             var bbs = gameObj.BoundBox().size;

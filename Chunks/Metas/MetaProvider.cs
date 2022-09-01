@@ -198,6 +198,13 @@ namespace TowerGenerator
         }
 
 
+        public void Populate(List<MetaBase> metas)
+        {
+            Metas.AddRange(metas);
+            Metas = Metas.Distinct().ToList();
+        }
+
+
 #if UNITY_EDITOR
 
         void DbgPrintMetas(IEnumerable<MetaBase> metas, int cnt = -1)

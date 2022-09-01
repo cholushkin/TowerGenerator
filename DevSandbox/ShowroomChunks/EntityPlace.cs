@@ -18,8 +18,8 @@ namespace TowerGenerator
             // spawn new
             _current = ChunkFactory.CreateChunkRnd(metaToPlace, seed, transform, transform.position);
             CameraEntShowroomController.FitView(_current);
-            _current.transform.localScale = Vector3.zero;
-            _current.transform.DOScale(100f, 1f).SetEase(Ease.OutElastic);
+            //_current.transform.localScale = Vector3.zero;
+            //_current.transform.DOScale(100f, 1f).SetEase(Ease.OutElastic);
             _chunkController = _current.GetComponent<ChunkControllerBase>();
 
         }

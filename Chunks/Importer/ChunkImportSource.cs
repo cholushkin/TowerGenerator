@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 
 namespace TowerGenerator
@@ -24,19 +25,15 @@ namespace TowerGenerator
 
         public float Scale = 1f; // Additionally scales imported chunks by this value
 
-        public List<string> ImportedMetas;
-        public List<string> ImportedChunks;
-
         [SerializeField]
         private string _metasOutputPath;
         [SerializeField]
         private string _chunksOutputPath;
 
-
-        public void StartImport()
+        public static string GetPathInResources(string fullPath)
         {
-            ImportedMetas = new List<string>();
-            ImportedChunks = new List<string>();
+            Assert.IsTrue(fullPath.Contains("Resources"));
+            return fullPath.Substring(fullPath.IndexOf("Resources") + 10);
         }
     }
 }
