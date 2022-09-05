@@ -24,7 +24,6 @@ namespace TowerGenerator.ChunkImporter
             metaAsset.AABB = chunkController.CalculateDimensionAABB().size;
             metaAsset.ImportSource = importSource;
 
-
             AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
             AssetDatabase.SaveAssets();
             Debug.Log($"Import meta: {metaAsset}");

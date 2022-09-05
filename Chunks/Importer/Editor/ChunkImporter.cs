@@ -116,7 +116,6 @@ namespace TowerGenerator.ChunkImporter
             }
             finally
             {
-                EditorUtility.SetDirty(importSource);
                 Object.DestroyImmediate(chunk);
             }
         }

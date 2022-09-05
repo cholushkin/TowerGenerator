@@ -93,6 +93,7 @@ namespace TowerGenerator
             }
         }
 
+        [ContextMenu("SetRandomConfiguration")]
         // Sets random state of the chunk using current Seed
         public void SetConfiguration()
         {
