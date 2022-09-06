@@ -11,9 +11,14 @@ namespace TowerGenerator.ChunkImporter
             var chunkController = chunkObject.GetComponent<ChunkControllerBase>();
             Assert.IsNotNull(chunkController, "chunk must have a controller");
 
-            var metaAsset = ScriptableObject.CreateInstance<MetaBase>();
-
             string assetPathAndName = importSource.MetasOutputPath + "/" + importState.ChunkName + ".cmeta.asset";
+            var metaAsset = AssetDatabase.LoadAssetAtPath<MetaBase>(assetPathAndName); // Try to load existing asset first to keep references to the asset alive
+            var isCreated = false;
+            if (metaAsset == null)
+            {
+                metaAsset = ScriptableObject.CreateInstance<MetaBase>();
+                isCreated = true;
+            }
 
             chunkController.Meta = metaAsset;
             metaAsset.ChunkName = importState.ChunkName;
@@ -24,7 +29,8 @@ namespace TowerGenerator.ChunkImporter
             metaAsset.AABB = chunkController.CalculateDimensionAABB().size;
             metaAsset.ImportSource = importSource;
 
-            AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
+            if(isCreated)
+                AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
             AssetDatabase.SaveAssets();
             Debug.Log($"Import meta: {metaAsset}");
             return metaAsset;
