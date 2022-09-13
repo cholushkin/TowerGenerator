@@ -38,6 +38,38 @@ GroupStack( 0 ) // MinimumIndexSelected = 0. Possible states are: 0xx, 01x, 012
 GroupStack( 1 ) // Possible states are: 01x, 012
 ```
 
+### ChunkController	
+-------------------
+Adds ChunkController to the node. ChunkController mostly controls randomization of the chunk.	
+
+| Parameters | Description |
+| --- | --- |
+| ChunkController ChunkControllerType = BasicChunkController | Sprecifies type of chunk controller. Possible values: BasicChunkController/           WaveFuncCollapseChunkController/GrowingChunkController/MarchingCubesChunkController |
+| string[] ChunkTagSet = null | Set of quick-add tags. You also can add tags by Tag FBX command. |
+
+```
+Examples:
+ChunkController() // By default parameters are: BasicChunkController, null
+ChunkController(BasicChunkController, ChunkTopEar, ChunkPeak, BiomeJungle, ArchitectureCubism)
+```
+
+### Set	
+--------------
+Sets the value of the property for the Unity component. If there is no component add it. Support multiple components per unity GameObject.
+
+| Parameters | Description |
+| --- | --- |
+| string ComponentNameAndIndex = null | Name of Unity component and index for multiple component |
+| string PropertyNameAndValue = null | Name of the parameter and value to set |
+	
+```
+Examples:
+Set(HoveringLocal[0], AlongVector=(0,1,0)) // [0] for support of multiple scripts with the same name. 
+Set(HoveringLocal, AlongVector=(0,1,0)) // Same effect as the previous one. 0 index could be omitted. 
+Set(SoundEffect) // Add SoundEffect script to GameObject
+Set(SoundEffect[1], ID="Boom") // Add second SoundEffect script and specify value for the ID property.
+```
+
 ### CollisionDependent
 ------------------------
 Add CollisionDependent component to the node which makes node/chunk auto disabled if collision accures.
@@ -48,8 +80,34 @@ Add CollisionDependent component to the node which makes node/chunk auto disable
 
 ```
 Examples:
-CollisionDependent( ) // by default FragmentDomination will be Submissive
-CollisionDependent( Dominant ) // make fragment disable other collided segments"
+CollisionDependent( ) // By default FragmentDomination will be Submissive
+CollisionDependent( Dominant ) // Make fragment disable other collided segments"
+```
+
+### Suppression
+-----------------
+Make this node suppress other nodes (disable them) when activated using suppression labels. Suppressed nodes are specified by FBX command SuppressedBy. If there is no any labels passed to Suppression then all nodes which have SupressedBy without parameters will be suppressed.	
+| Parameters | Description |
+| --- | --- |
+| string[] SuppressionLabels = null | List of labels which acts like suppression events sent to current chunk. |
+
+```
+Examples:
+Suppression() // Suppress all SuppressedBy nodes without parameters
+Suppression(Tube,Pipe) // Supress all SuppressedBy nodes which has 'Tube' or 'Pipe' parameters 
+```
+
+### SuppressedBy
+-----------
+Make this node suppressed by (disabled by) Suppression nodes with coresponding labels.
+| Parameters | Description |
+| --- | --- |
+| string[] SuppressionLabels = null | List of supression labels by which this node will be supressed. |
+
+```
+Examples:
+SuppressedBy(Tube,Pipe) // This node is suppresed by Supression node with Tube or Pipe parameter
+SuppressedBy( ) // Make this node suppressed by all Supression nodes without parameters
 ```
 
 
@@ -74,6 +132,18 @@ No parameters
 Examples:
 IgnoreCollider()
 ```
+
+### DimensionsIgnorant
+----------------------
+Makes fragment ignored for dimension calculation of the chunk.
+
+No parameters	
+
+```
+Examples:
+DimensionsIgnorant()
+```
+
 
 
 ### ToDo FBX commands
