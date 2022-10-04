@@ -16,7 +16,7 @@ namespace TowerGenerator
         public bool EnableImport = true; // Enable/disable importing for this import source
         public bool EnableCleanupFbxRoot = true; // Enable/disable fbx cleanup
 
-        public bool AddColliders; // Enable/disable adding collider to each Renderer
+        public bool AddColliders = true; // Enable/disable adding collider to each Renderer
         public bool ApplyMaterials; // Apply default TowerGenerator material ColorScheme
 
         public string MetasOutputPath => string.IsNullOrEmpty(_metasOutputPath) ? ChunksOutputPath : _metasOutputPath; // All generated metas of this import source will be saved to this directory. If not specified then ChunksOutputPath
