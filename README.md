@@ -98,20 +98,6 @@ Set(SoundEffect) // Add SoundEffect script to GameObject
 Set(SoundEffect[1], ID="Boom") // Add second SoundEffect script and specify value for the ID property.
 ```
 
-### CollisionDependent
-------------------------
-Add CollisionDependent component to the node which makes node/chunk auto disabled if collision accures.
-| Parameter | Description |
-| --- | --- |
-| FragmentRelation FragmentDomination = Submissive| Possible values: Submissive/Dominant. Submissive nodes get disabled when collision happened during instantiation of neighbor chunk. Dominant node will not allow neighbur/current chunk to spawn if collision happened in neigbor/current chunk.
-| CollisionCheck CollisionCheck = AABB | Possible values: AABB/ConvexHull/Mesh. Specifies collision check method. |
-
-```
-Examples:
-CollisionDependent( ) // By default FragmentDomination will be Submissive
-CollisionDependent( Dominant ) // Make fragment disable other collided segments"
-```
-
 ### Suppression
 -----------------
 Make this node suppress other nodes (disable them) when activated using suppression labels. Suppressed nodes are specified by FBX command SuppressedBy. If there is no any labels passed to Suppression then all nodes which have SupressedBy without parameters will be suppressed.	
@@ -165,6 +151,22 @@ InducedBy(Pipe) // Induced by Induction nodes with the command Induction(Pipe)
 InducedBy(Tube,Pipe,LargePillar) // Induced by Induction nodes: Induction(Tube), Induction(Pipe) or Induction(LargePillar)
 ```
 
+
+### CollisionDependent
+------------------------
+Add CollisionDependent component to the node which makes node/chunk auto disabled if collision accures.
+| Parameter | Description |
+| --- | --- |
+| FragmentRelation FragmentDomination = Submissive| Possible values: Submissive/Dominant. Submissive nodes get disabled when collision happened during instantiation of neighbor chunk. Dominant node will not allow neighbur/current chunk to spawn if collision happened in neigbor/current chunk.
+| CollisionCheck CollisionCheck = AABB | Possible values: AABB/ConvexHull/Mesh. Specifies collision check method. |
+
+```
+Examples:
+CollisionDependent( ) // By default FragmentDomination will be Submissive
+CollisionDependent( Dominant ) // Make fragment disable other collided segments"
+```
+
+
 ### AddCollider
 -------------------
 ChunkImportSource.AddColliders specifies should chunk importer add mesh colliders or not to all objects in the chunk. AddCollider FBX command indicates to add collider to specified node in the chunk even if ChunkImportSource.AddColliders equals to 'false'.
@@ -178,7 +180,7 @@ AddCollider()
 
 ### IgnoreCollider
 -------------------
-ChunkImportSource.AddColliders specifies should chunk importer add mesh colliders or not to all objects in the chunk. IgnoreCollider FBX command indicates to ignire adding collider to specified node in the chunk even if ChunkImportSource.AddColliders equals to 'true'.
+ChunkImportSource.AddColliders specifies should chunk importer add mesh colliders or not to all objects in the chunk. IgnoreCollider FBX command indicates to ignore adding collider to specified node in the chunk even if ChunkImportSource.AddColliders equals to 'true'.
 
 _No parameters_
 
@@ -186,6 +188,20 @@ _No parameters_
 Examples:
 IgnoreCollider()
 ```
+
+### Collider
+-------------------
+Defines a geometry of custom user collider specified by set of boxes.
+![collider image](Images/Collider.png)
+
+
+_No parameters_
+
+```
+Examples:
+Collider()
+```
+
 
 ### DimensionsIgnorant
 ----------------------
