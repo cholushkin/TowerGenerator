@@ -9,7 +9,7 @@ namespace TowerGenerator.FbxCommands
     // No parameters
     public class FbxCommandGroupSwitch : FbxCommandBase
     {
-        public FbxCommandGroupSwitch(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandGroupSwitch(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

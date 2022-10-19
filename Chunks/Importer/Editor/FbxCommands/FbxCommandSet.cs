@@ -18,7 +18,7 @@ namespace TowerGenerator.FbxCommands
         public string PropertyName;
         public string PropertyValue;
 
-        public FbxCommandSet(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandSet(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

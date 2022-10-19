@@ -15,7 +15,7 @@ namespace TowerGenerator.FbxCommands
     {
         public CollisionDependent.FragmentRelation FragmentDomination;
 
-        public FbxCommandCollisionDependent(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandCollisionDependent(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

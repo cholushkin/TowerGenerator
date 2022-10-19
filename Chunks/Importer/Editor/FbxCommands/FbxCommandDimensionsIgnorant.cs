@@ -6,7 +6,7 @@ namespace TowerGenerator.FbxCommands
 {
     public class FbxCommandDimensionsIgnorant: FbxCommandBase
     {
-        public FbxCommandDimensionsIgnorant(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandDimensionsIgnorant(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

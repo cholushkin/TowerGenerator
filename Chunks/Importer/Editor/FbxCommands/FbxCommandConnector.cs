@@ -10,7 +10,7 @@ public class FbxCommandConnector : FbxCommandBase
     // Connector(In|Out, ChunkStandard, ArchitectureNeutral, BiomeNeutral)
     public Connector.ConnectorType ConnectorType;
     public string[] ConnectExpressions;
-    public FbxCommandConnector(string fbxCommandName) : base(fbxCommandName)
+    public FbxCommandConnector(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
     {
     }
 
@@ -36,6 +36,4 @@ public class FbxCommandConnector : FbxCommandBase
         connector.ConnectExpressions = ConnectExpressions;
         importState.ConnectorAmount++;
     }
-
-
 }

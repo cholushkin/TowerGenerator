@@ -8,7 +8,7 @@ namespace TowerGenerator.FbxCommands
     // To hide some objects initially you could use 'Hidden'.
     public class FbxCommandHidden : FbxCommandBase
     {
-        public FbxCommandHidden(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandHidden(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

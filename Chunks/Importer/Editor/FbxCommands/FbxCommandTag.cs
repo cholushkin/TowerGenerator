@@ -15,7 +15,7 @@ namespace TowerGenerator.FbxCommands
     {
         public string TagName;
         public float TagValue;
-        public FbxCommandTag(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandTag(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

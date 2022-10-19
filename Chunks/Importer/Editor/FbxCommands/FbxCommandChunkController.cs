@@ -14,7 +14,8 @@ namespace TowerGenerator.FbxCommands
     {
         public ChunkControllerBase.ChunkController ChunkControllerType;
         public TagSet ChunkTagSet;
-        public FbxCommandChunkController(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandChunkController(string fbxCommandName, int executionPriority) 
+            : base(fbxCommandName, executionPriority)
         {
         }
 

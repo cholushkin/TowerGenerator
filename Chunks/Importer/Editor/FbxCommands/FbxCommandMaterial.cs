@@ -8,7 +8,7 @@ namespace TowerGenerator.FbxCommands
     {
         public string MaterialName;
 
-        public FbxCommandMaterial(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandMaterial(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

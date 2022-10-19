@@ -9,7 +9,7 @@ public class FbxCommandGeneratorConnector : FbxCommandBase
     // GeneratorConnector(Creature or Decoration)
     public string[] ConnectExpressions;
 
-    public FbxCommandGeneratorConnector(string fbxCommandName) : base(fbxCommandName)
+    public FbxCommandGeneratorConnector(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
     {
     }
 

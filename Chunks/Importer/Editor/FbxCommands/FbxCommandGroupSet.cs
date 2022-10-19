@@ -19,7 +19,7 @@ namespace TowerGenerator.FbxCommands
         public int MinObjectsSelected;
         public int MaxObjectsSelected;
 
-        public FbxCommandGroupSet(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandGroupSet(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

@@ -23,24 +23,24 @@ namespace TowerGenerator.FbxCommands
 
         static FbxCommandExecutor()
         {
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "ChunkController", Creator = () => new FbxCommandChunkController("ChunkController") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Generation", Creator = () => new FbxCommandChunkGeneration("Generation") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "CollisionDependent", Creator = () => new FbxCommandCollisionDependent("CollisionDependent") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Connector", Creator = () => new FbxCommandConnector("Connector") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "DimensionsIgnorant", Creator = () => new FbxCommandDimensionsIgnorant("DimensionsIgnorant") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GeneratorConnector", Creator = () => new FbxCommandGeneratorConnector("GeneratorConnector") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupSet", Creator = () => new FbxCommandGroupSet("GroupSet") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupStack", Creator = () => new FbxCommandGroupStack("GroupStack") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupSwitch", Creator = () => new FbxCommandGroupSwitch("GroupSwitch") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Hidden", Creator = () => new FbxCommandHidden("Hidden") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "IgnoreAddCollider", Creator = () => new FbxCommandIgnoreAddCollider("IgnoreAddCollider") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "InducedBy", Creator = () => new FbxCommandInducedBy("InducedBy") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Induction", Creator = () => new FbxCommandInduction("Induction") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Set", Creator = () => new FbxCommandSet("Set") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "SuppressedBy", Creator = () => new FbxCommandSuppressedBy("SuppressedBy") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Suppression", Creator = () => new FbxCommandSuppression("Suppression") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Tag", Creator = () => new FbxCommandTag("Tag") });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Material", Creator = () => new FbxCommandMaterial("Material") });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "ChunkController", Creator = () => new FbxCommandChunkController("ChunkController", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Generation", Creator = () => new FbxCommandChunkGeneration("Generation", 0) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "CollisionDependent", Creator = () => new FbxCommandCollisionDependent("CollisionDependent", 10)});
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Connector", Creator = () => new FbxCommandConnector("Connector", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "DimensionsIgnorant", Creator = () => new FbxCommandDimensionsIgnorant("DimensionsIgnorant", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GeneratorConnector", Creator = () => new FbxCommandGeneratorConnector("GeneratorConnector", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupSet", Creator = () => new FbxCommandGroupSet("GroupSet", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupStack", Creator = () => new FbxCommandGroupStack("GroupStack", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "GroupSwitch", Creator = () => new FbxCommandGroupSwitch("GroupSwitch", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Hidden", Creator = () => new FbxCommandHidden("Hidden", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "IgnoreAddCollider", Creator = () => new FbxCommandIgnoreAddCollider("IgnoreAddCollider", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "InducedBy", Creator = () => new FbxCommandInducedBy("InducedBy", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Induction", Creator = () => new FbxCommandInduction("Induction", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Set", Creator = () => new FbxCommandSet("Set", 0) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "SuppressedBy", Creator = () => new FbxCommandSuppressedBy("SuppressedBy", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Suppression", Creator = () => new FbxCommandSuppression("Suppression", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Tag", Creator = () => new FbxCommandTag("Tag", 10) });
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Material", Creator = () => new FbxCommandMaterial("Material", 10) });
         }
 
         public static void RegisterFbxCommand(CommandRegistrationEntry entry)

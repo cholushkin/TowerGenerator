@@ -5,17 +5,19 @@ using UnityEngine;
 
 namespace TowerGenerator.FbxCommands
 {
-    // see all commands: https://docs.google.com/spreadsheets/d/1sefKKZGdllpTpHPTX2AZMRrZCT5wT7QiN8GhPCoiGW4/edit#gid=0
+    // see all commands: https://github.com/cholushkin/TowerGenerator
     public abstract class FbxCommandBase
     {
         protected const int PriorityHighest = 0;
         protected const int PriorityLowest = Int32.MaxValue;
         public string RawInputFromFbx;
         private readonly string _fbxCommandName;
+        private int _executionPriority;
 
-        protected FbxCommandBase(string fbxCommandName)
+        protected FbxCommandBase(string fbxCommandName, int executionPriority)
         {
             _fbxCommandName = fbxCommandName;
+            _executionPriority = executionPriority;
         }
 
         public string GetFbxCommandName()
@@ -27,7 +29,7 @@ namespace TowerGenerator.FbxCommands
         public abstract void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState);
         public virtual int GetExecutionPriority()
         {
-            return PriorityHighest;
+            return _executionPriority;
         }
 
         public void SetRawInputFromFbx(string fbxCmdName, string fbxParameters)

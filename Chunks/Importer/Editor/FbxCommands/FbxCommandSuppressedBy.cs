@@ -14,7 +14,7 @@ namespace TowerGenerator.FbxCommands
     {
         public string[] SuppressionLabels;
 
-        public FbxCommandSuppressedBy(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandSuppressedBy(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

@@ -9,7 +9,7 @@ namespace TowerGenerator.FbxCommands
 
     public class FbxCommandIgnoreAddCollider : FbxCommandBase
     {
-        public FbxCommandIgnoreAddCollider(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandIgnoreAddCollider(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

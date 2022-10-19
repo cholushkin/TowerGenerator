@@ -15,7 +15,7 @@ namespace TowerGenerator.FbxCommands
     public class FbxCommandInduction: FbxCommandBase
     {
         public string[] InductionLabels;
-        public FbxCommandInduction(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandInduction(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

@@ -13,7 +13,7 @@ namespace TowerGenerator.FbxCommands
         public int MinIndexSelected;
 
 
-        public FbxCommandGroupStack(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandGroupStack(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

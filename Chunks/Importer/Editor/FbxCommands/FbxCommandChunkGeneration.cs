@@ -17,13 +17,8 @@ namespace TowerGenerator.FbxCommands
     {
         public uint Generation;
 
-        public FbxCommandChunkGeneration(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandChunkGeneration(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
-        }
-
-        public override int GetExecutionPriority()
-        {
-            return PriorityLowest;
         }
 
         public override void ParseParameters(string parameters, GameObject gameObject)

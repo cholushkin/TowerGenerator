@@ -13,7 +13,7 @@ namespace TowerGenerator.FbxCommands
     public class FbxCommandSuppression: FbxCommandBase
     {
         public string[] SuppressionLabels;
-        public FbxCommandSuppression(string fbxCommandName) : base(fbxCommandName)
+        public FbxCommandSuppression(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
         }
 

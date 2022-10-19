@@ -29,6 +29,7 @@ namespace TowerGenerator.ChunkImporter
             public int InductionAmount;
             public int InducedByAmount;
             public int HiddenAmount;
+            public int ColliderAmount;
             public int ConnectorAmount;
             public int IgnoreAddColliderAmount;
             public uint Generation;
