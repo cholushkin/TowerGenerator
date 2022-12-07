@@ -16,7 +16,7 @@ namespace TowerGenerator.FbxCommands
         public override void ParseParameters(string parameters, GameObject gameObject)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
-            Assert.IsTrue(string.IsNullOrWhiteSpace(parameters), "There should not be parameters for the command 'AddGroupStack'");
+            Assert.IsTrue(string.IsNullOrWhiteSpace(parameters), "There should not be parameters for the command 'FbxCommandIgnoreAddCollider'");
         }
 
         public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)

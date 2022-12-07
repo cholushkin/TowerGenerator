@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Assets.Plugins.Alg;
 using TowerGenerator.FbxCommands;
 using UnityEngine;
@@ -24,6 +26,7 @@ namespace TowerGenerator.ChunkImporter
             public int GroupSwitchAmount;
             public int CollisionDependentAmount;
             public int DimensionsIgnorantAmount;
+            public int IgnoreGroupItemAmount;
             public int SuppressionAmount;
             public int SuppressedByAmount;
             public int InductionAmount;
@@ -63,15 +66,17 @@ namespace TowerGenerator.ChunkImporter
 
         private static void ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
-            void ProcessCommand(Transform tr)
-            {
-                var fbxProp = tr.GetComponent<FbxProps>();
-                if (fbxProp == null)
-                    return;
-                FbxCommandExecutor.Execute(fbxProp, tr.gameObject, chunkImportInformation);
-                tr.gameObject.RemoveComponent<FbxProps>();
-            }
-            semifinishedEnt.transform.ForEachChildrenRecursive(ProcessCommand);
+            var fbxProps = semifinishedEnt.GetComponentsInChildren<FbxProps>(true);
+            Assert.IsTrue(fbxProps.Length > 0);
+            
+            var allCommands = new List<(GameObject, FbxCommandBase)>(fbxProps.Length);
+
+            // Parse all fbxProps
+            foreach (var props in fbxProps)
+                FbxCommandExecutor.ParseFbxProps(props, allCommands, chunkImportInformation);
+
+            // Execute all commands
+            FbxCommandExecutor.ExecuteCommands(allCommands, chunkImportInformation);
         }
 
         private static void ApplyColliders(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
@@ -118,7 +123,7 @@ namespace TowerGenerator.ChunkImporter
                 baseComponent.ChunkController = chunkController;
             }
 
-            chunkController.Validate();
+            chunkController.Init();
         }
     }
 }

@@ -18,6 +18,23 @@ namespace TowerGenerator
             public GameObject Node;
         }
 
+        // Private fields accessor for debug purposes
+        public class DebugChunkControllerBase
+        {
+            public DebugChunkControllerBase(ChunkControllerBase chunkController)
+            {
+                _dbg = chunkController;
+            }
+
+            public string GetChunkControllerName() => _dbg.name;
+            
+            public Dictionary<string, List<Transform>> GetSuppressionDictionary() => _dbg._suppression;
+
+            public Dictionary<string, List<Transform>> GetInductionDictionary() => _dbg._induction;
+
+            private ChunkControllerBase _dbg;
+        }
+
         // Tags used for specifying chunk topology
         public const string ChunkPeekTag = "ChunkPeek";
         public const string ChunkStandardTag = "ChunkStandard";
@@ -53,12 +70,11 @@ namespace TowerGenerator
         {
             if (Log.Verbose())
                 Debug.Log("> Init");
-            if (Seed == -1)
-                Seed = Random.Range(0, Int32.MaxValue);
             if (Log.Normal())
                 Debug.Log($"{transform.GetDebugName()} Seed {Seed}");
             BuildImpactTree();
-            InitializeTreeState();
+            InitializeInduction();
+            InitializeSuppression();
         }
 
         public TreeNode<Group> GetImpactTree()
@@ -81,45 +97,24 @@ namespace TowerGenerator
             return CalculateCurrentAABB();
         }
 
-        private void InitializeTreeState()
-        {
-            // enable all parts apart from Hidden
-            transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
-
-            foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
-            {
-                Group group = treeNode.Data;
-                group.SetInitialState();
-            }
-        }
-
-        [ContextMenu("SetRandomConfiguration")]
         // Sets random state of the chunk using current Seed
         public void SetConfiguration()
         {
+            if (Seed == -1)
+                Seed = Random.Range(0, Int32.MaxValue);
+
+            // Set default state of the tree
+            InitializeTreeState();
+
+            // Set initial configuration of all groups
             IPseudoRandomNumberGenerator rnd = RandomHelper.CreateRandomNumberGenerator(Seed);
-
-            foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
+            foreach (var treeNode in _impactTree.TraverseDepthFirstPreOrder())
             {
-                Group group = treeNode.Data;
-            
-                // set random state to the group if it's active
-                if (treeNode.Data.gameObject.activeInHierarchy)
-                    group.SetRandomState(rnd);
+                treeNode.Data.SetRandomState(rnd, false);
             }
-        }
 
-        private void DbgPrintGroupOutcomeConfiguration(Transform groupTransform)
-        {
-            var comp = groupTransform.GetComponent<Group>();
-            Assert.IsNotNull(comp);
-
-            var strOutcome = $"{comp.GetType().Name}:{groupTransform.GetDebugName(false)}:";
-            for (int i = 0; i < groupTransform.childCount; ++i)
-            {
-                strOutcome += groupTransform.GetChild(i).gameObject.activeSelf ? "V" : "X";
-            }
-            Debug.Log(strOutcome);
+            // Notify ChunkController
+            SetNodeActiveState(_impactTree.Data.transform, true);
         }
 
         public Connector[] GetActiveConnectors()
@@ -129,65 +124,74 @@ namespace TowerGenerator
 
         private void BuildImpactTree()
         {
-            // add root group if needed
+            // Add root group if needed
             var groupRoot = GetComponent<Group>();
             if (groupRoot == null)
                 groupRoot = gameObject.AddComponent<GroupRoot>();
 
+            // Create tree
             _impactTree = BuildStepRecursive(groupRoot.transform, null, null);
-
-            // fill up _induction
-            {
-                var induction = transform.GetComponentsInChildren<Induction>(true);
-                _induction = new Dictionary<string, List<Transform>>();
-                foreach (var src in induction)
-                    foreach (var inductionLabel in src.InductionLabels)
-                        if (!_induction.ContainsKey(inductionLabel))
-                            _induction.Add(inductionLabel, new List<Transform>());
-
-                var inducedBy = transform.GetComponentsInChildren<InducedBy>(true);
-                foreach (var inducedByComp in inducedBy)
-                {
-                    foreach (var label in inducedByComp.InductionLabels)
-                    {
-                        if (!_induction.ContainsKey(label))
-                            Debug.LogError($"There is no induction label with name '{label}'");
-                        _induction[label].Add(inducedByComp.transform);
-                    }
-                }
-            }
-
-            // fill up suppression
-            {
-                var suppression = transform.GetComponentsInChildren<Suppression>(true);
-                _suppression = new Dictionary<string, List<Transform>>();
-                foreach (var src in suppression)
-                    foreach (var suppressionLabel in src.SuppressionLabels)
-                        if (!_suppression.ContainsKey(suppressionLabel))
-                            _suppression.Add(suppressionLabel, new List<Transform>());
-
-                var suppressedBy = transform.GetComponentsInChildren<SuppressedBy>(true);
-                foreach (var suppressedByComp in suppressedBy)
-                {
-                    foreach (var label in suppressedByComp.SuppressionLabels)
-                    {
-                        if (!_suppression.ContainsKey(label))
-                            Debug.LogError($"There is no suppression label with name '{label}'");
-                        _suppression[label].Add(suppressedByComp.transform);
-                    }
-                }
-            }
-            if (Log.Verbose())
-                DbgPrintImpactTree();
         }
 
-        private void DbgPrintImpactTree()
+        private void InitializeSuppression()
         {
-            Debug.Log(">>>>> Impact tree");
-            foreach (var treeNode in _impactTree.TraverseDepthFirstPostOrder())
-                Debug.Log($"{treeNode.Data.transform.GetDebugName()}: level:{treeNode.Level} branch level:{treeNode.BranchLevel} ");
+            var suppression = transform.GetComponentsInChildren<Suppression>(true);
+            _suppression = new Dictionary<string, List<Transform>>();
+            foreach (var src in suppression)
+            foreach (var suppressionLabel in src.SuppressionLabels)
+                if (!_suppression.ContainsKey(suppressionLabel))
+                    _suppression.Add(suppressionLabel, new List<Transform>());
+
+            var suppressedBy = transform.GetComponentsInChildren<SuppressedBy>(true);
+            foreach (var suppressedByComp in suppressedBy)
+            {
+                foreach (var label in suppressedByComp.SuppressionLabels)
+                {
+                    if (!_suppression.ContainsKey(label))
+                        Debug.LogError($"There is no suppression label with name '{label}'");
+                    _suppression[label].Add(suppressedByComp.transform);
+                }
+            }
         }
 
+        private void InitializeInduction()
+        {
+            var induction = transform.GetComponentsInChildren<Induction>(true);
+            _induction = new Dictionary<string, List<Transform>>();
+            foreach (var src in induction)
+            foreach (var inductionLabel in src.InductionLabels)
+                if (!_induction.ContainsKey(inductionLabel))
+                    _induction.Add(inductionLabel, new List<Transform>());
+
+            var inducedBy = transform.GetComponentsInChildren<InducedBy>(true);
+            foreach (var inducedByComp in inducedBy)
+            {
+                foreach (var label in inducedByComp.InductionLabels)
+                {
+                    if (!_induction.ContainsKey(label))
+                        Debug.LogError($"There is no induction label with name '{label}'");
+                    _induction[label].Add(inducedByComp.transform);
+                }
+            }
+        }
+
+        private void InitializeTreeState()
+        {
+            // Default state:
+            // All groups items are disabled
+            // All non group items are enabled
+            // All hidden objects are disabled
+
+            // enable all parts apart from Hidden
+            transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
+
+            foreach (var treeNode in _impactTree.TraverseDepthFirstPreOrder())
+            {
+                Group group = treeNode.Data;
+                group.Initialize();
+            }
+        }
+                      
         private TreeNode<Group> BuildStepRecursive(Transform iTrans, Transform parent, TreeNode<Group> impactParent)
         {
             var group = iTrans.GetComponent<Group>();
@@ -206,25 +210,8 @@ namespace TowerGenerator
             return impactParent;
         }
 
-#if DEBUG
-        public void Validate()
-        {
-            BuildImpactTree();
-            var validators = GetComponentsInChildren<BaseComponent>(true);
-            foreach (var validator in validators)
-            {
-                if (!validator.IsValid())
-                    Debug.LogError($"Node is not valid {validator.transform.GetDebugName()}");
-            }
-        }
-#endif
-
         public void SetNodeActiveState(Transform node, bool newActiveState)
         {
-            // trying to set existing state to the node ?
-            if(node.gameObject.activeSelf == newActiveState)
-                return;
-
             if (newActiveState) // new suppressors/inductor revealed - let them work
             {
                 node.gameObject.SetActive(true); // enable
@@ -282,7 +269,7 @@ namespace TowerGenerator
         {
             var influencedObjects = _induction[inductionLabel];
             foreach (var influencedObject in influencedObjects)
-                influencedObject.gameObject.SetActive(!reverse);
+                SetNodeActiveState(influencedObject, !reverse);
         }
 
         public void Suppress(string suppressionLabel, bool reverse = false)

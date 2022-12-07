@@ -9,8 +9,11 @@ namespace TowerGenerator.FbxCommands
     // Nested objects are treated as stack levels which could be turned on sequentially 
     public class FbxCommandGroupStack : FbxCommandBase
     {
-        // parameters
-        public int MinIndexSelected;
+        // Parameters
+
+        // -1 no restriction ( could be zero elements enabled)
+        // 0 and greater: index of stack level which is enabled by default ( for 0: 0001, for 1: 0011, for 2: 0111 )
+        public int MinIndexSelected; 
 
 
         public FbxCommandGroupStack(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
@@ -21,12 +24,11 @@ namespace TowerGenerator.FbxCommands
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
 
-
-            // set default values for parameters
+            // Set default values for parameters
             MinIndexSelected = -1;
 
             if (string.IsNullOrWhiteSpace(parameters))
-                return; // keep default values if there is no parameters
+                return; // Keep default values if there is no parameters
 
             var actualParams = parameters.Split(',');
             Assert.IsTrue(actualParams.Length == 1, "The number of arguments should be 0, 1");

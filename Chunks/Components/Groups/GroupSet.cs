@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using Assets.Plugins.Alg;
 using GameLib.Random;
 using UnityEngine;
@@ -8,14 +6,27 @@ using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-    // Randomly enables some options from the group
+    // GroupSet controls some subset of its children
+    // Example:
+    // Let's assume there is a group (GroupSet) of 4 items, all disabled: 0000
+    // MinObjectsSelected = 1, MaxObjectsSelected = 3
+    // Then all possible combinations will be:
+    // 1000 1100 0101 1101
+    // 0100 0110 1110
+    // 0010 0011 0111
+    // 0001 1010 1011
+
     public class GroupSet : Group
     {
-        public int MinObjectsSelected; // default 0
-        public int MaxObjectsSelected; // default transform.childCount
+        public int MinObjectsSelected; // Default == 0
+        public int MaxObjectsSelected; // Default == transform.childCount
 
         public override bool IsValid()
         {
+            // Lazy initialization
+            if (!IsInitialized())
+                Initialize();
+
             if (MinObjectsSelected < 0)
             {
                 Debug.LogError($"{transform.GetDebugName()} MinObjectSelected is less than zero: {MinObjectsSelected}");
@@ -56,31 +67,79 @@ namespace TowerGenerator
             return true;
         }
 
-        protected override void SetState(params int[] indexes)
+        protected override void SetState(BitArray state, bool notifyChunkController)
         {
-            for (int i = 0; i < transform.childCount; ++i)
+            Assert.IsTrue(state.Count == _items.Count);
+            Assert.IsTrue(GetEnabledItemsCount(state) >= MinObjectsSelected);
+            Assert.IsTrue(GetEnabledItemsCount(state) <= MaxObjectsSelected);
+
+            for (int i = 0; i < state.Count; ++i)
             {
-                var child = transform.GetChild(i);
-                var needToEnable = indexes.Contains(i);
-                ChunkController.SetNodeActiveState(child, needToEnable);
+                if (notifyChunkController)
+                    ChunkController.SetNodeActiveState(_items[i], state[i]);
+                else
+                    _items[i].gameObject.SetActive(state[i]);
             }
         }
 
-        public override void EnableItem(int index, bool flag)
+        public override void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController)
         {
-            var child = transform.GetChild(index);
-            ChunkController.SetNodeActiveState(child, flag);
-            Assert.IsTrue(GetState().Count >= MinObjectsSelected);
-            Assert.IsTrue(GetState().Count <= MaxObjectsSelected);
-        }
-
-        public override void SetRandomState(IPseudoRandomNumberGenerator rnd)
-        {
+            // Prepare the array of index
             int[] itemsIndexes = new int[GetItemsCount()];
             for (int i = 0; i < GetItemsCount(); ++i)
                 itemsIndexes[i] = i;
+
+            // Take randomly from MinObjectsSelected to MaxObjectsSelected elements from index array
             var choices = rnd.FromArray(itemsIndexes, rnd.FromRangeIntInclusive(MinObjectsSelected, MaxObjectsSelected));
-            SetState(choices);
+
+            // Set bits 
+            BitArray newState = new BitArray(GetItemsCount(), false);
+            foreach (var choiceIndex in choices)
+                newState[choiceIndex] = true;
+
+            SetState(newState, notifyChunkController);
+        }
+
+        public override void EnableItem(int index, bool flag, bool notifyChunkController)
+        {
+            Assert.IsTrue(index < GetItemsCount());
+            Assert.IsTrue(index >= 0);
+            Assert.IsTrue(GetEnabledItemsCount(_state) >= MinObjectsSelected);
+            Assert.IsTrue(GetEnabledItemsCount(_state) <= MaxObjectsSelected);
+            var state = GetState();
+            state[index] = flag;
+
+            // Auto adjust to the range [MinObjectsSelected, MaxObjectsSelected] of enabled items in case of wrong range
+            var enabledNumber = GetEnabledItemsCount(state);
+            if (enabledNumber < MinObjectsSelected || enabledNumber > MaxObjectsSelected)
+            {
+                for (int i = 0; i < state.Count; ++i)
+                {
+                    if( i == index)
+                        continue;
+                    if (flag) // user requested to set bit and exceeded amount of max allowed items 
+                    {
+                        if (state[i])
+                        {
+                            state[i] = false;
+                            break;
+                        }
+                    }
+                    else // user requested to unset bit and got less than a minimum amount of allowed items
+                    {
+                        if (state[i] == false)
+                        {
+                            state[i] = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            Assert.IsTrue(GetEnabledItemsCount(state) >= MinObjectsSelected);
+            Assert.IsTrue(GetEnabledItemsCount(state) <= MaxObjectsSelected);
+
+            SetState(state, notifyChunkController);
         }
     }
 }

@@ -100,11 +100,12 @@ namespace TowerGenerator.ChunkImporter
                 chunk.transform.localScale *= importSource.Scale;
                 chunk.transform.position = Vector3.zero;
 
-                if (importSource.EnableMetaGeneration)
-                    ChunkMetaCooker.Cook(chunk, importSource, importInformation);
-
                 var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
                 PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
+
+                // Note: ChunkMetaCooker.Cook measures AAABB and modifies default state of chunk. This should be after PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
+                if (importSource.EnableMetaGeneration)
+                    ChunkMetaCooker.Cook(chunk, importSource, importInformation);
 
                 AssetDatabase.ImportAsset(fullPath);
                 Debug.Log($"Import chunk: {importInformation}");

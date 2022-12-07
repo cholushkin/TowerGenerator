@@ -1,4 +1,5 @@
-﻿using Assets.Plugins.Alg;
+﻿using System.Collections;
+using Assets.Plugins.Alg;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -16,37 +17,53 @@ namespace TowerGenerator
                 Debug.LogError($"Items count is less than 2: {itemsCount}. On '{transform.GetDebugName()}'");
                 return false;
             }
-
             return true;
         }
 
-        protected override void SetState(params int[] index)
+        protected override void SetState(BitArray state, bool notifyChunkController)
         {
-            Assert.IsTrue(index.Length == 1);
-            var itemIndex = index[0];
-            Assert.IsTrue(itemIndex >= 0);
-            Assert.IsTrue(itemIndex < GetItemsCount());
+            Assert.IsTrue(state.Count == _items.Count);
+            Assert.IsTrue(GetEnabledItemsCount(state) == 1);
 
-            for (int i = 0; i < transform.childCount; ++i)
+            for (int i = 0; i < state.Count; ++i)
             {
-                var child = transform.GetChild(i);
-                var needToEnable = i == itemIndex;
-                ChunkController.SetNodeActiveState(child, needToEnable);
+                if (notifyChunkController)
+                    ChunkController.SetNodeActiveState(_items[i], state[i]);
+                else
+                    _items[i].gameObject.SetActive(state[i]);
             }
         }
 
-        public override void EnableItem(int index, bool flag)
+        public override void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController)
         {
-            if(flag == false)
-                Debug.LogError($"GroupSwitch is not supposed to disable item {gameObject.transform.GetDebugName()}");
-
-            SetState(index);
+            var rndIndex = rnd.FromRangeIntInclusive(0, GetItemsCount() - 1);
+            EnableItem(rndIndex, true, notifyChunkController);
         }
 
-        public override void SetRandomState(IPseudoRandomNumberGenerator rnd)
+        public override void EnableItem(int index, bool flag, bool notifyChunkController)
         {
-            Assert.IsTrue(GetItemsCount() > 0);
-            SetState(rnd.FromRangeIntInclusive(0, GetItemsCount() - 1));
+            Assert.IsTrue(index < GetItemsCount());
+            Assert.IsTrue(index >= 0);
+            Assert.IsTrue(GetEnabledItemsCount(_state) == 1);
+
+            var state = GetState();
+            state[index] = flag;
+
+            // Auto enable in case of zero number of enabled items
+            var enabledNumber = GetEnabledItemsCount(state);
+            if (enabledNumber == 0)
+            {
+                for (int i = 0; i < state.Count; ++i)
+                {
+                    if (i == index)
+                        continue;
+                    state[i] = true;
+                    break;
+                }
+            }
+
+            Assert.IsTrue(GetEnabledItemsCount(state) == 1);
+            SetState(state, notifyChunkController);
         }
     }
 }

@@ -27,12 +27,12 @@ namespace TowerGenerator.FbxCommands
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
 
-            // set default values for parameters
+            // Set default values for parameters
             MinObjectsSelected = 0;
             MaxObjectsSelected = gameObject.transform.childCount;
 
             if (string.IsNullOrWhiteSpace(parametersString))
-                return; // keep default values if there is no parameters
+                return; // Keep default values if there is no parameters
 
             var actualParams = parametersString.Split(',');
             Assert.IsTrue(actualParams.Length == 1 || actualParams.Length == 2, "The number of arguments should be 0, 1 or 2");

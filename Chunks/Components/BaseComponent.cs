@@ -1,4 +1,5 @@
 ﻿
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace TowerGenerator
@@ -10,12 +11,16 @@ namespace TowerGenerator
 
     public abstract class BaseComponent : MonoBehaviour, IComponent
     {
+        public virtual void Initialize()
+        {
+        }
+
         public virtual bool IsValid()
         {
             return ChunkController != null;
         }
 
-        [HideInInspector]
+        [ReadOnly]
         public ChunkControllerBase ChunkController;
     }
 }

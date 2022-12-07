@@ -1,44 +1,68 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using GameLib.Random;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 
 namespace TowerGenerator
 {
     public abstract class Group : BaseComponent
     {
+        protected List<Transform> _items;
+        protected BitArray _state;
+
+        public override void Initialize()
+        {
+            _items = new List<Transform>(transform.childCount);
+            for (int i = 0; transform.childCount != i; ++i)
+                if (transform.GetChild(i).GetComponent<IgnoreGroupItem>() == null)
+                {
+                    _items.Add(transform.GetChild(i));
+                    transform.GetChild(i).gameObject.SetActive(false);
+                }
+            _state = new BitArray(_items.Count, false);
+        }
+
+        public bool IsInitialized()
+        {
+            return _state != null;
+        }
+
+        public List<Transform> GetChildren() => _items;
+
         // Sets a group to one of possible states.
         // The state controlled by indexes. Depending on a group type it could be one index or set of indexes.
-        protected abstract void SetState(params int[] index);
+        protected abstract void SetState(BitArray state, bool notifyChunkController);
 
-        // return indexes of activated children
-        public List<int> GetState()
+        // Returns state of each children
+        public BitArray GetState()
         {
-            List<int> actives = new List<int>(transform.childCount);
-            foreach (Transform child in transform)
-            {
-                if (child.gameObject.activeInHierarchy)
-                    actives.Add(child.GetSiblingIndex());
-            }
-            return actives;
+            return _state;
         }
 
-        public virtual void SetInitialState()
-        {
-            for (int i = 0; i < transform.childCount; ++i)
-                transform.GetChild(i).gameObject.SetActive(false);
-        }
-
-        public abstract void SetRandomState(IPseudoRandomNumberGenerator rnd);
+        // Set group random state in specific for a group way
+        public abstract void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController);
 
 
-        // enable item in unique to group type way
-        public abstract void EnableItem(int index, bool flag); 
+        // Enable item in unique to group type way
+        public abstract void EnableItem(int index, bool flag, bool notifyChunkController); 
 
-        // Items number under control of this group
+        // Get items number under control of this group
         public virtual int GetItemsCount()
         {
-            return transform.childCount;
+            return _items.Count;
+        }
+
+        // Get enabled items count
+        public int GetEnabledItemsCount(BitArray state)
+        {
+            Assert.IsTrue(state.Count == _state.Count);
+            int count = 0;
+            for (int i = 0; i < state.Length; i++)
+                if (state[i])
+                    count++;
+            return count;
         }
     }
 }

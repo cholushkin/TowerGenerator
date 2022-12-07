@@ -22,21 +22,19 @@ namespace TowerGenerator
         public static GameObject CreateChunkRnd(MetaBase meta, IPseudoRandomNumberGeneratorState seed, Transform parent, Vector3 position, Positioning positioning = Positioning.CenterOfAABB)
         {
             var pathInResources = ChunkImportSourceHelper.GetPathInResources(meta.ImportSource.ChunksOutputPath);
-            var visSegPrefab = (GameObject)Resources.Load(pathInResources + "/" + meta.ChunkName);
-            visSegPrefab.SetActive(false);
-            var visSegment = Object.Instantiate(visSegPrefab);
-            visSegment.name = visSegPrefab.name;
+            var chunkPrefab = (GameObject)Resources.Load(pathInResources + "/" + meta.ChunkName);
+            chunkPrefab.SetActive(false);
+            var chunk = Object.Instantiate(chunkPrefab);
+            
+            chunk.name = chunkPrefab.name;
+            chunk.transform.position = position;
+            chunk.transform.SetParent(parent);
+            chunk.transform.Rotate(chunk.transform.up, _rnd.FromArray(_angles));
 
-            visSegment.transform.position = position;
-            visSegment.transform.SetParent(parent);
-
-            // rotation 
-            visSegment.transform.Rotate(visSegment.transform.up, _rnd.FromArray(_angles));
-
-            var baseChunkController = visSegment.GetComponent<ChunkControllerBase>();
+            var baseChunkController = chunk.GetComponent<ChunkControllerBase>();
             baseChunkController.Seed = seed.AsNumber();
             baseChunkController.Init();
-            visSegment.SetActive(true);
+            chunk.SetActive(true);
             baseChunkController.SetConfiguration();
 
             // centering
@@ -44,10 +42,10 @@ namespace TowerGenerator
             {
                 var segBB = baseChunkController.CalculateCurrentAABB();
                 var offset = baseChunkController.transform.position - segBB.center;
-                visSegment.transform.position += offset;
+                chunk.transform.position += offset;
             }
 
-            return visSegment;
+            return chunk;
         }
 
         public static GameObject CreateChunk( Blueprint.Segment bpSegment, Transform parent)
