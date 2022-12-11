@@ -182,13 +182,15 @@ namespace TowerGenerator
             // All non group items are enabled
             // All hidden objects are disabled
 
-            // enable all parts apart from Hidden
+            // Enable all parts apart from Hidden
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<Hidden>() == null));
 
             foreach (var treeNode in _impactTree.TraverseDepthFirstPreOrder())
             {
+                // Assign items, disable all group items
                 Group group = treeNode.Data;
-                group.Initialize();
+                group.Initialize(); 
+                group.DisableAllItems();
             }
         }
                       

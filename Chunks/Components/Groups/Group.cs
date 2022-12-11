@@ -19,9 +19,16 @@ namespace TowerGenerator
                 if (transform.GetChild(i).GetComponent<IgnoreGroupItem>() == null)
                 {
                     _items.Add(transform.GetChild(i));
-                    transform.GetChild(i).gameObject.SetActive(false);
                 }
             _state = new BitArray(_items.Count, false);
+        }
+
+        public virtual void DisableAllItems()
+        {
+            foreach (var item in _items)
+            {
+                item.gameObject.SetActive(false);
+            }
         }
 
         public bool IsInitialized()

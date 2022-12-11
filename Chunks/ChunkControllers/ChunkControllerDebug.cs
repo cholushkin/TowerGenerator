@@ -1,12 +1,14 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
 using System.Linq;
 using Assets.Plugins.Alg;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Handles = UnityEditor.Handles;
+using Random = UnityEngine.Random;
 
 namespace TowerGenerator
 {
@@ -15,16 +17,40 @@ namespace TowerGenerator
         public ChunkControllerBase ChunkController;
         public bool InitOnAwake;
         public bool IsDrawTree;
+        [ResizableTextArea]
+        public string TreeText;
+
         public bool IsDrawSuppressionLabels;
         public bool IsDrawInductionLabels;
-        
+
 
         private ChunkControllerBase.DebugChunkControllerBase _dbgChunkController;
+        private long _prevSeed = -1;
 
         void Awake()
         {
-            if(InitOnAwake)
+            if (InitOnAwake)
+            {
                 Init();
+                SetRandomConfiguration();
+            }
+        }
+
+        void Update()
+        {
+            if (IsDrawTree)
+            {
+                TreeText = "";
+                var index = 0;
+                foreach (var treeNode in ChunkController.GetImpactTree().TraverseDepthFirstPreOrder())
+                {
+                    var group = treeNode.Data.GetComponent<Group>();
+                    Assert.IsNotNull(group);
+                    var path = $"{treeNode.Data.transform.GetDebugName()}:g[{group.GetItemsCount()}]";
+                    TreeText += (index == 0 ? "" : "\n") + path;
+                    ++index;
+                }
+            }
         }
 
         public bool IsInitialized()
@@ -65,9 +91,14 @@ namespace TowerGenerator
         [Button()]
         public void SetRandomConfiguration()
         {
+            if (ChunkController.Seed == _prevSeed)
+            {
+                ChunkController.Seed = Random.Range(0, Int32.MaxValue);
+                _prevSeed = ChunkController.Seed;
+            }
             ChunkController.SetConfiguration();
         }
-        
+
         public void DbgPrintImpactTree()
         {
             Debug.Log(">>>>> Impact tree");
@@ -85,19 +116,6 @@ namespace TowerGenerator
             // ----- Draw caption
             int lineIndex = 0;
             DrawTextLine(ref lineIndex, "Chunk: " + _dbgChunkController.GetChunkControllerName());
-
-            // ----- Draw tree
-            if (IsDrawTree)
-            {
-                foreach (var treeNode in ChunkController.GetImpactTree().TraverseDepthFirstPreOrder())
-                {
-                    var group = treeNode.Data.GetComponent<Group>();
-                    var path = $"{treeNode.Data.transform.GetDebugName()}:g[{group.GetItemsCount()}]";
-                    Assert.IsNotNull(group);
-
-                    DrawTextLine(ref lineIndex, path);
-                }
-            }
 
             // ----- Draw suppression labels
             if (IsDrawSuppressionLabels)
