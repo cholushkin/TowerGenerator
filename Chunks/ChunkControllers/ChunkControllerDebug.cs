@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-using UnityEditor;
+using Handles = UnityEditor.Handles;
 #endif
 using System;
 using System.Linq;
@@ -7,7 +7,7 @@ using Assets.Plugins.Alg;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Handles = UnityEditor.Handles;
+
 using Random = UnityEngine.Random;
 
 namespace TowerGenerator
