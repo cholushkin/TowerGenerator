@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Assets.Plugins.Alg;
 using TowerGenerator.FbxCommands;
 using UnityEngine;
 using UnityEngine.Assertions;

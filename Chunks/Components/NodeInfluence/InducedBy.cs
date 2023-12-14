@@ -1,4 +1,4 @@
-﻿using Assets.Plugins.Alg;
+﻿using GameLib.Alg;
 using UnityEngine;
 
 namespace TowerGenerator

@@ -3,7 +3,7 @@ using Handles = UnityEditor.Handles;
 #endif
 using System;
 using System.Linq;
-using Assets.Plugins.Alg;
+using GameLib.Alg;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;

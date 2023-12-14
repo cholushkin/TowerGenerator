@@ -1,4 +1,4 @@
-using Assets.Plugins.Alg;
+using GameLib.Alg;  
 using TowerGenerator.ChunkImporter;
 using UnityEngine;
 using UnityEngine.Assertions;

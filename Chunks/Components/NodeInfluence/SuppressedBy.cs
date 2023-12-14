@@ -1,9 +1,8 @@
-﻿using Assets.Plugins.Alg;
+﻿using GameLib.Alg;
 using UnityEngine;
 
 namespace TowerGenerator
 {
-
     public class SuppressedBy : BaseComponent
     {
         public string[] SuppressionLabels;

@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Assets.Plugins.Alg;
+using GameLib.Alg;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;

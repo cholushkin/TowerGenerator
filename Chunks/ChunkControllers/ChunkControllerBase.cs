@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Plugins.Alg;
+using GameLib.Alg;
 using GameLib.DataStructures;
 using GameLib.Log;
 using GameLib.Random;
