@@ -65,7 +65,6 @@ namespace TowerGenerator.ChunkImporter
         private static void ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             var fbxProps = semifinishedEnt.GetComponentsInChildren<FbxProps>(true);
-            Assert.IsTrue(fbxProps.Length > 0);
             
             var allCommands = new List<(GameObject, FbxCommandBase)>(fbxProps.Length);
 

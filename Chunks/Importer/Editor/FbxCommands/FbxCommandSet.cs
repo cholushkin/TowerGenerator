@@ -33,8 +33,15 @@ namespace TowerGenerator.FbxCommands
             Assert.IsFalse(string.IsNullOrWhiteSpace(parameters));
 
             var classAndParams = parameters.Split(new[] { ',' }, 2);
-            ComponentClassName = classAndParams[0].Split('[')[0].Trim();
-            ComponentIndex = ConvertInt(classAndParams[0].Split('[', ']')[1].Trim());
+            if (classAndParams[0].Contains("["))
+            {
+                ComponentClassName = classAndParams[0].Split('[')[0].Trim();
+                ComponentIndex = ConvertInt(classAndParams[0].Split('[', ']')[1].Trim());
+            }
+            else
+            {
+                ComponentClassName = classAndParams[0];
+            }
 
             if (classAndParams.Length == 1)
                 return; // only add component

@@ -79,8 +79,8 @@ namespace TowerGenerator.FbxCommands
                 Debug.Log($"Parsing {cmd.RawInputFromFbx} on {fromFbxProps.gameObject.transform.GetDebugName()}");
                 cmd.ParseParameters(fbxParameters, fromFbxProps.gameObject);
                 allCommands.Add((fromFbxProps.gameObject, cmd));
-                fromFbxProps.gameObject.RemoveComponent<FbxProps>();
             }
+            fromFbxProps.gameObject.RemoveComponent<FbxProps>();
         }
 
         public static void ExecuteCommands(List<(GameObject, FbxCommandBase)> commands, ChunkCooker.ChunkImportState importState)
