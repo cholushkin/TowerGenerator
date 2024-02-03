@@ -139,9 +139,9 @@ namespace TowerGenerator
             //}
         }
 
+        public List<MetaProviderPopulatorBase> MetaPopulators;
         public bool InitOnAwake;
         public List<MetaBase> Metas; // use this meta pool
-        public string[] ResourcePaths; // load metas as resources by these paths additionally (if presented)
         private bool _isInited;
 
 
@@ -151,37 +151,22 @@ namespace TowerGenerator
                 Init();
         }
 
-
         public void Init()
         {
+            Debug.Log($"{transform.GetDebugName()}: initializing");
             Assert.IsFalse(_isInited);
-            if (ResourcePaths == null || ResourcePaths.Length == 0)
-            {
-                Debug.Log("Using defined metas set");
-            }
-            else
-            {
-                // load metas from all provided resource folders
-                Metas ??= new List<MetaBase>();
-
-                foreach (var path in ResourcePaths)
-                {
-                    Debug.Log($"Loading metas from path provided: {path}");
-                    var metas = Resources.LoadAll<MetaBase>(path);
-                    Metas.AddRange(metas);
-                }
-            }
+            foreach (var populator in MetaPopulators)
+                populator.Populate(this);
             Debug.Log($"{transform.GetDebugName()}: {Metas.Count} metas in the pool.");
             _isInited = true;
         }
 
-
         public IEnumerable<MetaBase> GetMetas(Filter filter = null)
         {
-            return GetMetas(Metas, filter);
+            return FilterMetas(Metas, filter);
         }
 
-        public static IEnumerable<MetaBase> GetMetas(IEnumerable<MetaBase> metas, Filter filter = null)
+        public static IEnumerable<MetaBase> FilterMetas(IEnumerable<MetaBase> metas, Filter filter = null)
         {
             if (filter == null) // no filter? just return original sequence
                 return metas;
@@ -196,7 +181,6 @@ namespace TowerGenerator
 
             return filteredResult;
         }
-
 
         public void Populate(List<MetaBase> metas)
         {
@@ -264,8 +248,6 @@ namespace TowerGenerator
         //            string.Join(", ", metas.Select(x => x.EntName).ToArray()));
         //    }
         //}
-
 #endif
-       
     }
 }

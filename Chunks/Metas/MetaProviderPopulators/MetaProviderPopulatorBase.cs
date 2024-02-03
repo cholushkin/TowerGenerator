@@ -5,34 +5,24 @@ namespace TowerGenerator
 {
     interface IMetaProviderPopulator
     {
-        void FindMetas();
+        List<MetaBase> FindMetas();
+        void Populate(MetaProvider targetMetaProvider);
     }
 
-    [RequireComponent(typeof(MetaProvider))]
-    public abstract class MetaProviderPopulatorBase : MonoBehaviour, IMetaProviderPopulator
+    public class MetaProviderPopulatorBase : MonoBehaviour, IMetaProviderPopulator
     {
-        public MetaProvider Target;
-        public bool PopulateOnAwake;
-        public List<MetaBase> FoundMetas;
+        [SerializeField]
+        protected List<MetaBase> Metas;
 
-        void Reset()
+        public virtual List<MetaBase> FindMetas()
         {
-            Target = GetComponent<MetaProvider>();
+            return Metas;
         }
 
-        void Awake()
+        public virtual void Populate(MetaProvider targetMetaProvider)
         {
-            if (PopulateOnAwake)
-                Populate();
-        }
-
-        public abstract void FindMetas();    
-
-        [ContextMenu("Populate")]
-        void Populate()
-        {
-            FindMetas();
-            Target.Populate(FoundMetas);
+            Metas = FindMetas();
+            targetMetaProvider.Populate(Metas);
         }
     }
 }
