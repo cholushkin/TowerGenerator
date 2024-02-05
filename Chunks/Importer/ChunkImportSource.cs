@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -10,7 +12,8 @@ namespace TowerGenerator
 
     public class ChunkImportSource : ScriptableObject
     {
-        public string FbxNameStartFrom;
+        [Tooltip("List of paths this ChunkImportSource will work with. Example 'Assets\\Game\\FBX")]
+        public string[] FbxInputPath;
         public bool EnableMetaGeneration; // Turns on/off meta generation for this source of import
         public bool IsPack = true; // TRUE - FBX contains multiple chunks. FALSE - one FBX contains one chunk inside
         public bool EnableImport = true; // Enable/disable importing for this import source
@@ -29,6 +32,11 @@ namespace TowerGenerator
         private string _metasOutputPath;
         [SerializeField]
         private string _chunksOutputPath;
+
+        public bool IsMyAsset(string assetPath)
+        {
+            return FbxInputPath.Contains(Path.GetDirectoryName(assetPath));
+        }
     }
 
     public static class ChunkImportSourceHelper

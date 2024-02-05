@@ -1,6 +1,5 @@
-﻿using UnityEditor;
+﻿using TowerGenerator.Editor;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace TowerGenerator.ChunkImporter
 {
@@ -8,32 +7,21 @@ namespace TowerGenerator.ChunkImporter
     {
         public static MetaBase Cook(GameObject chunkObject, ChunkImportSource importSource, ChunkCooker.ChunkImportState importState)
         {
-            var chunkController = chunkObject.GetComponent<ChunkControllerBase>();
-            Assert.IsNotNull(chunkController, "chunk must have a controller");
-
-            string assetPathAndName = importSource.MetasOutputPath + "/" + importState.ChunkName + ".cmeta.asset";
-            var metaAsset = AssetDatabase.LoadAssetAtPath<MetaBase>(assetPathAndName); // Try to load existing asset first to keep references to the asset alive
-            var isCreated = false;
-            if (metaAsset == null)
+            if (string.IsNullOrEmpty(importState.MetaType))
             {
-                metaAsset = ScriptableObject.CreateInstance<MetaBase>();
-                isCreated = true;
+                Debug.LogError($"{importState.ChunkName} has no MetaType specified");
+                return null;
             }
 
-            chunkController.Meta = metaAsset;
-            metaAsset.ChunkName = importState.ChunkName;
-            metaAsset.ChunkControllerType = importState.ChunkControllerType;
-            metaAsset.Generation = importState.Generation;
-            metaAsset.TagSet = importState.ChunkTagSet;
-            metaAsset.ChunkMargin = 1f; // todo: FbxCommand ChunkMargin(0)
-            metaAsset.AABB = chunkController.CalculateDimensionAABB().size;
-            metaAsset.ImportSource = importSource;
+            var creator = MetaTypeRegistry.GetCreatorOfMetaType(importState.MetaType);
+            if (creator == null)
+            {
+                Debug.LogError($"Can't find registered Meta Creator for {importState.MetaType}");
+                return null;
+            }
 
-            if(isCreated)
-                AssetDatabase.CreateAsset(metaAsset, assetPathAndName);
-            AssetDatabase.SaveAssets();
-            Debug.Log($"Import meta: {metaAsset}");
-            return metaAsset;
+            var meta = creator.Create(chunkObject, importSource, importState);
+            return meta;
         }
     }
 }

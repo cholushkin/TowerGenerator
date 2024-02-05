@@ -1,8 +1,6 @@
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
-
 
 namespace TowerGenerator
 {
@@ -14,11 +12,11 @@ namespace TowerGenerator
             if (ext != ".blend" && ext != ".fbx")
                 return null;
 
-            var sources = Resources.LoadAll<ChunkImportSource>("");  
-            Assert.IsTrue(sources.Length > 0);
+            var sources = Resources.LoadAll<ChunkImportSource>("");
+            if (sources.Length == 0)
+                return null; 
 
-            var fileNameNoExt = Path.GetFileNameWithoutExtension(assetPath);
-            return sources.FirstOrDefault(x => fileNameNoExt.StartsWith(x.FbxNameStartFrom));
+            return sources.FirstOrDefault(importSource => importSource.IsMyAsset(assetPath));
         }
     }
 }

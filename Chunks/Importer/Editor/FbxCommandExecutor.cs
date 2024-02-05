@@ -42,7 +42,8 @@ namespace TowerGenerator.FbxCommands
             RegisterFbxCommand(new CommandRegistrationEntry { Name = "Tag", Creator = () => new FbxCommandTag("Tag", 10) });
             RegisterFbxCommand(new CommandRegistrationEntry { Name = "Material", Creator = () => new FbxCommandMaterial("Material", 10) });
             RegisterFbxCommand(new CommandRegistrationEntry { Name = "Collider", Creator = () => new FbxCommandCollider("Collider", 10) });
-            RegisterFbxCommand(new CommandRegistrationEntry { Name = "IgnoreGroupItem", Creator = () => new FbxCommandIgnoreGroupItem("IgnoreGroupItem", 11) }); // After all groups
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "IgnoreGroupItem", Creator = () => new FbxCommandIgnoreGroupItem("IgnoreGroupItem", 11) }); 
+            RegisterFbxCommand(new CommandRegistrationEntry { Name = "Meta", Creator = () => new FbxCommandMeta("Meta", 12) });
         }
 
         public static void RegisterFbxCommand(CommandRegistrationEntry entry)

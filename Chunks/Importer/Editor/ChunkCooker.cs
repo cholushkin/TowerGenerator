@@ -17,6 +17,7 @@ namespace TowerGenerator.ChunkImporter
                 ImportSource = importSource;
             }
             public string ChunkName;
+            public string MetaType;
             public int CommandsProcessedAmount;
 
             public int GroupStackAmount;

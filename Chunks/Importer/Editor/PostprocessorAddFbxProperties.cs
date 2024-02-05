@@ -40,6 +40,12 @@ namespace TowerGenerator.ChunkImporter
             {
                 fbxProps.AddProperty(names[i], values[i].ToString());
             }
+
+            // if chunk (need to have ChunkController) has no Meta command add the default one
+            if (fbxProps.Properties.FirstOrDefault(x => x.Name == "ChunkController") != null)
+                if (fbxProps.Properties.FirstOrDefault(x => x.Name == "Meta") == null)
+                    fbxProps.AddProperty("Meta", "MetaBase");
+
             Assert.IsTrue(fbxProps.Properties.Count > 0);
         }
 

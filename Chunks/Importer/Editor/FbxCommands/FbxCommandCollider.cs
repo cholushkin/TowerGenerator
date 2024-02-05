@@ -19,9 +19,9 @@ namespace TowerGenerator.FbxCommands
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
             Assert.IsNotNull(importState);
-            Assert.IsNull(gameObject.GetComponent<Hidden>());
+            Assert.IsNull(gameObject.GetComponent<Collider>());
 
-            gameObject.AddComponent<Hidden>();
+            gameObject.AddComponent<Collider>();
             importState.ColliderAmount++;
         }
     }
