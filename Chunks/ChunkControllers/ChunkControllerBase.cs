@@ -91,6 +91,7 @@ namespace TowerGenerator
             return bounds;
         }
 
+        // todo: move to editor only
         public virtual Bounds CalculateDimensionAABB()
         {
             transform.ForEachChildrenRecursive(t => t.gameObject.SetActive(t.GetComponent<DimensionsIgnorant>() == null));

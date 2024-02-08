@@ -16,7 +16,7 @@ namespace TowerGenerator.ChunkImporter
             var creator = MetaTypeRegistry.GetCreatorOfMetaType(importState.MetaType);
             if (creator == null)
             {
-                Debug.LogError($"Can't find registered Meta Creator for {importState.MetaType}");
+                Debug.LogError($"Can't find registered Meta Creator for '{importState.MetaType}'");
                 return null;
             }
 

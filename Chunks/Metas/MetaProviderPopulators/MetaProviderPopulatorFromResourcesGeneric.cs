@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace TowerGenerator
 {
-    public class MetaProviderPopulatorFromResources : MetaProviderPopulatorBase
+    public class MetaProviderPopulatorFromResourcesGeneric<TMeta> : MetaProviderPopulatorGeneric<TMeta> where TMeta : MetaBase
     {
         [Tooltip("Path inside Resources. If empty then all resources from entire project will be found")]
         public string ResourcesPath;
         
-        public override  List<MetaBase> FindMetas() => Resources.LoadAll<MetaBase>(ResourcesPath).ToList();
+        public override  List<TMeta> FindMetas() => Resources.LoadAll<TMeta>(ResourcesPath).ToList();
     }
 }

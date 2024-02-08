@@ -19,7 +19,7 @@ namespace TowerGenerator
         }
 
 
-        public static GameObject CreateChunkRnd(MetaBase meta, IPseudoRandomNumberGeneratorState seed, Transform parent, Vector3 position, Positioning positioning = Positioning.CenterOfAABB)
+        public static GameObject CreateChunkRnd(MetaBase meta, long seed, Transform parent, Vector3 position, Positioning positioning = Positioning.CenterOfAABB)
         {
             var pathInResources = ChunkImportSourceHelper.GetPathInResources(meta.ImportSource.ChunksOutputPath);
             var chunkPrefab = (GameObject)Resources.Load(pathInResources + "/" + meta.ChunkName);
@@ -32,7 +32,7 @@ namespace TowerGenerator
             chunk.transform.Rotate(chunk.transform.up, _rnd.FromArray(_angles));
 
             var baseChunkController = chunk.GetComponent<ChunkControllerBase>();
-            baseChunkController.Seed = seed.AsNumber();
+            baseChunkController.Seed = seed;
             baseChunkController.Init();
             chunk.SetActive(true);
             baseChunkController.SetConfiguration();

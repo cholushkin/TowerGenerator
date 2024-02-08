@@ -9,7 +9,7 @@ using Range = GameLib.Random.Range;
 
 namespace TowerGenerator
 {
-    public class MetaProvider : MonoBehaviour
+    public class MetaProviderGeneric<TMeta> : MonoBehaviour where TMeta : MetaBase
     {
         [Serializable]
         public class Filter
@@ -22,7 +22,7 @@ namespace TowerGenerator
             public string Expression;
 
 
-            public IEnumerable<MetaBase> FilterGeneration(IEnumerable<MetaBase> metas)
+            public IEnumerable<TMeta> FilterGeneration(IEnumerable<TMeta> metas)
             {
                 if (Generation == null)
                     return metas;
@@ -34,7 +34,7 @@ namespace TowerGenerator
             //    return metas.Where(m => (TopologyType & m.TopologyType) != 0);
             //}
 
-            public IEnumerable<MetaBase> FilterNameWildcard(IEnumerable<MetaBase> metas)
+            public IEnumerable<TMeta> FilterNameWildcard(IEnumerable<TMeta> metas)
             {
                 if (string.IsNullOrEmpty(Wildcard))
                     return metas;
@@ -42,7 +42,7 @@ namespace TowerGenerator
                 return metas.Where(m => Regex.IsMatch(m.ChunkName, wildcard));
             }
 
-            public IEnumerable<MetaBase> FilterTagExpression(IEnumerable<MetaBase> metas)
+            public IEnumerable<TMeta> FilterTagExpression(IEnumerable<TMeta> metas)
             {
                 if (string.IsNullOrEmpty(Expression))
                     return metas;
@@ -56,7 +56,7 @@ namespace TowerGenerator
                 //return metas.Where(x => _checkTagsPass(x, expression));
             }
 
-            public IEnumerable<MetaBase> FilterSize(IEnumerable<MetaBase> metas)
+            public IEnumerable<TMeta> FilterSize(IEnumerable<TMeta> metas)
             {
                 var breadth = BreadthRange;
                 if (breadth == null || breadth.IsZero())
@@ -139,9 +139,9 @@ namespace TowerGenerator
             //}
         }
 
-        public List<MetaProviderPopulatorBase> MetaPopulators;
+        public List<MetaProviderPopulatorGeneric<TMeta>> MetaPopulators;
         public bool InitOnAwake;
-        public List<MetaBase> Metas; // use this meta pool
+        public List<TMeta> Metas; // use this meta pool
         private bool _isInited;
 
 
@@ -161,17 +161,17 @@ namespace TowerGenerator
             _isInited = true;
         }
 
-        public IEnumerable<MetaBase> GetMetas(Filter filter = null)
+        public IEnumerable<TMeta> GetMetas(Filter filter = null)
         {
             return FilterMetas(Metas, filter);
         }
 
-        public static IEnumerable<MetaBase> FilterMetas(IEnumerable<MetaBase> metas, Filter filter = null)
+        public static IEnumerable<TMeta> FilterMetas(IEnumerable<TMeta> metas, Filter filter = null)
         {
             if (filter == null) // no filter? just return original sequence
                 return metas;
 
-            IEnumerable<MetaBase> filteredResult = metas;
+            IEnumerable<TMeta> filteredResult = metas;
 
             //filteredResult = filter.FilterEntType(filteredResult);
             filteredResult = filter.FilterGeneration(filteredResult);
@@ -182,7 +182,7 @@ namespace TowerGenerator
             return filteredResult;
         }
 
-        public void Populate(List<MetaBase> metas)
+        public void Populate(List<TMeta> metas)
         {
             Metas.AddRange(metas);
             Metas = Metas.Distinct().ToList();
@@ -191,7 +191,7 @@ namespace TowerGenerator
 
 #if UNITY_EDITOR
 
-        void DbgPrintMetas(IEnumerable<MetaBase> metas, int cnt = -1)
+        void DbgPrintMetas(IEnumerable<TMeta> metas, int cnt = -1)
         {
             foreach (var metaBase in metas)
             {
