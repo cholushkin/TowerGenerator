@@ -99,14 +99,15 @@ namespace TowerGenerator.ChunkImporter
         // but you can override material on specific objects by "Material" fbx command
         private static void ApplyMaterials(GameObject chunk, ChunkImportState chunkImportInformation)
         {
-            var colorAtlas = Resources.Load<Material>("ColorScheme.mat");
-            Assert.IsNotNull(colorAtlas, ChunkImporterHelper.AddStateInformation("Can't find ColorScheme.mat material in a project", chunkImportInformation));
+
+            var mat = chunkImportInformation.ImportSource.CastleChunkMat;
+            Assert.IsNotNull(mat, ChunkImporterHelper.AddStateInformation("Can't find ColorScheme.mat material in a project", chunkImportInformation));
 
             var renders = chunk.GetComponentsInChildren<Renderer>();
             foreach (var render in renders)
             {
-                render.material = colorAtlas;
-                render.receiveShadows = false;
+                render.material = mat;
+                //render.receiveShadows = false;
             }
         }
 

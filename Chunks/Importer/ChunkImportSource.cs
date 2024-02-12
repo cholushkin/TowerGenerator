@@ -21,7 +21,7 @@ namespace TowerGenerator
 
         public bool AddColliders = true; // Enable/disable adding collider to each Renderer
         public bool ApplyMaterials; // Apply default TowerGenerator material ColorScheme
-
+        public Material CastleChunkMat;
         public string MetasOutputPath => string.IsNullOrEmpty(_metasOutputPath) ? ChunksOutputPath : _metasOutputPath; // All generated metas of this import source will be saved to this directory. If not specified then ChunksOutputPath
 
         public string ChunksOutputPath => string.IsNullOrEmpty(_chunksOutputPath) ? "Assets/" : _chunksOutputPath; // All imported chunks are going to be saved to this directory. If not specified "Assets" will be used
