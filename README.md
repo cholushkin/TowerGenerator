@@ -29,16 +29,12 @@ GroupSet( 1, 1 ) // Very common usecase - enable only one child of all available
 -------------------
 Adds GroupStack component to the node which makes nested nodes elements act as a stack elements. The stack could turn on contained elements sequentially one after another.
 
-| Parameter | Description |
-| --- | --- |
-| int MinIndexSelected = -1 | Index of element which represents minimum possible stack level.|
+_No parameters_
 
 Let's assume that the stack node contains 3 elements with corresponding indexes 0,1,2.
 ```
 Examples:
 GroupStack( ) // Enable randomly one of the stack state: xxx(all disabled), 0xx, 01x, 012(all enabled) 
-GroupStack( 0 ) // MinimumIndexSelected = 0. Possible states are: 0xx, 01x, 012
-GroupStack( 1 ) // Possible states are: 01x, 012
 ```
 
 ### ChunkController	
