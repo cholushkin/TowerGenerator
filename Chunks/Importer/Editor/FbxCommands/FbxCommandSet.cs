@@ -57,9 +57,7 @@ namespace TowerGenerator.FbxCommands
 
             Type compType = CustomTypeConvertor.GetType(ComponentClassName);
             if (compType == null)
-            {
-                Debug.LogError($"No type {ComponentClassName}");
-            }
+                throw new Exception($"No such type as '{ComponentClassName}'");
 
             var components = gameObject.GetComponents(compType);
             if (components == null || components.Length <= ComponentIndex) // no components with such index, add it
@@ -88,8 +86,6 @@ namespace TowerGenerator.FbxCommands
                 {
                     fieldValue = CustomTypeConvertor.ImplicitConvert(PropertyValue, fType);
                 }
-
-
                 fieldInfo.SetValue(comp, fieldValue);
             }
         }
@@ -103,10 +99,12 @@ public static class CustomTypeConvertor
     {
         if (type == typeof(Vector3))
             return StringToVector3(valueString);
-        throw new NotImplementedException($"{valueString} has no converter");
+        if (type == typeof(Vector2Int))
+            return StringToVector2Int(valueString);
+        throw new NotImplementedException($"{valueString} has no converter. Try to implement one: string({valueString})->{type}");
     }
 
-    public static object StringToVector3(string v3String)
+    private static object StringToVector3(string v3String)
     {
         // Remove the parentheses
         if (v3String.StartsWith("(") && v3String.EndsWith(")"))
@@ -125,12 +123,30 @@ public static class CustomTypeConvertor
 
         return result;
     }
+    
+    private static object StringToVector2Int(string v3String)
+    {
+        // Remove the parentheses
+        if (v3String.StartsWith("(") && v3String.EndsWith(")"))
+        {
+            v3String = v3String.Substring(1, v3String.Length - 2);
+        }
+
+        // split the items
+        string[] sArray = v3String.Split(',');
+
+        // store as a Vector2Int
+        Vector2Int  result = new Vector2Int(
+            int.Parse(sArray[0]),
+            int.Parse(sArray[1]));
+
+        return result;
+    }
 
 
 
     public static Type GetType(string TypeName)
     {
-
         // Try Type.GetType() first. This will work with types defined
         // by the Mono runtime, in the same assembly as the caller, etc.
         var type = Type.GetType(TypeName);
@@ -179,6 +195,5 @@ public static class CustomTypeConvertor
 
         // The type just couldn't be found...
         return null;
-
     }
 }

@@ -45,7 +45,10 @@ namespace TowerGenerator.FbxCommands
 
             var tagHolder = gameObject.GetComponent<TagHolder>();
             if (tagHolder == null)
+            {
                 tagHolder = gameObject.AddComponent<TagHolder>();
+                tagHolder.TagSet = new TagSet();
+            }
 
             tagHolder.TagSet.SetTag(TagName, TagValue);
         }

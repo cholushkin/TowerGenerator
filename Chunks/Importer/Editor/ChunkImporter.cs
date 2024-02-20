@@ -86,7 +86,7 @@ namespace TowerGenerator.ChunkImporter
             var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + "cmeta..prefab");
             AssetDatabase.DeleteAsset(fullPath);
         }
-
+        
         // write patterns, add design-time stuff, do hierarchy reorganizations
         private static void ExtractChunk(GameObject chunkSource, string chunkName, ChunkImportSource importSource)
         {
@@ -105,6 +105,7 @@ namespace TowerGenerator.ChunkImporter
                 if (importSource.EnableMetaGeneration)
                     ChunkMetaCooker.Cook(chunk, importSource, importInformation);
                 
+                AssetDatabase.DeleteAsset(fullPath); // note: without this deletion sometimes there is a unity crash on the next line
                 PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
                 AssetDatabase.ImportAsset(fullPath);
                 Debug.Log($"Import chunk: {importInformation}");
