@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TowerGenerator.FbxCommands;
+using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -46,11 +48,11 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public static GameObject Cook(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
+        public static IEnumerator Cook(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
-            ExecuteFbxCommands(semifinishedEnt, chunkImportInformation);
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExecuteFbxCommands(semifinishedEnt, chunkImportInformation));
 
             if (importSource.AddColliders)
                 ApplyColliders(semifinishedEnt, chunkImportInformation);
@@ -58,12 +60,12 @@ namespace TowerGenerator.ChunkImporter
             if (importSource.ApplyMaterials)
                 ApplyMaterials(semifinishedEnt, chunkImportInformation);
 
-            ConfigureChunkController(semifinishedEnt, chunkImportInformation); // tree
+            yield return null;
 
-            return semifinishedEnt;
+            ConfigureChunkController(semifinishedEnt, chunkImportInformation); // tree
         }
 
-        private static void ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
+        private static IEnumerator ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             var fbxProps = semifinishedEnt.GetComponentsInChildren<FbxProps>(true);
             
@@ -75,6 +77,7 @@ namespace TowerGenerator.ChunkImporter
 
             // Execute all commands
             FbxCommandExecutor.ExecuteCommands(allCommands, chunkImportInformation);
+            yield return null;
         }
 
         private static void ApplyColliders(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
@@ -118,9 +121,7 @@ namespace TowerGenerator.ChunkImporter
 
             var baseComponents = chunkSemicooked.GetComponentsInChildren<BaseComponent>(true);
             foreach (var baseComponent in baseComponents)
-            {
                 baseComponent.ChunkController = chunkController;
-            }
 
             chunkController.Init();
         }
