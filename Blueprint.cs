@@ -1,10 +1,8 @@
-﻿using GameLib.DataStructures;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace TowerGenerator
 {
-
     public class Blueprint
     {
         public class Segment
