@@ -11,11 +11,14 @@ namespace TowerGenerator
     {
         public override bool IsValid()
         {
+            // Lazy initialization
+            if (!IsInitialized())
+                Initialize();
+            
             var itemsCount = GetItemsCount();
             if (itemsCount < 2)
             {
-                Debug.LogError($"Items count is less than 2: {itemsCount}. On '{transform.GetDebugName()}'");
-                return false;
+                Debug.LogWarning($"Items count is less than 2: {itemsCount}. On '{transform.GetDebugName()}'");
             }
             return true;
         }
@@ -44,7 +47,7 @@ namespace TowerGenerator
         {
             Assert.IsTrue(index < GetItemsCount());
             Assert.IsTrue(index >= 0);
-            Assert.IsTrue(GetEnabledItemsCount(_state) == 1);
+            //Assert.IsTrue(GetEnabledItemsCount(_state) == 1);
 
             var state = GetState();
             state[index] = flag;

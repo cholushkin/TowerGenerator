@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 namespace TowerGenerator
 {
     [CreateAssetMenu(fileName = "ChunkImportSource",
-        menuName = "ScriptableObjects/ChunkImportSource", order = 1)]
+        menuName = "GameLib/TowerGenerator/ChunkImportSource", order = 1)]
 
     public class ChunkImportSource : ScriptableObject
     {
@@ -35,8 +35,13 @@ namespace TowerGenerator
 
         public bool IsMyAsset(string assetPath)
         {
-            return FbxInputPath.Contains(Path.GetDirectoryName(assetPath));
+            // Normalize the slashes in the asset path
+            string normalizedAssetPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
+
+            // Normalize the slashes in all FbxInputPath entries and check if it contains the asset path
+            return FbxInputPath.Any(inputPath => inputPath.Replace("\\", "/").Contains(normalizedAssetPath));
         }
+
     }
 
     public static class ChunkImportSourceHelper

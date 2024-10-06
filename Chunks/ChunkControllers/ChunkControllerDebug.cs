@@ -99,6 +99,8 @@ namespace TowerGenerator
             ChunkController.SetConfiguration();
         }
 
+        [ShowIf("IsInitialized")]
+        [Button()]
         public void DbgPrintImpactTree()
         {
             Debug.Log(">>>>> Impact tree");
