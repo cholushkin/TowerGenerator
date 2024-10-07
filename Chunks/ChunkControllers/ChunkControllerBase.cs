@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using GameLib.Alg;
 using GameLib.Log;
 using GameLib.Random;
@@ -115,6 +117,9 @@ namespace TowerGenerator
 
             // Notify ChunkController
             SetNodeActiveState(_impactTree.Data.transform, true);
+            
+            // Update seed back
+            Seed = rnd.GetState().AsNumber();
         }
 
         public Connector[] GetActiveConnectors()
