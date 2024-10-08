@@ -101,8 +101,8 @@ namespace TowerGenerator.ChunkImporter
         private static System.Collections.IEnumerator InstantiateAndConfigureChunk(GameObject chunkSource,
             string chunkName, ChunkImportSource importSource)
         {
-            // Instantiate the Model Prefab but do not try to apply changes to it directly
-            var chunk = PrefabUtility.InstantiatePrefab(chunkSource) as GameObject;
+            // Instantiate output chunk
+            var chunk = Object.Instantiate(chunkSource);
             yield return null;
 
             // Cook the chunk (execute FBX command, apply colliders, and materials)

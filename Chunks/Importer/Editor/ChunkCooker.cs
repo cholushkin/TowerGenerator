@@ -5,6 +5,7 @@ using TowerGenerator.FbxCommands;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Rendering;
 
 namespace TowerGenerator.ChunkImporter
 {
@@ -59,6 +60,8 @@ namespace TowerGenerator.ChunkImporter
 
             if (importSource.ApplyMaterials)
                 ApplyMaterials(semifinishedEnt, chunkImportInformation);
+            
+            ApplysShadowsSettings(semifinishedEnt, importSource.CastShadows, chunkImportInformation);
 
             yield return null;
 
@@ -111,6 +114,16 @@ namespace TowerGenerator.ChunkImporter
             {
                 render.material = mat;
                 //render.receiveShadows = false;
+            }
+        }
+        
+        private static void ApplysShadowsSettings(GameObject chunk, bool castShadows, ChunkImportState chunkImportInformation)
+        {
+            var renders = chunk.GetComponentsInChildren<Renderer>();
+            foreach (var render in renders)
+            {
+                render.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
+                render.receiveShadows = castShadows;
             }
         }
 
