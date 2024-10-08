@@ -101,33 +101,42 @@ namespace TowerGenerator.ChunkImporter
         private static System.Collections.IEnumerator InstantiateAndConfigureChunk(GameObject chunkSource,
             string chunkName, ChunkImportSource importSource)
         {
-            // Instantiate output chunk
-            var chunk = Object.Instantiate(chunkSource);
+            // Instantiate the Model Prefab but do not try to apply changes to it directly
+            var chunk = PrefabUtility.InstantiatePrefab(chunkSource) as GameObject;
             yield return null;
 
-            // Cook the the chunk (execute fbx cmd, apply colliders and materials
+            // Cook the chunk (execute FBX command, apply colliders, and materials)
             var importInformation = new ChunkCooker.ChunkImportState(chunkName, importSource);
             chunk.name = chunkName;
-            yield return EditorCoroutineUtility.StartCoroutineOwnerless(ChunkCooker.Cook(importSource, chunk,
-                importInformation));
-            chunk.transform.localScale *= importSource.Scale; // apply additional scale
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(ChunkCooker.Cook(importSource, chunk, importInformation));
+
+            chunk.transform.localScale *= importSource.Scale; // Apply additional scale
             chunk.transform.position = Vector3.zero;
 
-            // Generate meta
+            // Generate meta if enabled
             if (importSource.EnableMetaGeneration)
                 ChunkMetaCooker.Cook(chunk, importSource, importInformation);
             yield return null;
 
-            // Save chunk prefab
+            // Save the chunk as a new Prefab (since you cannot modify the original Model Prefab directly)
             var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
+
 #if USE_ANTI_CRASH_HACK
             HackAvoidEditorCrash(fullPath);
 #endif
+
+            // Save the modified chunk as a new prefab
             PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
             AssetDatabase.ImportAsset(fullPath);
+            yield return null; // Ensure all processes are completed before destruction
+
             Debug.Log($"Import chunk: {importInformation}");
+
+            // Clean up the instantiated chunk
             Object.DestroyImmediate(chunk);
         }
+
+
 
         private static void HackAvoidEditorCrash(string fullPath)
         {
