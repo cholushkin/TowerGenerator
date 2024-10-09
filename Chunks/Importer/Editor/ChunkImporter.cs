@@ -132,9 +132,38 @@ namespace TowerGenerator.ChunkImporter
 
             Debug.Log($"Import chunk: {importInformation}");
 
+            // -------------------
+            // Save the variant prefab if it does not already exist
+            // -------------------
+            var variantName = chunkName + "Usr"; // Create variant name by appending "Usr"
+            var variantFullPath = Path.Combine(importSource.ChunksOutputPath, variantName + ".prefab");
+
+            // Check if the variant prefab already exists
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(variantFullPath) == null)
+            {
+                // Create and save the variant prefab
+                var chunkVariant = Object.Instantiate(chunk); // Instantiate a new chunk for the variant
+                chunkVariant.name = variantName;
+                
+                // Save as a new variant prefab
+                PrefabUtility.SaveAsPrefabAsset(chunkVariant, variantFullPath);
+                AssetDatabase.ImportAsset(variantFullPath);
+                yield return null; // Ensure everything is processed
+
+                Debug.Log($"Variant chunk saved: {variantName}");
+
+                // Clean up the instantiated chunk variant
+                Object.DestroyImmediate(chunkVariant);
+            }
+            else
+            {
+                Debug.Log($"Variant prefab '{variantName}' already exists, skipping creation.");
+            }
+            
             // Clean up the instantiated chunk
             Object.DestroyImmediate(chunk);
         }
+
 
 
 

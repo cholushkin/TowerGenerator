@@ -102,6 +102,9 @@ namespace TowerGenerator
         // Sets random state of the chunk using current Seed
         public void SetConfiguration()
         {
+            if(_impactTree == null)
+                Init();
+            
             if (Seed == -1)
                 Seed = Random.Range(0, Int32.MaxValue);
 
