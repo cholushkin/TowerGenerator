@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if UNITY_EDITOR
+using System.Linq;
 using GameLib.Alg;
 using UnityEditor;
 using UnityEngine;
@@ -45,3 +46,4 @@ namespace TowerGenerator.ChunkImporter
         }
     }
 }
+#endif

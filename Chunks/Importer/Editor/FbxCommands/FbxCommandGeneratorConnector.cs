@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using TowerGenerator.ChunkImporter;
 using TowerGenerator.FbxCommands;
 using UnityEngine;
@@ -31,3 +32,4 @@ public class FbxCommandGeneratorConnector : FbxCommandBase
         //importInformation.GeneratorConnectorAmount++;
     }
 }
+#endif

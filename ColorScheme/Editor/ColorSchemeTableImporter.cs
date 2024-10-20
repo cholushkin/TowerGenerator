@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿#if UNITY_EDITOR
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -109,5 +110,5 @@ namespace TowerGenerator
             AssetDatabase.ImportAsset($"{src.OutputPath}/{colorSchemeTableName}.png");
         }
     }
-
 }
+#endif

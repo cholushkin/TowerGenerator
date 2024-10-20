@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 
 namespace TowerGenerator.Editor
 {
@@ -13,3 +14,4 @@ namespace TowerGenerator.Editor
         }
     }
 }
+#endif

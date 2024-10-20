@@ -1,4 +1,5 @@
-﻿using TowerGenerator.Editor;
+﻿#if UNITY_EDITOR
+using TowerGenerator.Editor;
 using UnityEngine;
 
 namespace TowerGenerator.ChunkImporter
@@ -25,3 +26,4 @@ namespace TowerGenerator.ChunkImporter
         }
     }
 }
+#endif

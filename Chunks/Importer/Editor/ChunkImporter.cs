@@ -1,4 +1,6 @@
-﻿#define USE_ANTI_CRASH_HACK
+﻿#if UNITY_EDITOR
+
+#define USE_ANTI_CRASH_HACK
 using System.IO;
 using System.Text.RegularExpressions;
 using Unity.EditorCoroutines.Editor;
@@ -212,3 +214,4 @@ namespace TowerGenerator.ChunkImporter
         }
     }
 }
+#endif
