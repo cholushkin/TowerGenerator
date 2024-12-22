@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 #define USE_ANTI_CRASH_HACK
+using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 using Unity.EditorCoroutines.Editor;
@@ -100,7 +101,7 @@ namespace TowerGenerator.ChunkImporter
                 importSource));
         }
 
-        private static System.Collections.IEnumerator InstantiateAndConfigureChunk(GameObject chunkSource,
+        private static IEnumerator InstantiateAndConfigureChunk(GameObject chunkSource,
             string chunkName, ChunkImportSource importSource)
         {
             // Instantiate output chunk
@@ -108,9 +109,11 @@ namespace TowerGenerator.ChunkImporter
             yield return null;
 
             // Cook the chunk (execute FBX command, apply colliders, and materials)
-            var importInformation = new ChunkCooker.ChunkImportState(chunkName, importSource);
+            var importInformation = new ChunkImportState(chunkName, importSource);
             chunk.name = chunkName;
-            yield return EditorCoroutineUtility.StartCoroutineOwnerless(ChunkCooker.Cook(importSource, chunk, importInformation));
+
+            var chunkCooker = ChunkCookerFactory.CreateChunkCooker(importSource.ChunkCooker);
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(chunkCooker.Cook(importSource, chunk, importInformation));
 
             chunk.transform.localScale *= importSource.Scale; // Apply additional scale
             chunk.transform.position = Vector3.zero;

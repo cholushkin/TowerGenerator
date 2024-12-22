@@ -56,7 +56,7 @@ namespace TowerGenerator.FbxCommands
             _commandsRegistered.Add(entry);
         }
 
-        public static void ParseFbxProps(FbxProps fromFbxProps, List<(GameObject, FbxCommandBase)> allCommands, ChunkCooker.ChunkImportState importState)
+        public static void ParseFbxProps(FbxProps fromFbxProps, List<(GameObject, FbxCommandBase)> allCommands, ChunkImportState importState)
         {
             Assert.IsNotNull(fromFbxProps);
             Assert.IsNotNull(fromFbxProps.gameObject);
@@ -85,7 +85,7 @@ namespace TowerGenerator.FbxCommands
             fromFbxProps.gameObject.RemoveComponent<FbxProps>();
         }
 
-        public static void ExecuteCommands(List<(GameObject, FbxCommandBase)> commands, ChunkCooker.ChunkImportState importState)
+        public static void ExecuteCommands(List<(GameObject, FbxCommandBase)> commands, ChunkImportState importState)
         {
             // Execute commands by their priorities
             foreach (var goCmd in commands.OrderBy(c => c.Item2.GetExecutionPriority()))

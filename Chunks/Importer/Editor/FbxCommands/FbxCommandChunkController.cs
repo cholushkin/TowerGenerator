@@ -50,7 +50,7 @@ namespace TowerGenerator.FbxCommands
             }
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
+        public override void Execute(GameObject gameObject, ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
             Assert.IsNotNull(importState);

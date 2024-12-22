@@ -8,12 +8,12 @@ namespace TowerGenerator.Editor
 {
     public interface IMetaCreator
     {
-        MetaBase Create(GameObject chunkObject, ChunkImportSource importSource, ChunkCooker.ChunkImportState importState);
+        MetaBase Create(GameObject chunkObject, ChunkImportSource importSource, ChunkImportState importState);
     }
     
     public class MetaBaseCreator : IMetaCreator
     {
-        public MetaBase Create(GameObject chunkObject, ChunkImportSource importSource, ChunkCooker.ChunkImportState importState)
+        public MetaBase Create(GameObject chunkObject, ChunkImportSource importSource, ChunkImportState importState)
         {
             var chunkController = chunkObject.GetComponent<ChunkControllerBase>();
             Assert.IsNotNull(chunkController, "chunk must have a ChunkControllerBase");

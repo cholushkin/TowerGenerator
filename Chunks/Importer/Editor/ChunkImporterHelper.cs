@@ -12,7 +12,7 @@ namespace TowerGenerator.ChunkImporter
             return (fbxProbs == null || (fbxProbs.Properties.FirstOrDefault(x => x.Name == "IgnoreImport") != null));
         }
 
-        public static string AddStateInformation(string origString, ChunkCooker.ChunkImportState chunkImportInformation)
+        public static string AddStateInformation(string origString, ChunkImportState chunkImportInformation)
         {
             return $"{origString}. Chunk import state: {chunkImportInformation}";
         }

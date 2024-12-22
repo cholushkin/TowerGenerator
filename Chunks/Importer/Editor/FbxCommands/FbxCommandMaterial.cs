@@ -20,7 +20,7 @@ namespace TowerGenerator.FbxCommands
             MaterialName = parameters.Trim();
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
+        public override void Execute(GameObject gameObject, ChunkImportState importState)
         {
             var materialToApply = Resources.Load<Material>($"{MaterialName}");
             Assert.IsNotNull(materialToApply, $"Can't load material {MaterialName}.mat");

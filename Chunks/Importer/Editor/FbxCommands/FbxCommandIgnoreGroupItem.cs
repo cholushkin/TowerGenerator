@@ -18,7 +18,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsTrue(string.IsNullOrWhiteSpace(parameters), $"There should not be any parameters for the command '{GetFbxCommandName()}' but you have: '{parameters}' ");
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
+        public override void Execute(GameObject gameObject, ChunkImportState importState)
         {
             Assert.IsNull(gameObject.GetComponent<IgnoreGroupItem>());
             Assert.IsNull(gameObject.GetComponent<Group>(), $"if gameObject has IgnoreGroupItem then Group is not allowed (detached groups are not supported)");

@@ -26,7 +26,7 @@ namespace TowerGenerator.FbxCommands
             MetaType = parameters.Trim();
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
+        public override void Execute(GameObject gameObject, ChunkImportState importState)
         {
             importState.MetaType = MetaType;
         }

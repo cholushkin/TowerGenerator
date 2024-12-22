@@ -20,7 +20,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsTrue(string.IsNullOrWhiteSpace(parameters), "There should not be parameters for the command 'FbxCommandIgnoreAddCollider'");
         }
 
-        public override void Execute(GameObject gameObject, ChunkCooker.ChunkImportState importState)
+        public override void Execute(GameObject gameObject, ChunkImportState importState)
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
             Assert.IsNotNull(importState);

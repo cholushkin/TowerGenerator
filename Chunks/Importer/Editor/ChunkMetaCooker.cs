@@ -6,7 +6,7 @@ namespace TowerGenerator.ChunkImporter
 {
     public static class ChunkMetaCooker
     {
-        public static MetaBase Cook(GameObject chunkObject, ChunkImportSource importSource, ChunkCooker.ChunkImportState importState)
+        public static MetaBase Cook(GameObject chunkObject, ChunkImportSource importSource, ChunkImportState importState)
         {
             if (string.IsNullOrEmpty(importState.MetaType))
             {
