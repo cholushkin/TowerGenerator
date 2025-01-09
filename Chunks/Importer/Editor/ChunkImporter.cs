@@ -137,40 +137,41 @@ namespace TowerGenerator.ChunkImporter
 
             Debug.Log($"Import chunk: {importInformation}");
 
-            // -------------------
             // Save the variant prefab if it does not already exist
-            // -------------------
-            var variantName = chunkName + "Usr"; // meaning "user" prefab with user scripts and modifications 
-            var variantFullPath = Path.Combine(importSource.ChunksOutputPath, variantName + ".prefab");
-
-            // Check if the variant prefab already exists
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(variantFullPath) == null)
+            if (importSource.GenerateVariant)
             {
-                // Create and save the variant prefab
-                var chunkVariant = Object.Instantiate(chunk); // Instantiate a new chunk for the variant
-                chunkVariant.name = variantName;
-                
-                // Save as a new variant prefab
-                var chunkVariantPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(chunkVariant, variantFullPath, InteractionMode.AutomatedAction);
-                // PrefabUtility.SaveAsPrefabAsset(chunkVariant, variantFullPath);
-                // AssetDatabase.ImportAsset(variantFullPath);
-                yield return null; // Ensure everything is processed
+                var variantName = chunkName + "Usr"; // meaning "user" prefab with user scripts and modifications 
+                var variantFullPath = Path.Combine(importSource.ChunksVariantsOutputPath, variantName + ".prefab");
 
-                Debug.Log($"Variant chunk saved: {variantName}");
+                // Check if the variant prefab already exists
+                if (AssetDatabase.LoadAssetAtPath<GameObject>(variantFullPath) == null)
+                {
+                    // Load the saved base prefab
+                    var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
 
-                // Clean up the instantiated chunk variant
-                Object.DestroyImmediate(chunkVariant);
+                    // Instantiate the base prefab
+                    var chunkVariant = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
+                    chunkVariant.name = variantName;
+
+                    // Save as a new variant prefab, connecting it to the base prefab
+                    var chunkVariantPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(chunkVariant, variantFullPath,
+                        InteractionMode.AutomatedAction);
+                    yield return null; // Ensure everything is processed
+
+                    Debug.Log($"Variant chunk saved: {variantName}");
+
+                    // Clean up the instantiated chunk variant
+                    Object.DestroyImmediate(chunkVariant);
+                }
+                else
+                {
+                    Debug.Log($"Variant prefab '{variantName}' already exists, skipping creation.");
+                }
             }
-            else
-            {
-                Debug.Log($"Variant prefab '{variantName}' already exists, skipping creation.");
-            }
-            
+
             // Clean up the instantiated chunk
             Object.DestroyImmediate(chunk);
         }
-
-
 
 
         private static void HackAvoidEditorCrash(string fullPath)

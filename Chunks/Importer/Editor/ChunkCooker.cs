@@ -109,14 +109,12 @@ namespace TowerGenerator.ChunkImporter
 
         protected virtual void ApplyMaterials(GameObject chunk, ChunkImportState chunkImportInformation)
         {
-            var mat = chunkImportInformation.ImportSource.CastleChunkMat;
-            Assert.IsNotNull(mat, ChunkImporterHelper.AddStateInformation("Can't find ColorScheme.mat material in a project", chunkImportInformation));
+            var defaultMaterial = chunkImportInformation.ImportSource.DefaultMaterial;
+            Assert.IsNotNull(defaultMaterial, ChunkImporterHelper.AddStateInformation("defaultMaterial is not assigned", chunkImportInformation));
 
             var renders = chunk.GetComponentsInChildren<Renderer>();
             foreach (var render in renders)
-            {
-                render.material = mat;
-            }
+                render.material = defaultMaterial;
         }
         
         protected virtual void ApplyShadowsSettings(GameObject chunk, bool castShadows, ChunkImportState chunkImportInformation)

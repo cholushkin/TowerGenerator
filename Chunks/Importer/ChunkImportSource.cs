@@ -30,22 +30,31 @@ namespace TowerGenerator
         public bool AddColliders = true; // Enable/disable adding collider to each Renderer
         public bool CastShadows = true;
         public bool ApplyMaterials; // Apply default TowerGenerator material ColorScheme
-        public Material CastleChunkMat;
+        
+        [Tooltip("Default material to apply to all meshes of the chunk. To override default material for specified mesh use FbxCommandMaterial")]
+        public Material DefaultMaterial;
 
         public string MetasOutputPath =>
             string.IsNullOrEmpty(_metasOutputPath)
                 ? ChunksOutputPath
-                : _metasOutputPath; // All generated metas of this import source will be saved to this directory. If not specified then ChunksOutputPath
+                : _metasOutputPath; // All generated metas of this import source will be saved to this directory. If not specified then ChunksOutputPath will be used
 
         public string ChunksOutputPath =>
             string.IsNullOrEmpty(_chunksOutputPath)
                 ? "Assets/"
                 : _chunksOutputPath; // All imported chunks are going to be saved to this directory. If not specified "Assets" will be used
+        
+        public string ChunksVariantsOutputPath =>
+            string.IsNullOrEmpty(_chunksVariantsOutputPath)
+                ? ChunksOutputPath
+                : _chunksVariantsOutputPath; // All imported chunks variants are going to be saved to this directory. If not specified ChunksOutputPath will be used
 
         public float Scale = 1f; // Additionally scales imported chunks by this value
 
         [SerializeField] private string _metasOutputPath;
         [SerializeField] private string _chunksOutputPath;
+        [SerializeField] private string _chunksVariantsOutputPath;
+
 
         public bool IsMyAsset(string assetPath)
         {
@@ -54,6 +63,7 @@ namespace TowerGenerator
                 .Any(normalizedInputPath => normalizedAssetPath.StartsWith(normalizedInputPath));
         }
     }
+
 
     public static class ChunkImportSourceHelper
     {
