@@ -94,7 +94,7 @@ namespace TowerGenerator.FbxCommands
                 var gObject = goCmd.Item1;
                 Debug.Log($"Executing {cmd.RawInputFromFbx} on {gObject.transform.GetDebugName()}");
                 cmd.Execute(gObject, importState);
-                importState.CommandsProcessedAmount++;
+                importState.Inc("CommandsProcessedAmount");
             }
         }
 

@@ -29,7 +29,7 @@ namespace TowerGenerator.FbxCommands
 
             var renderer = gameObject.GetComponent<Renderer>();
             renderer.sharedMaterial = materialToApply;
-            renderer.receiveShadows = false;
+            importState.Inc("MaterialAmount");
         }
     }
 }

@@ -23,7 +23,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNull(gameObject.GetComponent<IgnoreGroupItem>());
             Assert.IsNull(gameObject.GetComponent<Group>(), $"if gameObject has IgnoreGroupItem then Group is not allowed (detached groups are not supported)");
             gameObject.AddComponent<IgnoreGroupItem>();
-            importState.IgnoreGroupItemAmount++;
+            importState.Inc("IgnoreGroupItemAmount");
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TowerGenerator.FbxCommands;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine;
@@ -20,31 +21,37 @@ namespace TowerGenerator.ChunkImporter
         }
         public string ChunkName;
         public string MetaType;
-        public int CommandsProcessedAmount;
-
-        public int GroupStackAmount;
-        public int GroupSetAmount;
-        public int GroupSwitchAmount;
-        public int CollisionDependentAmount;
-        public int DimensionsIgnorantAmount;
-        public int IgnoreGroupItemAmount;
-        public int SuppressionAmount;
-        public int SuppressedByAmount;
-        public int InductionAmount;
-        public int InducedByAmount;
-        public int HiddenAmount;
-        public int ColliderAmount;
-        public int ConnectorAmount;
-        public int IgnoreAddColliderAmount;
         public uint Generation;
-        public int CollidersApplied;
         public TagSet ChunkTagSet;
         public ChunkControllerBase.ChunkController ChunkControllerType;
         public readonly ChunkImportSource ImportSource;
+        private Dictionary<string, int> _stateCounters = new();
+
+        
+        public void Set(string keyName, int newValue)
+        {
+            _stateCounters[keyName] = newValue;
+        }
+        public void Inc(string keyName)
+        {
+            if (_stateCounters.ContainsKey(keyName))
+                _stateCounters[keyName]++;
+            else
+                _stateCounters[keyName] = 1;
+        }
+
+        public int Get(string keyName)
+        {
+            return _stateCounters.TryGetValue(keyName, out int value) ? value : 0;
+        }
 
         public override string ToString()
         {
-            return JsonUtility.ToJson(this, true);
+            var sb = new System.Text.StringBuilder(JsonUtility.ToJson(this, true))
+                .AppendLine()
+                .AppendLine("- StateCounters")
+                .AppendJoin("\n", _stateCounters.Select(kvp => $"  - {kvp.Key}: {kvp.Value}"));
+            return sb.ToString();
         }
     }
     
@@ -101,7 +108,7 @@ namespace TowerGenerator.ChunkImporter
                     if (render.gameObject.GetComponent<MeshCollider>() == null)
                     {
                         render.gameObject.AddComponent<MeshCollider>();
-                        chunkImportInformation.CollidersApplied++;
+                        chunkImportInformation.Inc("CollidersAppliedAmmount");
                     }
                 }
             }

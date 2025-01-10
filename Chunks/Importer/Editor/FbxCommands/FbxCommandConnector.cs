@@ -35,7 +35,7 @@ public class FbxCommandConnector : FbxCommandBase
         var connector = gameObject.AddComponent<Connector>();
         connector.ConnectorMode = ConnectorType;
         connector.ConnectExpressions = ConnectExpressions;
-        importState.ConnectorAmount++;
+        importState.Inc("ConnectorAmount");
     }
 }
 #endif

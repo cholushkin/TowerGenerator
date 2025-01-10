@@ -23,7 +23,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNotNull(importState);
             Assert.IsNull(gameObject.GetComponent<DimensionsIgnorant>());
             gameObject.AddComponent<DimensionsIgnorant>();
-            importState.DimensionsIgnorantAmount++;
+            importState.Inc("DimensionsIgnorantAmount");
         }
     }
 }

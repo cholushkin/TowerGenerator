@@ -26,7 +26,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNotNull(importState);
             Assert.IsNull(gameObject.GetComponent<IgnoreAddCollider>());
             var ignoreAddCollider = gameObject.AddComponent<IgnoreAddCollider>();
-            importState.IgnoreAddColliderAmount++;
+            importState.Inc("IgnoreAddColliderAmount");
         }
     }
 }

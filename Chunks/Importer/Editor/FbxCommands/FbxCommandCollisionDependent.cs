@@ -39,7 +39,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNull(gameObject.GetComponent<CollisionDependent>());
             var comp = gameObject.AddComponent<CollisionDependent>();
             comp.FragmentDomination = FragmentDomination;
-            importState.CollisionDependentAmount++;
+            importState.Inc("CollisionDependentAmount");
         }
     }
 }

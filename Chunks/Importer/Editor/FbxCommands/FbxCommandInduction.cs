@@ -37,7 +37,7 @@ namespace TowerGenerator.FbxCommands
 
             var comp = gameObject.AddComponent<Induction>();
             comp.InductionLabels = InductionLabels;
-            importState.InductionAmount++;
+            importState.Inc("InductionAmount");
         }
     }
 }

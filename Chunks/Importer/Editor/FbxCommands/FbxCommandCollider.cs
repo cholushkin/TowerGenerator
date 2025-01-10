@@ -23,7 +23,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNull(gameObject.GetComponent<Collider>());
 
             gameObject.AddComponent<Collider>();
-            importState.ColliderAmount++;
+            importState.Inc("ColliderAmount");
         }
     }
 }

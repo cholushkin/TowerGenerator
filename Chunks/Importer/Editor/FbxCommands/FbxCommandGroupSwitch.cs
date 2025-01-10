@@ -27,7 +27,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNull(gameObject.GetComponent<GroupSwitch>(), "no objects should be attached before");
             var groupSwitch = gameObject.AddComponent<GroupSwitch>();
             Assert.IsTrue(groupSwitch.IsValid(), $"{gameObject.transform.GetDebugName()} {GetFbxCommandName()} is invalid");
-            importState.GroupSwitchAmount++;
+            importState.Inc("GroupSwitchAmount");
         }
     }
 }

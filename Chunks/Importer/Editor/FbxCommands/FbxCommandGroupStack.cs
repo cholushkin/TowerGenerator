@@ -29,7 +29,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNull(gameObject.GetComponent<GroupStack>());
             var groupStack = gameObject.AddComponent<GroupStack>();
             Assert.IsTrue(groupStack.IsValid(), $"{gameObject.transform.GetDebugName()} {GetFbxCommandName()} is invalid");
-            importState.GroupStackAmount++;
+            importState.Inc("GroupStackAmount");
         }
     }
 }

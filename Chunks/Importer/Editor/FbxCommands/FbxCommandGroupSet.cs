@@ -54,7 +54,7 @@ namespace TowerGenerator.FbxCommands
             groupSet.MaxObjectsSelected = MaxObjectsSelected;
             groupSet.MinObjectsSelected = MinObjectsSelected;
             Assert.IsTrue(groupSet.IsValid(), $"{gameObject.transform.GetDebugName()} {GetFbxCommandName()} is invalid");
-            importState.GroupSetAmount++;
+            importState.Inc("GroupSetAmount");
         }
     }
 }

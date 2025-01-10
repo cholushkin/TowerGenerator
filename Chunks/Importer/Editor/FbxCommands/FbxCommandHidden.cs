@@ -25,7 +25,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNull(gameObject.GetComponent<Hidden>());
 
             gameObject.AddComponent<Hidden>();
-            importState.HiddenAmount++;
+            importState.Inc("HiddenAmount");
         }
     }
 }

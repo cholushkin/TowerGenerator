@@ -35,7 +35,7 @@ namespace TowerGenerator.FbxCommands
 
             var comp = gameObject.AddComponent<SuppressedBy>();
             comp.SuppressionLabels = SuppressionLabels;
-            importState.SuppressedByAmount++;
+            importState.Inc("SuppressedByAmount");
         }
     }
 }

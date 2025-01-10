@@ -89,6 +89,8 @@ namespace TowerGenerator.FbxCommands
                 }
                 fieldInfo.SetValue(comp, fieldValue);
             }
+            
+            importState.Inc("SetAmount");
         }
     }
 }
