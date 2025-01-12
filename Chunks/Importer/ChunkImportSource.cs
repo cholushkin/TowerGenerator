@@ -34,6 +34,9 @@ namespace TowerGenerator
         [Tooltip("Default material to apply to all meshes of the chunk. To override default material for specified mesh use FbxCommandMaterial")]
         public Material DefaultMaterial;
 
+        [Tooltip("List of materials for 'Material' FBX-command")]
+        public Material[] Materials; 
+
         public string MetasOutputPath =>
             string.IsNullOrEmpty(_metasOutputPath)
                 ? ChunksOutputPath

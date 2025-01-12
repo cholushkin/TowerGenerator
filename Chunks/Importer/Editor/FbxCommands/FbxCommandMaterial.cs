@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Linq;
 using TowerGenerator.ChunkImporter;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -22,8 +23,8 @@ namespace TowerGenerator.FbxCommands
 
         public override void Execute(GameObject gameObject, ChunkImportState importState)
         {
-            var materialToApply = Resources.Load<Material>($"{MaterialName}");
-            Assert.IsNotNull(materialToApply, $"Can't load material {MaterialName}.mat");
+            var materialToApply = importState.ImportSource.Materials.FirstOrDefault(material => material.name == MaterialName);
+            Assert.IsNotNull(materialToApply, $"Can't load material {MaterialName}.mat from {importState.ImportSource.name}");
 
             // todo: apply recursively as an options
 

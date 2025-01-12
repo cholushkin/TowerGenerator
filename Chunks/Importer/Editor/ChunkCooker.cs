@@ -19,6 +19,7 @@ namespace TowerGenerator.ChunkImporter
             ChunkName = chunkName;
             ImportSource = importSource;
         }
+
         public string ChunkName;
         public string MetaType;
         public uint Generation;
@@ -27,11 +28,12 @@ namespace TowerGenerator.ChunkImporter
         public readonly ChunkImportSource ImportSource;
         private Dictionary<string, int> _stateCounters = new();
 
-        
+
         public void Set(string keyName, int newValue)
         {
             _stateCounters[keyName] = newValue;
         }
+
         public void Inc(string keyName)
         {
             if (_stateCounters.ContainsKey(keyName))
@@ -54,7 +56,7 @@ namespace TowerGenerator.ChunkImporter
             return sb.ToString();
         }
     }
-    
+
     public interface IChunkCooker
     {
         IEnumerator Cook(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation);
@@ -73,7 +75,7 @@ namespace TowerGenerator.ChunkImporter
 
             if (importSource.ApplyMaterials)
                 ApplyMaterials(semifinishedEnt, chunkImportInformation);
-            
+
             ApplyShadowsSettings(semifinishedEnt, importSource.CastShadows, chunkImportInformation);
 
             yield return null;
@@ -84,7 +86,7 @@ namespace TowerGenerator.ChunkImporter
         protected virtual IEnumerator ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
             var fbxProps = semifinishedEnt.GetComponentsInChildren<FbxProps>(true);
-            
+
             var allCommands = new List<(GameObject, FbxCommandBase)>(fbxProps.Length);
 
             // Parse all fbxProps
@@ -121,9 +123,20 @@ namespace TowerGenerator.ChunkImporter
 
             var renders = chunk.GetComponentsInChildren<Renderer>();
             foreach (var render in renders)
-                render.material = defaultMaterial;
+            {
+                var matPreviouslyApplied = false; // Material is previously applied by Material FBX-command
+
+                if (render.sharedMaterial != null && chunkImportInformation?.ImportSource?.Materials != null)
+                {
+                    var matName = render.sharedMaterial.name.Replace(" (Instance)", "");
+                    matPreviouslyApplied = chunkImportInformation.ImportSource.Materials.Any(mat => mat?.name == matName);
+                }
+
+                if (!matPreviouslyApplied)
+                    render.material = defaultMaterial;
+            }
         }
-        
+
         protected virtual void ApplyShadowsSettings(GameObject chunk, bool castShadows, ChunkImportState chunkImportInformation)
         {
             var renders = chunk.GetComponentsInChildren<Renderer>();
@@ -137,7 +150,8 @@ namespace TowerGenerator.ChunkImporter
         protected virtual void ConfigureChunkController(GameObject chunkSemicooked, ChunkImportState chunkImportInformation)
         {
             var chunkController = chunkSemicooked.GetComponent<ChunkControllerBase>();
-            Assert.IsNotNull(chunkController, ChunkImporterHelper.AddStateInformation("There is no ChunkControllerBase on chunk. Probably missing ChunkController prop on chunk root in fbx", chunkImportInformation));
+            Assert.IsNotNull(chunkController,
+                ChunkImporterHelper.AddStateInformation("There is no ChunkControllerBase on chunk. Probably missing ChunkController prop on chunk root in fbx", chunkImportInformation));
 
             var baseComponents = chunkSemicooked.GetComponentsInChildren<BaseComponent>(true);
             foreach (var baseComponent in baseComponents)
