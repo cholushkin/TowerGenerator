@@ -70,6 +70,30 @@ namespace TowerGenerator.ChunkImporter
 
             AssetDatabase.Refresh();
         }
+        
+        void OnPreprocessModel()
+        {
+            // todo: define in ImportSource
+            
+            ModelImporter modelImporter = (ModelImporter)assetImporter;
+            
+            var source = ChunkImportSourceManager.GetChunkImportSource(assetPath);
+
+            if (source == null)
+                return;
+            if (!source.EnableImport)
+                return;
+
+            // Set the material creation mode
+            modelImporter.materialImportMode = ModelImporterMaterialImportMode.None;
+            modelImporter.importAnimation = false;
+            modelImporter.animationType = ModelImporterAnimationType.None;
+            modelImporter.importBlendShapes = false;
+            modelImporter.importVisibility = false;
+            modelImporter.importCameras = false;
+            modelImporter.importLights = false;
+            modelImporter.meshCompression = ModelImporterMeshCompression.Medium;
+        }
 
 
         private static void ExtractChunks(GameObject assetObject, string packName, ChunkImportSource importSource)
