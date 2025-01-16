@@ -5,6 +5,7 @@ using System.Linq;
 using GameLib.Alg;
 using GameLib.Log;
 using GameLib.Random;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Random = UnityEngine.Random;
@@ -59,6 +60,7 @@ namespace TowerGenerator
 
         public long Seed = -1;
         public MetaBase Meta;
+        [ReadOnly] public string ImportBasedOnHash;
 
 
         protected TreeNode<Group> _impactTree;

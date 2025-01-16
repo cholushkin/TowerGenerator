@@ -23,7 +23,6 @@ namespace TowerGenerator
             "Variant chunk prefab should be used to assign user scripts. Original prefab is considered as visual representation of the chunk. Variant is considered as logical part. Also I found no way to keep attached scripts retained on every reexport of the chunk")]
         public bool GenerateVariant = true;
 
-        public bool IsPack = true; // TRUE - FBX contains multiple chunks. FALSE - one FBX contains one chunk inside
         public bool EnableImport = true; // Enable/disable importing for this import source
         public bool EnableCleanupFbxRoot = true; // Enable/disable fbx cleanup
 

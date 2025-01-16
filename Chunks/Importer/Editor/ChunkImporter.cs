@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
 
@@ -30,33 +31,18 @@ namespace TowerGenerator.ChunkImporter
                 if (!source.EnableImport)
                     continue;
 
-                if (source.IsPack)
-                {
-                    Debug.Log($"Importing content pack: '{assetPath}'");
-                    var packName = Path.GetFileNameWithoutExtension(assetPath);
-                    var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                    if (assetObj == null)
-                    {
-                        Debug.LogError($"Error: can't load asset at path {assetPath}");
-                        continue;
-                    }
 
-                    // Extracting all chunks from the pack
-                    ExtractChunks(assetObj, packName, source);
-                }
-                else
+                Debug.Log($"Importing chunk: '{assetPath}'");
+                var chunkName = Path.GetFileNameWithoutExtension(assetPath);
+                var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                var depHash = GetDependencyHash(assetPath);
+                if (assetObj == null)
                 {
-                    Debug.Log($"Importing chunk: '{assetPath}'");
-                    var chunkName = Path.GetFileNameWithoutExtension(assetPath);
-                    var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                    if (assetObj == null)
-                    {
-                        Debug.LogError($"Error: can't load asset at path {assetPath}");
-                        continue;
-                    }
-
-                    ExtractChunk(assetObj, chunkName, source);
+                    Debug.LogError($"Error: can't load asset at path {assetPath}");
+                    continue;
                 }
+
+                ExtractChunk(assetObj, chunkName, source, depHash);
             }
 
             AssetDatabase.SaveAssets();
@@ -69,6 +55,11 @@ namespace TowerGenerator.ChunkImporter
             }
 
             AssetDatabase.Refresh();
+        }
+        
+        private static string GetDependencyHash(string assetPath)
+        {
+            return AssetDatabase.GetAssetDependencyHash(assetPath).ToString();
         }
         
         void OnPreprocessModel()
@@ -95,17 +86,6 @@ namespace TowerGenerator.ChunkImporter
             modelImporter.meshCompression = ModelImporterMeshCompression.Medium;
         }
 
-
-        private static void ExtractChunks(GameObject assetObject, string packName, ChunkImportSource importSource)
-        {
-            // process all chunks inside fbx
-            foreach (Transform ent in assetObject.transform)
-            {
-                var fullEntName = $"{packName}.{CleanName(ent.gameObject.name)}";
-                ExtractChunk(ent.gameObject, fullEntName, importSource);
-            }
-        }
-
         private static void DeleteChunk(string chunkName, ChunkImportSource importSource)
         {
             var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
@@ -119,23 +99,41 @@ namespace TowerGenerator.ChunkImporter
         }
 
         // write patterns, add design-time stuff, do hierarchy reorganizations
-        private static void ExtractChunk(GameObject chunkSource, string chunkName, ChunkImportSource importSource)
+        private static void ExtractChunk(GameObject chunkSource, string chunkName, ChunkImportSource importSource, string importBasedOnHash)
         {
-            EditorCoroutineUtility.StartCoroutineOwnerless(InstantiateAndConfigureChunk(chunkSource, chunkName,
-                importSource));
+            EditorCoroutineUtility.StartCoroutineOwnerless(
+                InstantiateAndConfigureChunk(chunkSource, chunkName, importSource, importBasedOnHash));
         }
 
-        private static IEnumerator InstantiateAndConfigureChunk(GameObject chunkSource,
-            string chunkName, ChunkImportSource importSource)
+        private static IEnumerator InstantiateAndConfigureChunk(
+            GameObject chunkSource,
+            string chunkName, 
+            ChunkImportSource importSource,
+            string importBasedOnHash)
         {
+            var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
+            var prevPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+
+            if (prevPrefab != null)
+            {
+                // Check if prevPrefab.importBasedOnHash is the same then we don't need to reimport
+                var chunkController = prevPrefab.GetComponent<ChunkControllerBase>();
+                Assert.IsNotNull(chunkController);
+                if (chunkController.ImportBasedOnHash == importBasedOnHash)
+                {
+                    Debug.Log("Don't need to reimport");
+                    yield break;
+                }
+            }
+            
+            var importInformation = new ChunkImportState(chunkName, importSource, importBasedOnHash);
+            
             // Instantiate output chunk
             var chunk = Object.Instantiate(chunkSource);
+            chunk.name = chunkName;
             yield return null;
 
             // Cook the chunk (execute FBX command, apply colliders, and materials)
-            var importInformation = new ChunkImportState(chunkName, importSource);
-            chunk.name = chunkName;
-
             var chunkCooker = ChunkCookerFactory.CreateChunkCooker(importSource.ChunkCooker);
             yield return EditorCoroutineUtility.StartCoroutineOwnerless(chunkCooker.Cook(importSource, chunk, importInformation));
 
@@ -147,9 +145,7 @@ namespace TowerGenerator.ChunkImporter
                 ChunkMetaCooker.Cook(chunk, importSource, importInformation);
             yield return null;
 
-            // Save the chunk as a new Prefab (since you cannot modify the original Model Prefab directly)
-            var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
-
+            // Save the chunk as a new Prefab
 #if USE_ANTI_CRASH_HACK
             HackAvoidEditorCrash(fullPath);
 #endif
