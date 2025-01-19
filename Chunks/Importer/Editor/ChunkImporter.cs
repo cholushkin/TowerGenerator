@@ -121,7 +121,7 @@ namespace TowerGenerator.ChunkImporter
                 Assert.IsNotNull(chunkController);
                 if (chunkController.ImportBasedOnHash == importBasedOnHash)
                 {
-                    Debug.Log("Don't need to reimport");
+                    Debug.Log($"Don't need to reimport. Same importBasedOnHash {importBasedOnHash}");
                     yield break;
                 }
             }
@@ -129,7 +129,7 @@ namespace TowerGenerator.ChunkImporter
             var importInformation = new ChunkImportState(chunkName, importSource, importBasedOnHash);
             
             // Instantiate output chunk
-            var chunk = Object.Instantiate(chunkSource);
+            var chunk = PrefabUtility.InstantiatePrefab(chunkSource) as GameObject;
             chunk.name = chunkName;
             yield return null;
 
