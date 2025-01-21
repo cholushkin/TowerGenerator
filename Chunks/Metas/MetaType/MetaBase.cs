@@ -13,7 +13,7 @@ namespace TowerGenerator
         public string ChunkName;
         public ChunkControllerBase.ChunkController ChunkControllerType;
         public TagSet TagSet; // topology, labels, architecture, biome, etc.
-        public uint Generation;
+        public int Generation;
         public float ChunkMargin;
 
         public Vector3 AABB; // Axed-aligned maximum bounding box

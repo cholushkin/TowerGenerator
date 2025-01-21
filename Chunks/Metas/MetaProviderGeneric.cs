@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GameLib.Alg;
+using GameLib.Random;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Range = GameLib.Random.Range;
 
 namespace TowerGenerator
 {
@@ -14,19 +15,18 @@ namespace TowerGenerator
         [Serializable]
         public class Filter
         {
-            public Range Generation;
-            //public TopologyType TopologyType;
-            public Range BreadthRange;
-            public Range HeightRange;
+            public int2 Generation;
+            public float2 BreadthRange;
+            public float2 HeightRange;
             public string Wildcard;
             public string Expression;
 
 
             public IEnumerable<TMeta> FilterGeneration(IEnumerable<TMeta> metas)
             {
-                if (Generation == null)
+                if (Generation.Equals(int2.zero))
                     return metas;
-                return metas.Where(m => Generation.IsIn(m.Generation));
+                return metas.Where(m => Generation.Contains(m.Generation));
             }
 
             //public IEnumerable<MetaBase> FilterEntType(IEnumerable<MetaBase> metas)
@@ -60,7 +60,7 @@ namespace TowerGenerator
             {
                 var breadth = BreadthRange;
                 if (breadth == null || breadth.IsZero())
-                    breadth = Range.InfiniteRange;
+                    breadth = int2.InfiniteRange;
                 var height = HeightRange;
                 if (height == null || height.IsZero())
                     height = Range.InfiniteRange;
