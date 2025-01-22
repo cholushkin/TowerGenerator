@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Random = GameLib.Random.Random;
 
 
 namespace TowerGenerator
@@ -49,7 +50,7 @@ namespace TowerGenerator
         }
 
         // Set group random state in specific for a group way
-        public abstract void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController);
+        public abstract void SetRandomState(Random rnd, bool notifyChunkController);
 
 
         // Enable item in unique to group type way

@@ -16,7 +16,7 @@ namespace TowerGenerator.FbxCommands
 
     public class FbxCommandChunkGeneration : FbxCommandBase
     {
-        public uint Generation;
+        public int Generation;
 
         public FbxCommandChunkGeneration(string fbxCommandName, int executionPriority) : base(fbxCommandName, executionPriority)
         {
@@ -26,7 +26,7 @@ namespace TowerGenerator.FbxCommands
         {
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
             Assert.IsFalse(string.IsNullOrEmpty(parameters));
-            Generation = ConvertUInt(parameters);
+            Generation = ConvertInt(parameters);
         }
 
         public override void Execute(GameObject gameObject, ChunkImportState importState)

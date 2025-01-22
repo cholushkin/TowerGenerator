@@ -23,7 +23,7 @@ namespace TowerGenerator.ChunkImporter
 
         public string ChunkName;
         public string MetaType;
-        public uint Generation;
+        public int Generation;
         public TagSet ChunkTagSet;
         public ChunkControllerBase.ChunkController ChunkControllerType;
         public string ImportBasedOnHash;

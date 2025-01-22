@@ -1,5 +1,6 @@
 ﻿using GameLib.Random;
 using UnityEngine;
+using Random = GameLib.Random.Random;
 
 namespace TowerGenerator
 {
@@ -10,7 +11,7 @@ namespace TowerGenerator
             CenterOfAABB,
             ChunkPivot
         }
-        private static IPseudoRandomNumberGenerator _rnd = RandomHelper.CreateRandomNumberGenerator();
+        private static Random _rnd = RandomHelper.CreateRandomNumberGenerator();
         private static readonly float[] _angles = { 0f, 90f, 180f, 270f };
 
         public static Vector3 GetAttachPosition(Bounds parent, Vector3 attachDirection)

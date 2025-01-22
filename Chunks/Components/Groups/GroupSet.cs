@@ -3,6 +3,7 @@ using GameLib.Alg;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Random = GameLib.Random.Random;
 
 namespace TowerGenerator
 {
@@ -82,7 +83,7 @@ namespace TowerGenerator
             }
         }
 
-        public override void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController)
+        public override void SetRandomState(Random rnd, bool notifyChunkController)
         {
             // Prepare the array of index
             int[] itemsIndexes = new int[GetItemsCount()];
@@ -90,7 +91,7 @@ namespace TowerGenerator
                 itemsIndexes[i] = i;
 
             // Take randomly from MinObjectsSelected to MaxObjectsSelected elements from index array
-            var choices = rnd.FromArray(itemsIndexes, rnd.FromRangeIntInclusive(MinObjectsSelected, MaxObjectsSelected));
+            var choices = rnd.FromArray(itemsIndexes, rnd.RangeInclusive(MinObjectsSelected, MaxObjectsSelected));
 
             // Set bits 
             BitArray newState = new BitArray(GetItemsCount(), false);

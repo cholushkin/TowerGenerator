@@ -58,20 +58,12 @@ namespace TowerGenerator
 
             public IEnumerable<TMeta> FilterSize(IEnumerable<TMeta> metas)
             {
-                var breadth = BreadthRange;
-                if (breadth == null || breadth.IsZero())
-                    breadth = int2.InfiniteRange;
-                var height = HeightRange;
-                if (height == null || height.IsZero())
-                    height = Range.InfiniteRange;
-
-                if (breadth == Range.InfiniteRange && height == Range.InfiniteRange)
+                if (BreadthRange.Equals(BreadthRange.Zero()) && HeightRange.Equals(HeightRange.Zero()))
                     return metas;
 
                 return metas;
-                //return metas.Where(x=>_checkSizes(x, breadth, height));
-
             }
+
 
             public override string ToString()
             {
@@ -108,20 +100,17 @@ namespace TowerGenerator
             //    }
             //}
 
-            public static bool IsAABBInside(Vector3 AABB, Range breadthRange, Range heightRange)
+            public static bool IsAABBInside(Vector3 AABB, float2 breadthRange, float2 heightRange)
             {
-                if (breadthRange == null || breadthRange.IsZero())
-                    breadthRange = Range.InfiniteRange;
-                if (heightRange == null || heightRange.IsZero())
-                    heightRange = Range.InfiniteRange;
+                if (breadthRange.Equals(breadthRange.Zero()))
+                    breadthRange = breadthRange.Infinity();
+                if (heightRange.Equals(heightRange.Zero()))
+                    heightRange = heightRange.Infinity();
 
-                var xIsOK = AABB.x >= breadthRange.From && AABB.x <= breadthRange.To;
-                var zIsOK = AABB.z >= breadthRange.From && AABB.z <= breadthRange.To;
-                var heightIsOK = AABB.y >= heightRange.From && AABB.y <= heightRange.To;
-                if (xIsOK && zIsOK && heightIsOK)
-                    return true;
-
-                return false;
+                var xIsOK = AABB.x >= breadthRange.x  && AABB.x <= breadthRange.y;
+                var zIsOK = AABB.z >= breadthRange.x && AABB.z <= breadthRange.y;
+                var heightIsOK = AABB.y >= heightRange.x && AABB.y <= heightRange.y;
+                return xIsOK && zIsOK && heightIsOK;
             }
 
             //static bool _checkSizes(MetaBase meta, Range breadthRange, Range heightRange)

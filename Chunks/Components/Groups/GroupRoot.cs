@@ -22,7 +22,7 @@ namespace TowerGenerator
         {
         }
 
-        public override void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController)
+        public override void SetRandomState(Random rnd, bool notifyChunkController)
         {
         }
 

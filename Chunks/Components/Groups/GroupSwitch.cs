@@ -3,6 +3,7 @@ using GameLib.Alg;
 using GameLib.Random;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Random = GameLib.Random.Random;
 
 
 namespace TowerGenerator
@@ -37,9 +38,9 @@ namespace TowerGenerator
             }
         }
 
-        public override void SetRandomState(IPseudoRandomNumberGenerator rnd, bool notifyChunkController)
+        public override void SetRandomState(Random rnd, bool notifyChunkController)
         {
-            var rndIndex = rnd.FromRangeIntInclusive(0, GetItemsCount() - 1);
+            var rndIndex = rnd.RangeInclusive(0, GetItemsCount() - 1);
             EnableItem(rndIndex, true, notifyChunkController);
         }
 

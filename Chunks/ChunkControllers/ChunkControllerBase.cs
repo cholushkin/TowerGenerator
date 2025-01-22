@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using GameLib.Alg;
 using GameLib.Log;
 using GameLib.Random;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Random = UnityEngine.Random;
+using Random = GameLib.Random.Random;
 
 
 namespace TowerGenerator
@@ -59,6 +57,7 @@ namespace TowerGenerator
         }
 
         public long Seed = -1;
+        public uint RngState;
         public MetaBase Meta;
         [ReadOnly] public string ImportBasedOnHash;
 
@@ -107,14 +106,19 @@ namespace TowerGenerator
             if(_impactTree == null)
                 Init();
             
+            // Randomize seed if Seed==-1
             if (Seed == -1)
-                Seed = Random.Range(0, Int32.MaxValue);
+                Seed = RandomHelper.Rnd.ValueInt();
+            Random rnd = RandomHelper.CreateRandomNumberGenerator((uint)Seed);
+            // Override state if it's not a zero state
+            if (RngState != 0)
+                rnd.SetState(RngState);
 
             // Set default state of the tree
             InitializeTreeState();
 
             // Set initial configuration of all groups
-            IPseudoRandomNumberGenerator rnd = RandomHelper.CreateRandomNumberGenerator(Seed);
+            
             foreach (var treeNode in _impactTree.TraverseDepthFirstPreOrder())
             {
                 treeNode.Data.SetRandomState(rnd, false);
@@ -123,8 +127,8 @@ namespace TowerGenerator
             // Notify ChunkController
             SetNodeActiveState(_impactTree.Data.transform, true);
             
-            // Update seed back
-            Seed = rnd.GetState().AsNumber();
+            // set current state
+            RngState = rnd.GetState();
         }
 
         public Connector[] GetActiveConnectors()
