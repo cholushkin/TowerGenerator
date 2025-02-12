@@ -45,7 +45,7 @@ namespace TowerGenerator.FbxCommands
                 for (int i = 1; i < actualParams.Length; ++i)
                 {
                     var tagName = actualParams[i];
-                    ChunkTagSet.SetTag(tagName, 1f);
+                    ChunkTagSet.Set(tagName, 1f);
                 }
             }
         }

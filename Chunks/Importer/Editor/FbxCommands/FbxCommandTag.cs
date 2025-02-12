@@ -51,7 +51,7 @@ namespace TowerGenerator.FbxCommands
                 tagHolder.TagSet = new TagSet();
             }
 
-            tagHolder.TagSet.SetTag(TagName, TagValue);
+            tagHolder.TagSet.Set(TagName, TagValue);
         }
     }
 }

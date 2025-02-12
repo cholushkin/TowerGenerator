@@ -14,75 +14,70 @@ namespace TowerGenerator
         {
             public Tag(string name, float value)
             {
-                Assert.IsTrue(value >= 0.0f);
-                Assert.IsTrue(value <= 1.0f);
-                Assert.IsTrue(!string.IsNullOrEmpty(name));
-
-                value = Mathf.Clamp01(value);
+                Assert.IsTrue(value >= 0.0f && value <= 1.0f, "Value must be between 0 and 1.");
+                Assert.IsFalse(string.IsNullOrEmpty(name), "Tag name cannot be null or empty.");
 
                 Name = name;
-                Value = value;
+                Value = Mathf.Clamp01(value);
             }
 
             public string Name;
-            [Range(0, 1)]
-            public float Value;
+            [Range(0, 1)] public float Value;
         }
 
         public List<Tag> Tags;
+        private Dictionary<string, Tag> _tagDictionary;
 
-
-        public TagSet()
+        // Lazy initialization for _tagDictionary
+        private void EnsureTagDictionaryInitialized()
         {
-            Tags = new List<Tag>();
-        }
-
-        public TagSet(TagSet otherTagset)
-        {
-            if (otherTagset.Tags != null)
+            if (_tagDictionary == null)
             {
-                Tags = new List<Tag>(otherTagset.Tags.Count);
-                for (int i = 0; i < otherTagset.Tags.Count; ++i)
-                    Tags.Add(new Tag(otherTagset.Tags[i].Name, otherTagset.Tags[i].Value));
+                _tagDictionary = new Dictionary<string, Tag>();
+                foreach (var tag in Tags)
+                    _tagDictionary[tag.Name] = tag;
             }
         }
 
-        public void SetTag(Tag tag)
+        public void Set(string tagName, float value = 1.0f)
         {
-            Assert.IsNotNull(tag);
-            SetTag(tag.Name, tag.Value);
-        }
-
-        public void SetTag(string tagName, float value)
-        {
-            Tag existing = Tags.FirstOrDefault(x => x.Name == tagName);
-
-            if (existing != null)
+            EnsureTagDictionaryInitialized(); // Make sure dictionary is initialized
+            
+            // Try to get the existing tag by name from the dictionary
+            if (_tagDictionary.TryGetValue(tagName, out var existingTag))
             {
-                existing.Value = value;
+                existingTag.Value = value; // Update the value if the tag exists
             }
             else
             {
-                Tags.Add(new Tag(tagName, value));
-                UpdateFastAccessDictionaries();
+                // If the tag doesn't exist, create a new one and add it to both the list and dictionary
+                var newTag = new Tag(tagName, value);
+                Tags.Add(newTag);
+                _tagDictionary[tagName] = newTag;
             }
         }
 
-        public bool HasTag(string tag, float threshold = 0.0f)
+        public float Get(string tagName, float defaultValue = 0f)
         {
-            if (_dictionary.TryGetValue(tag, out var existed))
-            {
-                if (Math.Abs(existed.Value) < 0.0001f)
-                    return false;
-                if (existed.Value >= threshold)
-                    return true;
-            }
+            EnsureTagDictionaryInitialized(); // Make sure dictionary is initialized
+
+            if (_tagDictionary.TryGetValue(tagName, out var tag))
+                return tag.Value;
+            return defaultValue;
+        }
+
+        public bool HasTag(string tag)
+        {
+            EnsureTagDictionaryInitialized(); // Make sure dictionary is initialized
+
+            if (_tagDictionary.TryGetValue(tag, out var existingTag))
+                return existingTag.Value >= 0f;
             return false;
         }
 
         public bool IsEmpty()
         {
-            return (Tags == null || Tags.Count == 0);
+            return Tags.Count == 0;
         }
 
         public override string ToString()
@@ -91,46 +86,8 @@ namespace TowerGenerator
             {
                 return "|no tags|";
             }
-            var result = "";
-            foreach (var tag in Tags)
-                result += $"[{tag.Name}:{tag.Value}]";
-            return result;
-        }
 
-        private Dictionary<string, object> _nCalcDictionary;
-        private Dictionary<string, Tag> _dictionary;
-
-        void UpdateFastAccessDictionaries()
-        {
-            UpdateNCalcDictionary();
-        }
-
-        public void UpdateNCalcDictionary()
-        {
-            _nCalcDictionary = new Dictionary<string, object>();
-            foreach (var tag in Tags)
-                _nCalcDictionary.Add(tag.Name, tag.Value);
-        }
-
-        public Dictionary<string, object> AsNCalcDictionary()
-        {
-            if (_nCalcDictionary == null)
-                UpdateNCalcDictionary();
-            return _nCalcDictionary;
-        }
-
-        public void UpdateDictionary()
-        {
-            _dictionary = new Dictionary<string, Tag>();
-            foreach (var tag in Tags)
-                _dictionary.Add(tag.Name, new Tag(tag.Name, tag.Value));
-        }
-
-        public Dictionary<string, Tag> AsDictionary()
-        {
-            if (_dictionary == null)
-                UpdateDictionary();
-            return _dictionary;
+            return string.Join(", ", Tags.Select(tag => $"[{tag.Name}:{tag.Value}]"));
         }
     }
 }
