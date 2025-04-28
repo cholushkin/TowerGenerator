@@ -108,7 +108,7 @@ namespace TowerGenerator
             
             // Randomize seed if Seed==-1
             if (Seed == -1)
-                Seed = RandomHelper.Rnd.ValueInt();
+                Seed = RandomHelper.Rng.ValueInt();
             Random rnd = RandomHelper.CreateRandomNumberGenerator((uint)Seed);
             // Override state if it's not a zero state
             if (RngState != 0)
