@@ -11,7 +11,7 @@ namespace TowerGenerator
             CenterOfAABB,
             ChunkPivot
         }
-        private static Random _rnd = RandomHelper.CreateRandomNumberGenerator();
+        private static Random _rnd = RandomHelper.CreateRandomNumberGenerator(out _);
         private static readonly float[] _angles = { 0f, 90f, 180f, 270f };
 
         public static Vector3 GetAttachPosition(Bounds parent, Vector3 attachDirection)
