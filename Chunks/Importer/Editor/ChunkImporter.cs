@@ -118,8 +118,8 @@ namespace TowerGenerator.ChunkImporter
             {
                 // Check if prevPrefab.importBasedOnHash is the same then we don't need to reimport
                 var chunkController = prevPrefab.GetComponent<ChunkControllerBase>();
-                Assert.IsNotNull(chunkController);
-                if (chunkController.ImportBasedOnHash == importBasedOnHash)
+                
+                if (chunkController != null && chunkController.ImportBasedOnHash == importBasedOnHash)
                 {
                     Debug.Log($"Don't need to reimport. Same importBasedOnHash {importBasedOnHash}");
                     yield break;
