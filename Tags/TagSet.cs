@@ -14,18 +14,17 @@ namespace TowerGenerator
         {
             public Tag(string name, float value)
             {
-                Assert.IsTrue(value >= 0.0f && value <= 1.0f, "Value must be between 0 and 1.");
                 Assert.IsFalse(string.IsNullOrEmpty(name), "Tag name cannot be null or empty.");
 
                 Name = name;
-                Value = Mathf.Clamp01(value);
+                Value = value;
             }
 
             public string Name;
-            [Range(0, 1)] public float Value;
+            public float Value;
         }
 
-        public List<Tag> Tags;
+        public List<Tag> Tags = new();
         private Dictionary<string, Tag> _tagDictionary;
 
         // Lazy initialization for _tagDictionary
