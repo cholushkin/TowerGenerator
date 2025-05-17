@@ -6,6 +6,7 @@ using GameLib.Random;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
+using VitalRouter;
 using Random = GameLib.Random.Random;
 
 
@@ -13,7 +14,7 @@ namespace TowerGenerator
 {
     public class ChunkControllerBase : MonoBehaviour
     {
-        public class EventNodeActiveStateChanged
+        public class EventNodeActiveStateChanged : ICommand
         {
             public GameObject Node;
         }
@@ -266,7 +267,7 @@ namespace TowerGenerator
                         Induce(inductionLabel, true);
             }
 
-            GlobalEventAggregator.EventAggregator.Publish(new EventNodeActiveStateChanged { Node = node.gameObject });
+            VitalRouter.Router.Default.PublishAsync(new EventNodeActiveStateChanged { Node = node.gameObject });
         }
 
         public bool HasSuppressionLabel(string label)

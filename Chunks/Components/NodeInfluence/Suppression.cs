@@ -1,5 +1,4 @@
-﻿using Events;
-
+﻿
 
 namespace TowerGenerator
 {
