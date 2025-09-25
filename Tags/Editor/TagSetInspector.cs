@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
@@ -168,3 +169,4 @@ public class TagSetInspector : PropertyDrawer
         return listInstance;
     }
 }
+#endif
