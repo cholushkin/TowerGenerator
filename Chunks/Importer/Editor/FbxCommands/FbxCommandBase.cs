@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using System;
+﻿using System;
 using TowerGenerator.ChunkImporter;
 using UnityEngine;
 
@@ -85,4 +84,3 @@ namespace TowerGenerator.FbxCommands
         #endregion
     }
 }
-#endif

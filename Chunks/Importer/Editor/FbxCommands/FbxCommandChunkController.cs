@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using GameLib;
 using TowerGenerator.ChunkImporter;
 using UnityEngine;
@@ -69,4 +68,3 @@ namespace TowerGenerator.FbxCommands
         }
     }
 }
-#endif

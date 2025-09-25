@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -111,4 +110,3 @@ namespace TowerGenerator
         }
     }
 }
-#endif

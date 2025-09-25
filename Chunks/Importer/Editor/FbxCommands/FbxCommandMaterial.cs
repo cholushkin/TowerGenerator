@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Linq;
 using TowerGenerator.ChunkImporter;
 using UnityEngine;
@@ -34,4 +33,3 @@ namespace TowerGenerator.FbxCommands
         }
     }
 }
-#endif

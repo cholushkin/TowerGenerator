@@ -1,0 +1,21 @@
+{
+    "name": "TowerGenerator.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9093958824af9c841bbc0123a33d076e",
+        "GUID:478a2357cc57436488a56e564b08d223",
+        "GUID:e374adf4b521a744cbe1f65144dbb05a",
+        "GUID:cec6ca78d9ef46a4480a4891fd7a52db"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
