@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using GameLib.Alg;
 using GameLib.Log;
 using GameLib.Random;
+using Microsoft.Extensions.Logging;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
 using VitalRouter;
+using ZLogger;
+using Logger = GameLib.Log.Logger;
 using Random = GameLib.Random.Random;
 
 
@@ -66,15 +69,14 @@ namespace TowerGenerator
         protected TreeNode<Group> _impactTree;
         private Dictionary<string, List<Transform>> _suppression;
         private Dictionary<string, List<Transform>> _induction;
-        public LogChecker Log = new LogChecker(LogChecker.Level.Verbose);
+        public Logger Logger = new Logger();
 
 
         public virtual void Init() // configure
         {
-            if (Log.Verbose())
-                Debug.Log("> Init");
-            if (Log.Normal())
-                Debug.Log($"{transform.GetDebugName()} Seed {Seed}");
+            
+            Logger.Instance().ZLog(Logger.Level(LogLevel.Trace), $"Init");
+            Logger.Instance().ZLog(Logger.Level(LogLevel.Information), $"{transform.GetDebugName()} Seed {Seed}");
             BuildImpactTree();
             InitializeInduction();
             InitializeSuppression();
