@@ -9,15 +9,15 @@ namespace TowerGenerator.ChunkImporter
         public class RegistrationEntry
         {
             public string Name;
-            public Func<IChunkCooker> Creator;
+            public Func<IChunkCookerAsync> Creator;
         }
 
-        private static readonly Dictionary<string, Func<IChunkCooker>> ChunkCookerRegistry = new();
+        private static readonly Dictionary<string, Func<IChunkCookerAsync>> ChunkCookerRegistry = new();
 
         static ChunkCookerFactory()
         {
             RegisterChunkCooker(new RegistrationEntry
-                { Name = "DefaultChunkCooker", Creator = () => new ChunkCookerDefault() });
+                { Name = "DefaultChunkCooker", Creator = () => new ChunkCookerDefaultAsync() });
         }
 
         public static void RegisterChunkCooker(RegistrationEntry entry)
@@ -28,7 +28,7 @@ namespace TowerGenerator.ChunkImporter
             }
         }
 
-        public static IChunkCooker CreateChunkCooker(string name)
+        public static IChunkCookerAsync CreateChunkCooker(string name)
         {
             if (string.IsNullOrEmpty(name))
                 name = "DefaultChunkCooker";

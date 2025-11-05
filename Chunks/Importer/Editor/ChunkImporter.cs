@@ -2,7 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
-using Unity.EditorCoroutines.Editor;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -40,7 +40,8 @@ namespace TowerGenerator.ChunkImporter
                     continue;
                 }
 
-                ExtractChunk(assetObj, chunkName, source, depHash);
+                InstantiateAndConfigureChunkAsync(assetObj, chunkName, source, depHash).Forget();
+
             }
 
             AssetDatabase.SaveAssets();
@@ -54,18 +55,18 @@ namespace TowerGenerator.ChunkImporter
 
             AssetDatabase.Refresh();
         }
-        
+
         private static string GetDependencyHash(string assetPath)
         {
             return AssetDatabase.GetAssetDependencyHash(assetPath).ToString();
         }
-        
+
         void OnPreprocessModel()
         {
             // todo: define in ImportSource
-            
+
             ModelImporter modelImporter = (ModelImporter)assetImporter;
-            
+
             var source = ChunkImportSourceManager.GetChunkImportSource(assetPath);
 
             if (source == null)
@@ -96,89 +97,84 @@ namespace TowerGenerator.ChunkImporter
             AssetDatabase.DeleteAsset(fullPath);
         }
 
-        // write patterns, add design-time stuff, do hierarchy reorganizations
-        private static void ExtractChunk(GameObject chunkSource, string chunkName, ChunkImportSource importSource, string importBasedOnHash)
-        {
-            EditorCoroutineUtility.StartCoroutineOwnerless(
-                InstantiateAndConfigureChunk(chunkSource, chunkName, importSource, importBasedOnHash));
-        }
-
-        private static IEnumerator InstantiateAndConfigureChunk(
+        private static async UniTask InstantiateAndConfigureChunkAsync(
             GameObject chunkSource,
-            string chunkName, 
+            string chunkName,
             ChunkImportSource importSource,
             string importBasedOnHash)
         {
             var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
             var prevPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
 
+            // Skip reimport if hash is unchanged
             if (prevPrefab != null)
             {
-                // Check if prevPrefab.importBasedOnHash is the same then we don't need to reimport
                 var chunkController = prevPrefab.GetComponent<ChunkControllerBase>();
-                
                 if (chunkController != null && chunkController.ImportBasedOnHash == importBasedOnHash)
                 {
                     Debug.Log($"Don't need to reimport. Same importBasedOnHash {importBasedOnHash}");
-                    yield break;
+                    return;
                 }
             }
-            
+
             var importInformation = new ChunkImportState(chunkName, importSource, importBasedOnHash);
-            
-            // Instantiate output chunk
+
+            // Instantiate the chunk
             var chunk = PrefabUtility.InstantiatePrefab(chunkSource) as GameObject;
             chunk.name = chunkName;
-            yield return null;
 
-            // Cook the chunk (execute FBX command, apply colliders, and materials)
+            await UniTask.Yield(); // same as yield return null
+
+
+            // Cook the chunk — using your async cooker
             var chunkCooker = ChunkCookerFactory.CreateChunkCooker(importSource.ChunkCooker);
-            yield return EditorCoroutineUtility.StartCoroutineOwnerless(chunkCooker.Cook(importSource, chunk, importInformation));
+            await chunkCooker.CookAsync(importSource, chunk, importInformation);
 
-            chunk.transform.localScale *= importSource.Scale; // Apply additional scale
+
+            // Apply scale and reset position
+            chunk.transform.localScale *= importSource.Scale;
             chunk.transform.position = Vector3.zero;
 
-            // Generate meta if enabled
+            // Generate meta
             if (importSource.EnableMetaGeneration)
                 ChunkMetaCooker.Cook(chunk, importSource, importInformation);
-            yield return null;
 
-            // Save the chunk as a new Prefab
+            await UniTask.Yield();
+
+
 #if USE_ANTI_CRASH_HACK
             HackAvoidEditorCrash(fullPath);
 #endif
 
-            // Save the modified chunk as a new prefab
+            // Save new prefab
             PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
             AssetDatabase.ImportAsset(fullPath);
-            yield return null; // Ensure all processes are completed before destruction
+
+            await UniTask.Yield();
 
             Debug.Log($"Import chunk: {importInformation}");
 
-            // Save the variant prefab if it does not already exist
+            // Optional: generate variant
             if (importSource.GenerateVariant)
             {
-                var variantName = chunkName + "Usr"; // meaning "user" prefab with user scripts and modifications 
+                var variantName = chunkName + "Usr";
                 var variantFullPath = Path.Combine(importSource.ChunksVariantsOutputPath, variantName + ".prefab");
 
-                // Check if the variant prefab already exists
                 if (AssetDatabase.LoadAssetAtPath<GameObject>(variantFullPath) == null)
                 {
-                    // Load the saved base prefab
                     var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
-
-                    // Instantiate the base prefab
                     var chunkVariant = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
                     chunkVariant.name = variantName;
 
-                    // Save as a new variant prefab, connecting it to the base prefab
-                    var chunkVariantPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(chunkVariant, variantFullPath,
+                    PrefabUtility.SaveAsPrefabAssetAndConnect(
+                        chunkVariant,
+                        variantFullPath,
                         InteractionMode.AutomatedAction);
-                    yield return null; // Ensure everything is processed
+
+                    await UniTask.Yield();
 
                     Debug.Log($"Variant chunk saved: {variantName}");
 
-                    // Clean up the instantiated chunk variant
                     Object.DestroyImmediate(chunkVariant);
                 }
                 else
@@ -187,7 +183,7 @@ namespace TowerGenerator.ChunkImporter
                 }
             }
 
-            // Clean up the instantiated chunk
+            // Cleanup
             Object.DestroyImmediate(chunk);
         }
 

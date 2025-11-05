@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using TowerGenerator.FbxCommands;
-using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
@@ -58,18 +58,22 @@ namespace TowerGenerator.ChunkImporter
         }
     }
 
-    public interface IChunkCooker
+    public interface IChunkCookerAsync
     {
-        IEnumerator Cook(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation);
+        UniTask CookAsync(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation);
     }
 
-    public class ChunkCookerDefault : IChunkCooker
+    public class ChunkCookerDefaultAsync : IChunkCookerAsync
     {
-        public virtual IEnumerator Cook(ChunkImportSource importSource, GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
+        public virtual async UniTask CookAsync(
+            ChunkImportSource importSource,
+            GameObject semifinishedEnt,
+            ChunkImportState chunkImportInformation)
         {
             Debug.Log($"Cooking entity: {semifinishedEnt}");
 
-            yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExecuteFbxCommands(semifinishedEnt, chunkImportInformation));
+            // Execute FBX commands
+            await ExecuteFbxCommandsAsync(semifinishedEnt, chunkImportInformation);
 
             if (importSource.AddColliders)
                 ApplyColliders(semifinishedEnt, chunkImportInformation);
@@ -79,25 +83,31 @@ namespace TowerGenerator.ChunkImporter
 
             ApplyShadowsSettings(semifinishedEnt, importSource.CastShadows, chunkImportInformation);
 
-            yield return null;
+            // Equivalent to "yield return null;"
+            await UniTask.Yield();
 
-            ConfigureChunkController(semifinishedEnt, chunkImportInformation); // tree
+            ConfigureChunkController(semifinishedEnt, chunkImportInformation);
         }
 
-        protected virtual IEnumerator ExecuteFbxCommands(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
+        protected virtual async UniTask ExecuteFbxCommandsAsync(
+            GameObject semifinishedEnt,
+            ChunkImportState chunkImportInformation)
         {
             var fbxProps = semifinishedEnt.GetComponentsInChildren<FbxProps>(true);
 
             var allCommands = new List<(GameObject, FbxCommandBase)>(fbxProps.Length);
 
-            // Parse all fbxProps
+            // Parse all FBX props into command list
             foreach (var props in fbxProps)
                 FbxCommandExecutor.ParseFbxProps(props, allCommands, chunkImportInformation);
 
-            // Execute all commands
+            // Execute all commands (synchronous)
             FbxCommandExecutor.ExecuteCommands(allCommands, chunkImportInformation);
-            yield return null;
+
+            // One frame yield, same as old coroutine `yield return null`
+            await UniTask.Yield();
         }
+
 
         protected virtual void ApplyColliders(GameObject semifinishedEnt, ChunkImportState chunkImportInformation)
         {
