@@ -55,7 +55,7 @@ namespace TowerGenerator.FbxCommands
             Assert.IsNotNull(gameObject, $"There must be an object for the command '{GetFbxCommandName()}'");
             Assert.IsNotNull(importState);
 
-            Type compType = CustomTypeConvertor.GetType(ComponentClassName);
+            Type compType = CustomTypeConvertor.GetType(ComponentClassName, importState.ImportSource.ResolveTypeAsmDefs);
             if (compType == null)
                 throw new Exception($"No such type as '{ComponentClassName}'");
 
@@ -145,57 +145,68 @@ public static class CustomTypeConvertor
         return result;
     }
 
-
-
-    public static Type GetType(string TypeName)
+    public static Type GetType(string typeName, string[] additionalAsmDefs = null)
     {
-        // Try Type.GetType() first. This will work with types defined
-        // by the Mono runtime, in the same assembly as the caller, etc.
-        var type = Type.GetType(TypeName);
-
-        // If it worked, then we're done here
+        // 1. Try Type.GetType first
+        var type = Type.GetType(typeName);
         if (type != null)
             return type;
 
-        // If the TypeName is a full name, then we can try loading the defining assembly directly
-        if (TypeName.Contains("."))
+        // 2. If typeName is fully qualified, try loading the assembly directly
+        if (typeName.Contains("."))
         {
-
-            // Get the name of the assembly (Assumption is that we are using 
-            // fully-qualified type names)
-            var assemblyName = TypeName.Substring(0, TypeName.IndexOf('.'));
-
-            // Attempt to load the indicated Assembly
-            var assembly = Assembly.Load(assemblyName);
-            if (assembly == null)
-                return null;
-
-            // Ask that assembly to return the proper Type
-            type = assembly.GetType(TypeName);
-            if (type != null)
-                return type;
-
-        }
-
-        // If we still haven't found the proper type, we can enumerate all of the 
-        // loaded assemblies and see if any of them define the type
-        var currentAssembly = Assembly.GetExecutingAssembly();
-        var referencedAssemblies = currentAssembly.GetReferencedAssemblies();
-        foreach (var assemblyName in referencedAssemblies)
-        {
-
-            // Load the referenced assembly
-            var assembly = Assembly.Load(assemblyName);
-            if (assembly != null)
+            var assemblyName = typeName.Substring(0, typeName.IndexOf('.'));
+            try
             {
-                // See if that assembly defines the named type
-                type = assembly.GetType(TypeName);
+                var assembly = Assembly.Load(assemblyName);
+                type = assembly?.GetType(typeName);
                 if (type != null)
                     return type;
             }
+            catch
+            {
+                // ignored
+            }
         }
 
-        // The type just couldn't be found...
+        // 3. Check referenced assemblies of current assembly
+        var currentAssembly = Assembly.GetExecutingAssembly();
+        foreach (var asmName in currentAssembly.GetReferencedAssemblies())
+        {
+            try
+            {
+                var asm = Assembly.Load(asmName);
+                type = asm?.GetType(typeName);
+                if (type != null)
+                    return type;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        // 4. Check additional assemblies explicitly passed in
+        if (additionalAsmDefs != null)
+        {
+            foreach (var asmName in additionalAsmDefs)
+            {
+                try
+                {
+                    var asm = Assembly.Load(asmName);
+                    type = asm?.GetType(typeName);
+                    if (type != null)
+                        return type;
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+        }
+
+        // 5. Type not found
         return null;
     }
+
 }

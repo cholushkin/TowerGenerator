@@ -53,6 +53,8 @@ namespace TowerGenerator
 
         public float Scale = 1f; // Additionally scales imported chunks by this value
 
+
+        public string[] ResolveTypeAsmDefs;
         [SerializeField] private string _metasOutputPath;
         [SerializeField] private string _chunksOutputPath;
         [SerializeField] private string _chunksVariantsOutputPath;
