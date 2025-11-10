@@ -13,6 +13,8 @@ namespace TowerGenerator.ChunkImporter
 {
     public class ChunkImporter : AssetPostprocessor
     {
+        static UniTask _importQueue = UniTask.CompletedTask;
+
         private static void OnPostprocessAllAssets(
             string[] importedAssets,
             string[] deletedAssets,
@@ -20,40 +22,50 @@ namespace TowerGenerator.ChunkImporter
             string[] movedFromAssetPaths)
         {
             // Process chunk importing
-            foreach (string assetPath in importedAssets)
+            foreach (var assetPath in importedAssets)
             {
                 var source = ChunkImportSourceManager.GetChunkImportSource(assetPath);
+                if (source == null || !source.EnableImport) continue;
 
-                if (source == null)
-                    continue;
-                if (!source.EnableImport)
-                    continue;
-
-
-                Debug.Log($"Importing chunk: '{assetPath}'");
                 var chunkName = Path.GetFileNameWithoutExtension(assetPath);
                 var assetObj = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                var depHash = GetDependencyHash(assetPath);
                 if (assetObj == null)
                 {
-                    Debug.LogError($"Error: can't load asset at path {assetPath}");
+                    Debug.LogError($"Can't load {assetPath}");
                     continue;
                 }
 
-                InstantiateAndConfigureChunkAsync(assetObj, chunkName, source, depHash).Forget();
+                var depHash = GetDependencyHash(assetPath);
 
+                // If the chain is in a bad state, reset it.
+                if (_importQueue.Status.IsCompleted() || _importQueue.Status.IsCanceled() || _importQueue.Status.IsFaulted())
+                    _importQueue = UniTask.CompletedTask;
+                
+                _importQueue = _importQueue.ContinueWith(async () =>
+                {
+                    try
+                    {
+                        await InstantiateAndConfigureChunkAsync(assetObj, chunkName, source, depHash);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogException(ex); // swallow so the chain doesn't fault
+                    }
+                });
             }
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
 
             // process deleted chunk packs
             foreach (string deletedAssetPath in deletedAssets)
             {
                 // todo:
             }
-
-            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
+        }
+        
+        [InitializeOnLoadMethod]
+        static void ResetQueueOnLoad()
+        {
+            _importQueue = UniTask.CompletedTask;
         }
 
         private static string GetDependencyHash(string assetPath)
@@ -98,93 +110,84 @@ namespace TowerGenerator.ChunkImporter
         }
 
         private static async UniTask InstantiateAndConfigureChunkAsync(
-            GameObject chunkSource,
-            string chunkName,
-            ChunkImportSource importSource,
-            string importBasedOnHash)
+            GameObject chunkSource, string chunkName, ChunkImportSource importSource, string importBasedOnHash)
         {
+            await UniTask.SwitchToMainThread();
+
             var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
             var prevPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
 
-            // Skip reimport if hash is unchanged
             if (prevPrefab != null)
             {
-                var chunkController = prevPrefab.GetComponent<ChunkControllerBase>();
-                if (chunkController != null && chunkController.ImportBasedOnHash == importBasedOnHash)
+                var controller = prevPrefab.GetComponent<ChunkControllerBase>();
+                if (controller != null && controller.ImportBasedOnHash == importBasedOnHash)
                 {
-                    Debug.Log($"Don't need to reimport. Same importBasedOnHash {importBasedOnHash}");
+                    Debug.Log($"Skip reimport: {importBasedOnHash}");
                     return;
                 }
             }
 
             var importInformation = new ChunkImportState(chunkName, importSource, importBasedOnHash);
 
-            // Instantiate the chunk
-            var chunk = PrefabUtility.InstantiatePrefab(chunkSource) as GameObject;
-            chunk.name = chunkName;
+            GameObject chunk = null;
+            try
+            {
+                chunk = PrefabUtility.InstantiatePrefab(chunkSource) as GameObject;
+                chunk.name = chunkName;
 
-            await UniTask.Yield(); // same as yield return null
+                await UniTask.Yield();
 
+                var cooker = ChunkCookerFactory.CreateChunkCooker(importSource.ChunkCooker);
+                await cooker.CookAsync(importSource, chunk, importInformation);
 
-            // Cook the chunk — using your async cooker
-            var chunkCooker = ChunkCookerFactory.CreateChunkCooker(importSource.ChunkCooker);
-            await chunkCooker.CookAsync(importSource, chunk, importInformation);
+                chunk.transform.localScale *= importSource.Scale;
+                chunk.transform.position = Vector3.zero;
 
+                if (importSource.EnableMetaGeneration)
+                    ChunkMetaCooker.Cook(chunk, importSource, importInformation);
 
-            // Apply scale and reset position
-            chunk.transform.localScale *= importSource.Scale;
-            chunk.transform.position = Vector3.zero;
-
-            // Generate meta
-            if (importSource.EnableMetaGeneration)
-                ChunkMetaCooker.Cook(chunk, importSource, importInformation);
-
-            await UniTask.Yield();
-
-
+                await UniTask.Yield();
+                
 #if USE_ANTI_CRASH_HACK
-            HackAvoidEditorCrash(fullPath);
+                HackAvoidEditorCrash(fullPath); // now leak-free
 #endif
 
-            // Save new prefab
-            PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
-            AssetDatabase.ImportAsset(fullPath);
+                PrefabUtility.SaveAsPrefabAsset(chunk, fullPath);
+                // AssetDatabase.ImportAsset(fullPath); // usually unnecessary after SaveAsPrefabAsset
+                await UniTask.Yield();
 
-            await UniTask.Yield();
+                Debug.Log($"Import chunk: {importInformation}");
 
-            Debug.Log($"Import chunk: {importInformation}");
-
-            // Optional: generate variant
-            if (importSource.GenerateVariant)
-            {
-                var variantName = chunkName + "Usr";
-                var variantFullPath = Path.Combine(importSource.ChunksVariantsOutputPath, variantName + ".prefab");
-
-                if (AssetDatabase.LoadAssetAtPath<GameObject>(variantFullPath) == null)
+                if (importSource.GenerateVariant)
                 {
-                    var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
-                    var chunkVariant = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
-                    chunkVariant.name = variantName;
+                    var variantName = chunkName + "Usr";
+                    var variantFullPath = Path.Combine(importSource.ChunksVariantsOutputPath, variantName + ".prefab");
 
-                    PrefabUtility.SaveAsPrefabAssetAndConnect(
-                        chunkVariant,
-                        variantFullPath,
-                        InteractionMode.AutomatedAction);
+                    if (AssetDatabase.LoadAssetAtPath<GameObject>(variantFullPath) == null)
+                    {
+                        var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+                        var chunkVariant = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
+                        chunkVariant.name = variantName;
 
-                    await UniTask.Yield();
+                        try
+                        {
+                            PrefabUtility.SaveAsPrefabAssetAndConnect(
+                                chunkVariant, variantFullPath, InteractionMode.AutomatedAction);
+                        }
+                        finally
+                        {
+                            Object.DestroyImmediate(chunkVariant);
+                        }
 
-                    Debug.Log($"Variant chunk saved: {variantName}");
-
-                    Object.DestroyImmediate(chunkVariant);
-                }
-                else
-                {
-                    Debug.Log($"Variant prefab '{variantName}' already exists, skipping creation.");
+                        await UniTask.Yield();
+                        Debug.Log($"Variant chunk saved: {variantName}");
+                    }
                 }
             }
-
-            // Cleanup
-            Object.DestroyImmediate(chunk);
+            finally
+            {
+                if (chunk != null) Object.DestroyImmediate(chunk);
+            }
         }
 
 
@@ -199,18 +202,26 @@ namespace TowerGenerator.ChunkImporter
             // 0x00007FF8D95726D5 (Unity) SavePrefab_Internal
             // 0x00007FF8D957177C (Unity) SaveAsPrefabAsset
             // 0x00007FF8D90E9838 (Unity) PrefabUtilityBindings::SaveAsPrefabAsset_Internal
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
-            if (prefab == null)
-                return;
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+            if (prefab == null) return;
 
             GameObject loadedPrefab = PrefabUtility.LoadPrefabContents(fullPath);
-            if (loadedPrefab == null)
-                return;
+            if (loadedPrefab == null) return;
 
-            foreach (Transform child in loadedPrefab.transform)
-                Object.DestroyImmediate(child.gameObject);
-            PrefabUtility.SaveAsPrefabAsset(loadedPrefab, fullPath);
+            try
+            {
+                foreach (Transform child in loadedPrefab.transform)
+                    Object.DestroyImmediate(child.gameObject);
+
+                PrefabUtility.SaveAsPrefabAsset(loadedPrefab, fullPath);
+            }
+            finally
+            {
+                // This is the critical line you were missing.
+                PrefabUtility.UnloadPrefabContents(loadedPrefab);
+            }
         }
+
 
         // removes <> from name
         private static string CleanName(string entNameInFbx)

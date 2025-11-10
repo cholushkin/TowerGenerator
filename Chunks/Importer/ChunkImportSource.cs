@@ -71,10 +71,35 @@ namespace TowerGenerator
 
     public static class ChunkImportSourceHelper
     {
-        public static string GetPathInResources(string fullPath)
+        private const string ResourcesFolder = "Resources";
+
+        /// Loads a prefab from a full path that contains a Resources folder.
+        public static GameObject LoadChunkPrefab(string fullPathToResources, string chunkName)
         {
-            Assert.IsTrue(fullPath.Contains("Resources"));
-            return fullPath.Substring(fullPath.IndexOf("Resources", StringComparison.Ordinal) + 10);
+            if (string.IsNullOrEmpty(fullPathToResources))
+                throw new ArgumentException("Path cannot be null or empty.", nameof(fullPathToResources));
+
+            // Find the last "Resources" folder
+            int index = fullPathToResources.LastIndexOf(ResourcesFolder, StringComparison.OrdinalIgnoreCase);
+            if (index < 0)
+                throw new ArgumentException($"Path must contain '{ResourcesFolder}' folder.", nameof(fullPathToResources));
+
+            // Extract path after "Resources"
+            string relativePath = fullPathToResources.Substring(index + ResourcesFolder.Length)
+                .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Combine with chunk name
+            string resourcePath = string.IsNullOrEmpty(relativePath) 
+                ? chunkName 
+                : relativePath.Replace("\\", "/").TrimEnd('/') + "/" + chunkName;
+
+            // Load prefab
+            var prefab = Resources.Load<GameObject>(resourcePath);
+            if (prefab == null)
+                Debug.LogError($"Failed to load chunk prefab at path: {resourcePath}");
+
+            return prefab;
         }
     }
+
 }

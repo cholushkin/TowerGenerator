@@ -22,8 +22,7 @@ namespace TowerGenerator
 
         public static GameObject CreateChunkRnd(MetaBase meta, long seed, Transform parent, Vector3 position, Positioning positioning = Positioning.CenterOfAABB)
         {
-            var pathInResources = ChunkImportSourceHelper.GetPathInResources(meta.ImportSource.ChunksOutputPath);
-            var chunkPrefab = (GameObject)Resources.Load(pathInResources + "/" + meta.ChunkName);
+            var chunkPrefab = ChunkImportSourceHelper.LoadChunkPrefab(meta.ImportSource.ChunksOutputPath,meta.ChunkName);
             chunkPrefab.SetActive(false);
             var chunk = Object.Instantiate(chunkPrefab);
             
