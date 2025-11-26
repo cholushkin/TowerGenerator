@@ -35,8 +35,6 @@ namespace TowerGenerator.ChunkImporter
                     continue;
                 }
 
-                var depHash = GetDependencyHash(assetPath);
-
                 // If the chain is in a bad state, reset it.
                 if (_importQueue.Status.IsCompleted() || _importQueue.Status.IsCanceled() || _importQueue.Status.IsFaulted())
                     _importQueue = UniTask.CompletedTask;
@@ -45,7 +43,7 @@ namespace TowerGenerator.ChunkImporter
                 {
                     try
                     {
-                        await InstantiateAndConfigureChunkAsync(assetObj, chunkName, source, depHash);
+                        await InstantiateAndConfigureChunkAsync(assetObj, chunkName, source);
                     }
                     catch (System.Exception ex)
                     {
@@ -110,24 +108,14 @@ namespace TowerGenerator.ChunkImporter
         }
 
         private static async UniTask InstantiateAndConfigureChunkAsync(
-            GameObject chunkSource, string chunkName, ChunkImportSource importSource, string importBasedOnHash)
+            GameObject chunkSource, string chunkName, ChunkImportSource importSource)
         {
             await UniTask.SwitchToMainThread();
 
             var fullPath = Path.Combine(importSource.ChunksOutputPath, chunkName + ".prefab");
             var prevPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
 
-            if (prevPrefab != null)
-            {
-                var controller = prevPrefab.GetComponent<ChunkControllerBase>();
-                if (controller != null && controller.ImportBasedOnHash == importBasedOnHash)
-                {
-                    Debug.Log($"Skip reimport: {importBasedOnHash}");
-                    return;
-                }
-            }
-
-            var importInformation = new ChunkImportState(chunkName, importSource, importBasedOnHash);
+            var importInformation = new ChunkImportState(chunkName, importSource);
 
             GameObject chunk = null;
             try

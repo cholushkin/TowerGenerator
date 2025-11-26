@@ -13,11 +13,10 @@ namespace TowerGenerator.ChunkImporter
     [Serializable]
     public class ChunkImportState
     {
-        public ChunkImportState(string chunkName, ChunkImportSource importSource, string importBasedOnHash)
+        public ChunkImportState(string chunkName, ChunkImportSource importSource)
         {
             ChunkName = chunkName;
             ImportSource = importSource;
-            ImportBasedOnHash = importBasedOnHash;
         }
 
         public string ChunkName;
@@ -25,7 +24,6 @@ namespace TowerGenerator.ChunkImporter
         public int Generation;
         public TagSet ChunkTagSet;
         public ChunkControllerBase.ChunkController ChunkControllerType;
-        public string ImportBasedOnHash;
         public readonly ChunkImportSource ImportSource;
         private Dictionary<string, int> _stateCounters = new();
 
@@ -168,7 +166,6 @@ namespace TowerGenerator.ChunkImporter
             foreach (var baseComponent in baseComponents)
                 baseComponent.ChunkController = chunkController;
 
-            chunkController.ImportBasedOnHash = chunkImportInformation.ImportBasedOnHash;
             chunkController.Init();
         }
     }

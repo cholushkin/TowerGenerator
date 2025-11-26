@@ -63,7 +63,6 @@ namespace TowerGenerator
         public long Seed = -1;
         public uint RngState;
         public MetaBase Meta;
-        [ReadOnly] public string ImportBasedOnHash;
 
 
         protected TreeNode<Group> _impactTree;
@@ -74,7 +73,6 @@ namespace TowerGenerator
 
         public virtual void Init() // configure
         {
-            
             Logger.Instance().ZLog(Logger.Level(LogLevel.Trace), $"Init");
             Logger.Instance().ZLog(Logger.Level(LogLevel.Information), $"{transform.GetDebugName()} Seed {Seed}");
             BuildImpactTree();
