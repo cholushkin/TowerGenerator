@@ -88,6 +88,10 @@ namespace TowerGenerator.FbxCommands
                 }
                 fieldInfo.SetValue(comp, fieldValue);
             }
+            else
+            {
+                Debug.LogError($"No such property '{PropertyName}' in component '{compType.Name}'");
+            }
             
             importState.Inc("SetAmount");
         }
