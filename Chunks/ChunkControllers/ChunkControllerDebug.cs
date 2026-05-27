@@ -3,8 +3,8 @@ using Handles = UnityEditor.Handles;
 #endif
 using System;
 using System.Linq;
+using Alchemy.Inspector;
 using GameLib.Alg;
-using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -17,7 +17,7 @@ namespace TowerGenerator
         public ChunkControllerBase ChunkController;
         public bool InitOnAwake;
         public bool IsDrawTree;
-        [ResizableTextArea]
+        [TextArea]
         public string TreeText;
 
         public bool IsDrawSuppressionLabels;
@@ -75,7 +75,6 @@ namespace TowerGenerator
         //    Debug.Log(strOutcome);
         //}
 
-        [HideIf("IsInitialized")]
         [Button()]
         public void Init()
         {
@@ -87,7 +86,6 @@ namespace TowerGenerator
             ChunkController.Init();
         }
 
-        [ShowIf("IsInitialized")]
         [Button()]
         public void SetRandomConfiguration()
         {
@@ -99,7 +97,6 @@ namespace TowerGenerator
             ChunkController.SetConfiguration();
         }
 
-        [ShowIf("IsInitialized")]
         [Button()]
         public void DbgPrintImpactTree()
         {

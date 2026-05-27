@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameLib.Alg;
-using GameLib.Log;
 using GameLib.Random;
 using Microsoft.Extensions.Logging;
-using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
 using VitalRouter;
