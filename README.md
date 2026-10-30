@@ -1,5 +1,34 @@
 
 # TowerGenerator Unity submodule
+
+Package id: `com.qcat.towergenerator`.
+
+## Installation
+
+Install via Unity Package Manager → **Install package from git URL**:
+
+```
+https://github.com/cholushkin/TowerGenerator.git
+```
+
+`com.unity.mathematics` is a Unity Registry dependency and is installed automatically.
+
+### Required manual dependencies (install BEFORE this package — Git/third-party, not declared in `package.json`)
+
+1. **`com.qcat.gamelib`** — `https://github.com/cholushkin/gamelib.git` — used for algorithms, randomization and logging (`GameLib`, `GameLib.Alg`, `GameLib.Random`, `GameLib.Log`).
+2. **Alchemy** (`Alchemy.Inspector`, third-party Unity inspector-extension library by AnnulusGames) — install per its own distribution instructions, e.g. `https://github.com/AnnulusGames/Alchemy.git`.
+3. **UniTask** (`Cysharp.Threading.Tasks`, third-party) — install per its own instructions, e.g. `https://github.com/Cysharp/UniTask.git`.
+4. **VitalRouter** (third-party pub/sub router) — install per its own distribution instructions; no confirmed canonical URL verified here, consult the library's own repository.
+5. **ZLogger** and **Microsoft.Extensions.Logging** (third-party .NET logging libraries) — install per their own NuGet/UPM instructions; no confirmed canonical URL verified here.
+
+Install order: GameLib and the third-party libraries above first, then this package.
+
+### Known pre-existing issue (not introduced by this UPM conversion)
+
+`TowerGenerator.asmdef` (the root/runtime assembly, unrestricted platform) lists a reference to GameLib's **Editor** assembly GUID (`cec6ca78d9ef46a4480a4891fd7a52db`) alongside GameLib's Runtime assembly GUID (`e374adf4b521a744cbe1f65144dbb05a`). This is a Runtime→Editor assembly reference, which Unity will flag/refuse to compile for non-Editor platforms once GameLib is actually present as a package. This predates the UPM conversion and was not altered here — flagging for the maintainer to resolve (likely remove the stray Editor GUID from `TowerGenerator.asmdef`'s references).
+
+Three other `references` GUIDs in `TowerGenerator.asmdef`/`Editor/TowerGenerator.Editor.asmdef` could not be resolved to a name from this repo alone (`d8b63aba1907145bea998dd612889d6b`, `77aea589fe3f34fa883d9f7e26eee12e`, `f51ebe6a0ceec4240a699833d6309b23`, `88be65f96b86746888c927a5c8ff3534`, `4129704b5a1a13841ba16f230bf24a57`) — based on the `using` statements found in source, these most likely correspond to Alchemy, UniTask, VitalRouter, ZLogger and/or Microsoft.Extensions.Logging assemblies, but this could not be confirmed without those packages' own `.asmdef.meta` files present.
+
 ## Example projects
 * https://github.com/cholushkin/SciFiCityGenerator
 

@@ -1,0 +1,25 @@
+{
+  "name": "com.qcat.towergenerator",
+  "displayName": "Tower Generator",
+  "version": "1.0.0",
+  "unity": "2022.3",
+  "description": "Procedural chunk-based tower/building generator for Unity, with a color-scheme system, tag system and FBX-importer commands for Blender-authored hierarchies.",
+  "keywords": [
+    "procedural",
+    "generator",
+    "tower",
+    "building",
+    "fbx"
+  ],
+  "author": {
+    "name": "Maxim Cholushkin",
+    "email": "cholushkin@gmail.com",
+    "url": "https://sites.google.com/view/cholushkinmaximcard/home"
+  },
+  "documentationUrl": "https://github.com/cholushkin/TowerGenerator/blob/master/README.md",
+  "changelogUrl": "https://github.com/cholushkin/TowerGenerator/blob/master/CHANGELOG.md",
+  "licensesUrl": "https://github.com/cholushkin/TowerGenerator/blob/master/LICENSE",
+  "dependencies": {
+    "com.unity.mathematics": "1.2.6"
+  }
+}
